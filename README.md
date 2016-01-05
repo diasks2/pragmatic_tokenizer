@@ -1,6 +1,8 @@
-# PragmaticTokenizer
+# Pragmatic Tokenizer
 
-
+TODO: add downcase option
+TODO: add split out contractions option
+TODO: add language support
 
 ## Installation
 
