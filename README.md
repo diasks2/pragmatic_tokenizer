@@ -77,7 +77,7 @@ Or install it yourself as:
 <hr>
 
 ##### `minimum_length`
-  **default** = `0`
+  **default** = `0`  
   The minimum number of characters a token should be.  
 
 **Example Usage**
