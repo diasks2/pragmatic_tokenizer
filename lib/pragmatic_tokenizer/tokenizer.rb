@@ -4,8 +4,8 @@ require 'pragmatic_tokenizer/languages'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0)
       unless punctuation.eql?('all') ||
         punctuation.eql?('semi') ||
         punctuation.eql?('none') ||
@@ -32,11 +32,12 @@ module PragmaticTokenizer
       @expand_contractions = expand_contractions
       @clean = clean
       @remove_numbers = remove_numbers
+      @minimum_length = minimum_length
     end
 
     def tokenize
       return [] unless text
-      delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))))
+      remove_short_tokens(delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text)))))))
     end
 
     private
@@ -47,14 +48,18 @@ module PragmaticTokenizer
       Processor
     end
 
+    def remove_short_tokens(tokens)
+      tokens.delete_if { |t| t.length < minimum_length }
+    end
+
     def delete_numbers(tokens)
       return tokens unless remove_numbers
-      tokens.delete_if { |t| t =~ /\D*\d+\d*/ }
+      tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
     end
 
     def cleaner(tokens)
       return tokens unless clean
-      tokens.delete_if { |t| t =~ /\A_+\z/ || t =~ /\A-+\z/ }
+      tokens.delete_if { |t| t =~ /\A_+\z/ || t =~ /\A-+\z/ || PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) }
     end
 
     def remove_punctuation(tokens)

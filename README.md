@@ -61,7 +61,7 @@ Or install it yourself as:
 ##### `clean`
   **default** = `'false'`
 - `true`  
-  Removes tokens consisting of only hypens or underscores.
+  Removes tokens consisting of only hypens or underscores as well as some special characters (®, ©, ™).
 - `false`   
   Leaves tokens as is.
 
@@ -70,9 +70,15 @@ Or install it yourself as:
 ##### `remove_numbers`
   **default** = `'false'`
 - `true`  
-  Removes any token that contains a number.
+  Removes any token that contains a number or Roman numeral.
 - `false`   
   Leaves tokens as is.
+
+<hr>
+
+##### `minimum_length`
+  **default** = `0`
+  The minimum number of characters a token should be.  
 
 **Example Usage**
 ```ruby
@@ -110,6 +116,10 @@ PragmaticTokenizer::Tokenizer.new(text, remove_numbers: true).tokenize
 text = "Hello ______ ."
 PragmaticTokenizer::Tokenizer.new(text, clean: true).tokenize
 # => ["hello", "."]
+
+text = "Let's test the minimum length."
+PragmaticTokenizer::Tokenizer.new(text, minimum_length: 6).tokenize
+# => ["minimum", "length"]
 ```
 
 ## Development

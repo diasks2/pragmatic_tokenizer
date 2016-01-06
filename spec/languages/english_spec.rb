@@ -112,6 +112,27 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "dollars", ".", "you", "can", "pay", "at", ",", "after", "it", "is", "."])
       end
+
+      it 'tokenizes a string #0015' do
+        pt = PragmaticTokenizer::Tokenizer.new("Let's test the minimum length of fiver.",
+          minimum_length: 5
+        )
+        expect(pt.tokenize).to eq(["let's", "minimum", "length", "fiver"])
+      end
+
+      it 'tokenizes a string #0016' do
+        pt = PragmaticTokenizer::Tokenizer.new("Remove III Roman Numerals and IX. with a period.",
+          remove_numbers: true
+        )
+        expect(pt.tokenize).to eq(["remove", "roman", "numerals", "and", ".", "with", "a", "period", "."])
+      end
+
+      it 'tokenizes a string #0017' do
+        pt = PragmaticTokenizer::Tokenizer.new("© ABC Company 1994",
+          clean: true
+        )
+        expect(pt.tokenize).to eq(["abc", "company", "1994"])
+      end
     end
 
     context 'ending punctutation' do
