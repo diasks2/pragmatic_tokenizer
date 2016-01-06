@@ -70,7 +70,16 @@ Or install it yourself as:
 ##### `remove_numbers`
   **default** = `'false'`
 - `true`  
-  Removes any token that contains a number or Roman numeral.
+  Removes any token that contains a number.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
+##### `remove_roman_numerals`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains a Roman numeral.
 - `false`   
   Leaves tokens as is.
 
