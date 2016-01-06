@@ -130,16 +130,10 @@ module PragmaticTokenizer
     end
 
     def convert_sym_to_punct(p)
-      counter = 0
       PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.each_with_index do |m, i|
-        if p.include?(m)
-          counter+=1
-          return p.gsub!(m, PragmaticTokenizer::Languages::Common::PUNCTUATION[i])
-        end
+        return p.gsub!(m, PragmaticTokenizer::Languages::Common::PUNCTUATION[i]) if p.include?(m)
       end
-      if counter.eql?(0)
-        p
-      end
+      p
     end
   end
 end
