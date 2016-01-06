@@ -4,8 +4,8 @@ require 'pragmatic_tokenizer/languages'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :language_module
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false)
       unless punctuation.eql?('all') ||
         punctuation.eql?('semi') ||
         punctuation.eql?('none') ||
@@ -29,11 +29,12 @@ module PragmaticTokenizer
       @language_module = Languages.get_language_by_code(language)
       @punctuation = punctuation
       @remove_stop_words = remove_stop_words
+      @expand_contractions = expand_contractions
     end
 
     def tokenize
       return [] unless text
-      remove_punctuation(processor.new(language: language_module).process(text: text))
+      find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))
     end
 
     private
@@ -62,6 +63,16 @@ module PragmaticTokenizer
         t.squeeze!
         true unless PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t)
       end
+    end
+
+    def delete_stop_words(tokens)
+      return tokens unless remove_stop_words && language_module::STOP_WORDS
+      tokens - language_module::STOP_WORDS
+    end
+
+    def find_contractions(tokens)
+      return tokens unless expand_contractions && language_module::CONTRACTIONS
+      tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(t) ? language_module::CONTRACTIONS[t].split(' ').flatten : t }
     end
   end
 end
