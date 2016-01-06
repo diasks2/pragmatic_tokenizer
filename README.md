@@ -124,145 +124,147 @@ PragmaticTokenizer::Tokenizer.new(text, minimum_length: 6).tokenize
 
 ## Language Support
 
-The following lists the current level of support for different languages. Pull requests or help for any languages that are not fully supported would be greatly appreciated. *N.B. - contractions might not be applicable for all languages below - in that case the CONTRACTIONS hash should stay empty.*  
+The following lists the current level of support for different languages. Pull requests or help for any languages that are not fully supported would be greatly appreciated.  
+
+*N.B. - contractions might not be applicable for all languages below - in that case the CONTRACTIONS hash should stay empty.*  
 
 ##### English
-Specs: Yes
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: Yes
+Specs: Yes  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: Yes  
 
 ##### Arabic
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Bulgarian
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Catalan
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Czech
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Danish
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
-##### German
-Specs: More needed
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+##### Deutsch
+Specs: More needed  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Finnish
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### French
-Specs: More needed
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: More needed  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Greek
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Indonesian
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Italian
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Latvian
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Norwegian
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Persian
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Polish
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Portuguese
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Romanian
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Russian
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Slovak
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Spanish
-Specs: No
-Abbreviations: Yes
-Stop Words: Yes
-Contractions: Yes
+Specs: No  
+Abbreviations: Yes  
+Stop Words: Yes  
+Contractions: Yes  
 
 ##### Swedish
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ##### Turkish
-Specs: No
-Abbreviations: No
-Stop Words: Yes
-Contractions: No
+Specs: No  
+Abbreviations: No  
+Stop Words: Yes  
+Contractions: No  
 
 ## Development
 
