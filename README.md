@@ -56,35 +56,33 @@ Or install it yourself as:
 - `false`   
   Leaves contractions as is.
 
+**Example Usage**
 ```ruby
 text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
 
 PragmaticTokenizer::Tokenizer.new(text).tokenize
-
 # => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
 
 PragmaticTokenizer::Tokenizer.new(text, remove_stop_words: true).tokenize
-
 # => ["\"", ",", "'", "what're", "?", "crazy", "?", "'", "\"", "sandowsky", ".", "\"", "afford", ".", "\""]
 
 PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none').tokenize
-
 # => ["i", "said", "what're", "you", "crazy", "said", "sandowsky", "i", "can't", "afford", "to", "do", "that"]
 
 PragmaticTokenizer::Tokenizer.new(text, punctuation: 'only').tokenize
-
 # => ["\"", ",", "'", "?", "?", "'", "\"", ".", "\"", ".", "\""]
 
 PragmaticTokenizer::Tokenizer.new(text, punctuation: 'semi').tokenize
-
 # => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", "\"", "i", "can't", "afford", "to", "do", "that", "\""]
 
 PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true).tokenize
-
 # => ['"', 'i', 'said', ',', "'", 'what', 'are', 'you', '?', 'crazy', '?', "'", '"', 'said', 'sandowsky', '.', '"', 'i', 'cannot', 'afford', 'to', 'do', 'that', '.', '"']
 
-PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, remove_stop_words: true, punctuation: 'none').tokenize
-
+PragmaticTokenizer::Tokenizer.new(text, 
+  expand_contractions: true, 
+  remove_stop_words: true, 
+  punctuation: 'none'
+).tokenize
 # => ["crazy", "sandowsky", "afford"]
 ```
 
