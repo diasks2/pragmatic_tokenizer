@@ -133,6 +133,13 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["abc", "company", "1994"])
       end
+
+      it 'tokenizes a string #0018' do
+        pt = PragmaticTokenizer::Tokenizer.new("This sentence has a long string of dots .......................",
+          clean: true
+        )
+        expect(pt.tokenize).to eq(["this", "sentence", "has", "a", "long", "string", "of", "dots"])
+      end
     end
 
     context 'ending punctutation' do

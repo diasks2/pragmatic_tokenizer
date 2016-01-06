@@ -59,7 +59,7 @@ module PragmaticTokenizer
 
     def cleaner(tokens)
       return tokens unless clean
-      tokens.delete_if { |t| t =~ /\A_+\z/ || t =~ /\A-+\z/ || PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) }
+      tokens.delete_if { |t| t =~ /\A_+\z/ || t =~ /\A-+\z/ || PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) || t =~ /\A\.{2,}\z/ }
     end
 
     def remove_punctuation(tokens)
