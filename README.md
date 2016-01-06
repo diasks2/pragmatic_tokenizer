@@ -1,6 +1,6 @@
 # Pragmatic Tokenizer
 
-[![Gem Version](https://badge.fury.io/rb/pragmatic_tokenizer.svg)](http://badge.fury.io/rb/pragmatic_tokenizer) [![Build Status](https://travis-ci.org/diasks2/pragmatic_tokenizer.png)](https://travis-ci.org/diasks2/pragmatic_tokenizer) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/diasks2/pragmatic_tokenizer/blob/master/LICENSE.txt)
+[![Gem Version](https://badge.fury.io/rb/pragmatic_tokenizer.svg)](https://badge.fury.io/rb/pragmatic_tokenizer) [![Build Status](https://travis-ci.org/diasks2/pragmatic_tokenizer.png)](https://travis-ci.org/diasks2/pragmatic_tokenizer) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/diasks2/pragmatic_tokenizer/blob/master/LICENSE.txt)
 
 Pragmatic Tokenizer is a multilingual tokenizer to split a string into tokens.
 
