@@ -1,8 +1,8 @@
 # Pragmatic Tokenizer
 
-TODO: add downcase option
-TODO: add split out contractions option
-TODO: add language support
+[![Gem Version](https://badge.fury.io/rb/pragmatic_tokenizer.svg)](http://badge.fury.io/rb/pragmatic_tokenizer) [![Build Status](https://travis-ci.org/diasks2/pragmatic_tokenizer.png)](https://travis-ci.org/diasks2/pragmatic_tokenizer) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/diasks2/pragmatic_tokenizer/blob/master/LICENSE.txt)
+
+Pragmatic Tokenizer is a multilingual tokenizer to split a string into tokens.
 
 ## Installation
 
@@ -22,7 +22,67 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+* If no language is specified, the library will default to English.   
+* To specify a language use its two character [ISO 639-1 code](https://www.tm-town.com/languages).
+
+**Options**  
+
+##### `punctuation`
+  **default** = `'all'`
+- `'all'`  
+  Does not remove any punctuation from the result.
+- `'semi'`   
+  Removes full stops (i.e. periods) ['。', '．', '.'].
+- `'none'`  
+  Removes all punctuation from the result.
+- `'only'`  
+  Removes everything except punctuation. The returned result is an array of only the punctuation.
+
+##### `remove_stop_words`
+  **default** = `'false'`
+- `true`  
+  Removes all stop words.
+- `false`   
+  Does not remove stop words.
+
+##### `expand_contractions`
+  **default** = `'false'`
+- `true`  
+  Expands contractions (i.e. i'll -> i will).
+- `false`   
+  Leaves contractions as is.
+
+```ruby
+text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
+
+PragmaticTokenizer::Tokenizer.new(text).tokenize
+
+# => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
+
+PragmaticTokenizer::Tokenizer.new(text, remove_stop_words: true).tokenize
+
+# => ["\"", ",", "'", "what're", "?", "crazy", "?", "'", "\"", "sandowsky", ".", "\"", "afford", ".", "\""]
+
+PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none').tokenize
+
+# => ["i", "said", "what're", "you", "crazy", "said", "sandowsky", "i", "can't", "afford", "to", "do", "that"]
+
+PragmaticTokenizer::Tokenizer.new(text, punctuation: 'only').tokenize
+
+# => ["\"", ",", "'", "?", "?", "'", "\"", ".", "\"", ".", "\""]
+
+PragmaticTokenizer::Tokenizer.new(text, punctuation: 'semi').tokenize
+
+# => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", "\"", "i", "can't", "afford", "to", "do", "that", "\""]
+
+PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true).tokenize
+
+# => ['"', 'i', 'said', ',', "'", 'what', 'are', 'you', '?', 'crazy', '?', "'", '"', 'said', 'sandowsky', '.', '"', 'i', 'cannot', 'afford', 'to', 'do', 'that', '.', '"']
+
+PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, remove_stop_words: true, punctuation: 'none').tokenize
+
+# => ["crazy", "sandowsky", "afford"]
+```
 
 ## Development
 

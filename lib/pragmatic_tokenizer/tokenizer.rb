@@ -34,7 +34,7 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))
+      delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))
     end
 
     private

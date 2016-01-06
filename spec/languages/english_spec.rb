@@ -74,6 +74,16 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["experiment", "fine", "."])
       end
+
+      it 'tokenizes a string #0010' do
+        # https://www.ibm.com/developerworks/community/blogs/nlp/entry/tokenization?lang=en
+        pt = PragmaticTokenizer::Tokenizer.new("\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\"",
+          expand_contractions: true,
+          remove_stop_words: true,
+          punctuation: 'none'
+        )
+        expect(pt.tokenize).to eq(["crazy", "sandowsky", "afford"])
+      end
     end
 
     context 'ending punctutation' do
