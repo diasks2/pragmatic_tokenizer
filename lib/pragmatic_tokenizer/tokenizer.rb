@@ -4,8 +4,8 @@ require 'pragmatic_tokenizer/languages'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false)
       unless punctuation.eql?('all') ||
         punctuation.eql?('semi') ||
         punctuation.eql?('none') ||
@@ -30,11 +30,13 @@ module PragmaticTokenizer
       @punctuation = punctuation
       @remove_stop_words = remove_stop_words
       @expand_contractions = expand_contractions
+      @clean = clean
+      @remove_numbers = remove_numbers
     end
 
     def tokenize
       return [] unless text
-      delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))
+      delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))))
     end
 
     private
@@ -43,6 +45,16 @@ module PragmaticTokenizer
       language_module::Processor
     rescue
       Processor
+    end
+
+    def delete_numbers(tokens)
+      return tokens unless remove_numbers
+      tokens.delete_if { |t| t =~ /\D*\d+\d*/ }
+    end
+
+    def cleaner(tokens)
+      return tokens unless clean
+      tokens.delete_if { |t| t =~ /\A_+\z/ || t =~ /\A-+\z/ }
     end
 
     def remove_punctuation(tokens)

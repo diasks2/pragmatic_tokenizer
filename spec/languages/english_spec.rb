@@ -84,6 +84,34 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["crazy", "sandowsky", "afford"])
       end
+
+      it 'tokenizes a string #0011' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello ---------------.",
+          clean: true
+        )
+        expect(pt.tokenize).to eq(["hello", "."])
+      end
+
+      it 'tokenizes a string #0012' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .",
+          clean: true
+        )
+        expect(pt.tokenize).to eq(["hello", "."])
+      end
+
+      it 'tokenizes a string #0013' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .",
+
+        )
+        expect(pt.tokenize).to eq(["hello", "____________________", "."])
+      end
+
+      it 'tokenizes a string #0014' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello, that will be $5 dollars. You can pay at 5:00, after it is 500.",
+          remove_numbers: true
+        )
+        expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "dollars", ".", "you", "can", "pay", "at", ",", "after", "it", "is", "."])
+      end
     end
 
     context 'ending punctutation' do

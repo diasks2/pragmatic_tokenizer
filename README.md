@@ -56,6 +56,24 @@ Or install it yourself as:
 - `false`   
   Leaves contractions as is.
 
+<hr>
+
+##### `clean`
+  **default** = `'false'`
+- `true`  
+  Removes tokens consisting of only hypens or underscores.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
+##### `remove_numbers`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains a number.
+- `false`   
+  Leaves tokens as is.
+
 **Example Usage**
 ```ruby
 text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
@@ -84,6 +102,14 @@ PragmaticTokenizer::Tokenizer.new(text,
   punctuation: 'none'
 ).tokenize
 # => ["crazy", "sandowsky", "afford"]
+
+text = "The price is $5.50 and it works for 5 hours."
+PragmaticTokenizer::Tokenizer.new(text, remove_numbers: true).tokenize
+# => ["the", "price", "is", "and", "it", "works", "for", "hours", "."]
+
+text = "Hello ______ ."
+PragmaticTokenizer::Tokenizer.new(text, clean: true).tokenize
+# => ["hello", "."]
 ```
 
 ## Development
