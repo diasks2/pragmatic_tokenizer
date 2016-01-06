@@ -4,7 +4,7 @@ require 'pragmatic_tokenizer/languages'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :language_module
     def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false)
       unless punctuation.eql?('all') ||
         punctuation.eql?('semi') ||
@@ -32,7 +32,36 @@ module PragmaticTokenizer
     end
 
     def tokenize
-      text.split.map { |t| t.downcase }
+      return [] unless text
+      remove_punctuation(processor.new(language: language_module).process(text: text))
+    end
+
+    private
+
+    def processor
+      language_module::Processor
+    rescue
+      Processor
+    end
+
+    def remove_punctuation(tokens)
+      case punctuation
+      when 'all'
+        tokens
+      when 'semi'
+        tokens - PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
+      when 'none'
+        tokens - PragmaticTokenizer::Languages::Common::PUNCTUATION
+      when 'only'
+        only_punctuation(tokens)
+      end
+    end
+
+    def only_punctuation(tokens)
+      tokens.delete_if do |t|
+        t.squeeze!
+        true unless PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t)
+      end
     end
   end
 end
