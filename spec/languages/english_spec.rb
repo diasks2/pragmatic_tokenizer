@@ -122,7 +122,8 @@ describe PragmaticTokenizer do
 
       it 'tokenizes a string #0016' do
         pt = PragmaticTokenizer::Tokenizer.new("Remove III Roman Numerals and IX. with a period.",
-          remove_numbers: true
+          remove_numbers: true,
+          remove_roman_numerals: true
         )
         expect(pt.tokenize).to eq(["remove", "roman", "numerals", "and", ".", "with", "a", "period", "."])
       end

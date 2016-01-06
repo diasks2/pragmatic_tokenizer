@@ -124,16 +124,17 @@ module PragmaticTokenizer
       cleaned_tokens
     end
 
-    def convert_punct_to_sym(p)
-      index = PragmaticTokenizer::Languages::Common::PUNCTUATION.index(p)
-      PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[index]
+    def convert_punct_to_sym(punctuation)
+      PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[punctuation]
     end
 
-    def convert_sym_to_punct(p)
-      PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.each_with_index do |m, i|
-        return p.gsub!(m, PragmaticTokenizer::Languages::Common::PUNCTUATION[i]) if p.include?(m)
+    def convert_sym_to_punct(token)
+      symbol = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚]/.match(token)
+      if symbol.nil?
+        return token
+      else
+        return token.gsub!(symbol[0], PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(symbol[0]))
       end
-      p
     end
   end
 end

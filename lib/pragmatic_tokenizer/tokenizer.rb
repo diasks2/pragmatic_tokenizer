@@ -4,8 +4,8 @@ require 'pragmatic_tokenizer/languages'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false)
       unless punctuation.eql?('all') ||
         punctuation.eql?('semi') ||
         punctuation.eql?('none') ||
@@ -33,11 +33,12 @@ module PragmaticTokenizer
       @clean = clean
       @remove_numbers = remove_numbers
       @minimum_length = minimum_length
+      @remove_roman_numerals = remove_roman_numerals
     end
 
     def tokenize
       return [] unless text
-      remove_short_tokens(delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text)))))))
+      remove_short_tokens(delete_roman_numerals(delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))))))
     end
 
     private
@@ -54,7 +55,12 @@ module PragmaticTokenizer
 
     def delete_numbers(tokens)
       return tokens unless remove_numbers
-      tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
+      tokens.delete_if { |t| t =~ /\D*\d+\d*/ }
+    end
+
+    def delete_roman_numerals(tokens)
+      return tokens unless remove_roman_numerals
+      tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") } if remove_roman_numerals
     end
 
     def cleaner(tokens)
