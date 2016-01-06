@@ -38,12 +38,16 @@ Or install it yourself as:
 - `'only'`  
   Removes everything except punctuation. The returned result is an array of only the punctuation.
 
+<hr>
+
 ##### `remove_stop_words`
   **default** = `'false'`
 - `true`  
   Removes all stop words.
 - `false`   
   Does not remove stop words.
+
+<hr>
 
 ##### `expand_contractions`
   **default** = `'false'`
