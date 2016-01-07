@@ -24,18 +24,17 @@ module PragmaticTokenizer
 
     def convert_dbl_quotes(text)
       # Convert left double quotes to special character
-      text.gsub!(/"(?=.*\w)/o, ' ' + convert_punct_to_sym('"') + ' ') || text
+      text.gsub!(/"(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
       # Convert remaining quotes to special character
-      text.gsub!(/"/, ' ' + convert_punct_to_sym('"') + ' ') || text
+      text.gsub!(/"/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
     end
 
     def convert_sgl_quotes(text)
-      text.gsub!(/`(?!`)(?=.*\w)/o, ' ' + convert_punct_to_sym("'") + ' ') || text
-      # Convert left quotes to special character except for 'Twas or 'twas
-      text.gsub!(/(\W|^)'(?=.*\w)(?!twas)(?!Twas)/o) { $1 ? $1 + ' ' + convert_punct_to_sym("'") + ' ' : ' ' + convert_punct_to_sym("'") + ' ' } || text
-      text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + convert_punct_to_sym("'")) || text
-      # Separate right single quotes
-      text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { $1 + ' ' + convert_punct_to_sym("'") + ' ' } || text
+      if defined? @language::SingleQuotes
+        @language::SingleQuotes.new.handle_single_quotes(text)
+      else
+        PragmaticTokenizer::Languages::Common::SingleQuotes.new.handle_single_quotes(text)
+      end
     end
 
     def shift_multiple_dash(text)
@@ -71,7 +70,7 @@ module PragmaticTokenizer
         !(/\A\d+/ == text.partition(':').last[0]) &&
         !(/\A\d+/ == text.partition(':').first[-1])
       # Ignore web addresses
-      text.gsub!(/(?<=[http|https]):(?=\/\/)/, convert_punct_to_sym(":")) || text
+      text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[":"]) || text
       text.gsub!(/:/o, ' :') || text
     end
 
@@ -122,10 +121,6 @@ module PragmaticTokenizer
         end
       end
       cleaned_tokens
-    end
-
-    def convert_punct_to_sym(punctuation)
-      PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[punctuation]
     end
 
     def convert_sym_to_punct(token)

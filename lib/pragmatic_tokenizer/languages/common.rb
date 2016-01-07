@@ -9,7 +9,15 @@ module PragmaticTokenizer
       ABBREVIATIONS = []
       STOP_WORDS = []
       CONTRACTIONS = {}
+
+      class SingleQuotes
+        def handle_single_quotes(text)
+          text.gsub!(/`(?!`)(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ') || text
+          text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"]) || text
+          # Separate right single quotes
+          text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { $1 + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
+        end
+      end
     end
   end
 end
-
