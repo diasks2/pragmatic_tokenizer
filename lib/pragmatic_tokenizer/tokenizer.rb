@@ -38,7 +38,7 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      remove_short_tokens(delete_roman_numerals(delete_numbers(cleaner(delete_stop_words(find_contractions(remove_punctuation(processor.new(language: language_module).process(text: text))))))))
+      cleaner(remove_short_tokens(delete_numbers(delete_roman_numerals(find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))))))
     end
 
     private
