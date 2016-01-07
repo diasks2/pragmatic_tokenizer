@@ -61,7 +61,7 @@ Or install it yourself as:
 ##### `clean`
   **default** = `'false'`
 - `true`  
-  Removes tokens consisting of only hypens, underscores, or periods as well as some special characters (®, ©, ™).
+  Removes tokens consisting of only hypens, underscores, or periods as well as some special characters (®, ©, ™). Also removes long tokens or tokens with a backslash.
 - `false`   
   Leaves tokens as is.
 
