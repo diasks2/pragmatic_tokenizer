@@ -14,6 +14,7 @@ module PragmaticTokenizer
       shift_special_quotes(text)
       shift_colon(text)
       shift_bracket(text)
+      shift_semicolon(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
       tokens = separate_full_stop(text.squeeze(' ').split.map { |t| convert_sym_to_punct(t.downcase) })
@@ -72,6 +73,10 @@ module PragmaticTokenizer
       # Ignore web addresses
       text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[":"]) || text
       text.gsub!(/:/o, ' :') || text
+    end
+
+    def shift_semicolon(text)
+      text.gsub!(/([;])/o) { ' ' + $1 + ' ' } || text
     end
 
     def shift_ellipse(text)

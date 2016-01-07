@@ -154,6 +154,14 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["experiment"])
       end
+
+      it 'tokenizes a string #0020' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello; what is your: name @username **delete**",
+          clean: true,
+          punctuation: 'none'
+        )
+        expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name"])
+      end
     end
 
     context 'ending punctutation' do
