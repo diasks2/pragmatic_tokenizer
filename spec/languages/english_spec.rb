@@ -141,6 +141,19 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["this", "sentence", "has", "a", "long", "string", "of", "dots"])
       end
+
+      it 'tokenizes a string #0019' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello world with a stop word experiment.",
+          language: 'en',
+          clean: true,
+          remove_numbers: true,
+          minimum_length: 3,
+          expand_contractions: true,
+          remove_stop_words: true,
+          punctuation: 'none'
+        )
+        expect(pt.tokenize).to eq(["experiment"])
+      end
     end
 
     context 'ending punctutation' do
