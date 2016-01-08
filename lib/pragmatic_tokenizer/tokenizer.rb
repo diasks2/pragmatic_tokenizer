@@ -102,6 +102,7 @@ module PragmaticTokenizer
     def find_contractions(tokens)
       return tokens unless expand_contractions && language_module::CONTRACTIONS
       tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(t) ? language_module::CONTRACTIONS[t].split(' ').flatten : t }
+        .flat_map { |t| t.include?("/") ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
     end
   end
 end

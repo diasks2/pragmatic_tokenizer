@@ -162,6 +162,13 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name"])
       end
+
+      it 'tokenizes a string #0021' do
+        pt = PragmaticTokenizer::Tokenizer.new("Look for his/her account.",
+          expand_contractions: true,
+        )
+        expect(pt.tokenize).to eq(["look", "for", "his", "her", "account", "."])
+      end
     end
 
     context 'ending punctutation' do
