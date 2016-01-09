@@ -38,7 +38,7 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      cleaner(remove_short_tokens(delete_numbers(delete_roman_numerals(find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))))))
+      cleaner(remove_short_tokens(delete_numbers(delete_roman_numerals(find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text)))))))).reject { |t| t.empty? }
     end
 
     private
@@ -65,8 +65,7 @@ module PragmaticTokenizer
 
     def cleaner(tokens)
       return tokens unless clean
-      tokens.delete_if { |t| t =~ /\A_+\z/ ||
-        t =~ /\A-+\z/ ||
+      tokens.delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||
         t.length > 50 ||
@@ -81,7 +80,7 @@ module PragmaticTokenizer
       when 'semi'
         tokens - PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
       when 'none'
-        tokens - PragmaticTokenizer::Languages::Common::PUNCTUATION
+        tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
       when 'only'
         only_punctuation(tokens)
       end

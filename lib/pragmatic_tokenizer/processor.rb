@@ -15,6 +15,9 @@ module PragmaticTokenizer
       shift_colon(text)
       shift_bracket(text)
       shift_semicolon(text)
+      shift_underscore(text)
+      shift_asterisk(text)
+      shift_at_symbol(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
       tokens = separate_full_stop(text.squeeze(' ').split.map { |t| convert_sym_to_punct(t.downcase) })
@@ -66,6 +69,21 @@ module PragmaticTokenizer
       text.gsub!(/([\(\[\{\}\]\)])/o) { ' ' + $1 + ' ' } || text
     end
 
+    def shift_underscore(text)
+      text.gsub!(/(?<=\s)\_+/, ' \1') || text
+      text.gsub!(/\_+(?=\s)/, ' \1') || text
+      text.gsub!(/(?<=\A)\_+/, '\1 ') || text
+      text.gsub!(/\_+(?=\z)/, ' \1') || text
+    end
+
+    def shift_asterisk(text)
+      text.gsub!(/\*+/, ' \1 ') || text
+    end
+
+    def shift_at_symbol(text)
+      text.gsub!(/(\A|\s)\@/, '\1 ') || text
+    end
+
     def shift_colon(text)
       return text unless text.include?(':') &&
         !(/\A\d+/ == text.partition(':').last[0]) &&
@@ -81,6 +99,8 @@ module PragmaticTokenizer
 
     def shift_ellipse(text)
       text.gsub!(/(\.\.\.+)/o) { ' ' + $1 + ' ' } || text
+      text.gsub!(/(\.\.+)/o) { ' ' + $1 + ' ' } || text
+      text.gsub!(/(…+)/o) { ' ' + $1 + ' ' } || text
     end
 
     def separate_full_stop(tokens)

@@ -103,7 +103,7 @@ describe PragmaticTokenizer do
         pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .",
 
         )
-        expect(pt.tokenize).to eq(["hello", "____________________", "."])
+        expect(pt.tokenize).to eq(["hello", "."])
       end
 
       it 'tokenizes a string #0014' do
@@ -160,7 +160,7 @@ describe PragmaticTokenizer do
           clean: true,
           punctuation: 'none'
         )
-        expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name"])
+        expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name", "username", "delete"])
       end
 
       it 'tokenizes a string #0021' do
@@ -168,6 +168,55 @@ describe PragmaticTokenizer do
           expand_contractions: true,
         )
         expect(pt.tokenize).to eq(["look", "for", "his", "her", "account", "."])
+      end
+
+      it 'tokenizes a string #0022' do
+        pt = PragmaticTokenizer::Tokenizer.new("kath. / evang",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["kath", "evang"])
+      end
+
+      it 'tokenizes a string #0023' do
+        pt = PragmaticTokenizer::Tokenizer.new("derStandard.at › Sport",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["derstandard.at", "sport"])
+      end
+
+      it 'tokenizes a string #0024' do
+        pt = PragmaticTokenizer::Tokenizer.new("hello ^^",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["hello"])
+      end
+
+      it 'tokenizes a string #0025' do
+        pt = PragmaticTokenizer::Tokenizer.new("This hyphen – is not...or is it? ... It's a - dash... And a horizontal ellipsis…",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["this", "hyphen", "is", "not", "or", "is", "it", "it's", "a", "dash", "and", "a", "horizontal", "ellipsis"])
+      end
+
+      it 'tokenizes a string #0026' do
+        pt = PragmaticTokenizer::Tokenizer.new("A sentence. One with two dots.. And with three... Or horizontal ellipsis… which are three dots too.",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["a", "sentence", "one", "with", "two", "dots", "and", "with", "three", "or", "horizontal", "ellipsis", "which", "are", "three", "dots", "too"])
+      end
+
+      it 'tokenizes a string #0027' do
+        pt = PragmaticTokenizer::Tokenizer.new("+++ BREAKING +++ something happened; is it interesting?",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["breaking", "something", "happened", "is", "it", "interesting"])
+      end
+
+      it 'tokenizes a string #0028' do
+        pt = PragmaticTokenizer::Tokenizer.new("Some *interesting stuff* is __happening here__",
+          punctuation: 'none',
+        )
+        expect(pt.tokenize).to eq(["some", "interesting", "stuff", "is", "happening", "here"])
       end
     end
 
@@ -322,6 +371,14 @@ describe PragmaticTokenizer do
       it 'handles email addresses' do
         text = 'Please email example@example.com for more info.'
         expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["please", "email", "example@example.com", "for", "more", "info", "."])
+      end
+
+      it 'handles empty tokens' do
+        text = "!!!!! https://t.co/xxxx"
+        pt = PragmaticTokenizer::Tokenizer.new(text,
+          punctuation: 'none'
+        )
+        expect(pt.tokenize).to eq(["https://t.co/xxxx"])
       end
     end
 
