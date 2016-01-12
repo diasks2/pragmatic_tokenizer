@@ -82,11 +82,7 @@ module PragmaticTokenizer
 
     def downcase_tokens(tokens)
       return tokens unless downcase
-      if language.eql?('en')
-        tokens.map { |t| t.downcase }
-      else
-        tokens.map { |t| Unicode::downcase(t) }
-      end
+      tokens.map { |t| Unicode::downcase(t) }
     end
 
     def remove_short_tokens(tokens)
@@ -100,7 +96,7 @@ module PragmaticTokenizer
 
     def delete_roman_numerals(tokens)
       return tokens unless remove_roman_numerals
-      tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t.downcase) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t.downcase}.") } if remove_roman_numerals
+      tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode::downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode::downcase(t)}.") } if remove_roman_numerals
     end
 
     def cleaner(tokens)
@@ -133,23 +129,19 @@ module PragmaticTokenizer
     def delete_stop_words(tokens)
       return tokens unless remove_stop_words && language_module::STOP_WORDS
       if downcase
-        if language.eql?('en')
-          tokens.map { |t| t.downcase } - language_module::STOP_WORDS
-        else
-          tokens.map { |t| Unicode::downcase(t) } - language_module::STOP_WORDS
-        end
+        tokens.map { |t| Unicode::downcase(t) } - language_module::STOP_WORDS
       else
-        tokens.delete_if { |t| language_module::STOP_WORDS.include?(t.downcase) }
+        tokens.delete_if { |t| language_module::STOP_WORDS.include?(Unicode::downcase(t)) }
       end
     end
 
     def find_contractions(tokens)
       return tokens unless expand_contractions && language_module::CONTRACTIONS
       if downcase
-        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(t.downcase) ? language_module::CONTRACTIONS[t.downcase].split(' ').flatten : t }
+        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').flatten : t }
           .flat_map { |t| t.include?("/") ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
       else
-        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(t.downcase) ? language_module::CONTRACTIONS[t.downcase].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
+        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
           .flat_map { |t| t.include?("/") ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
       end
     end
