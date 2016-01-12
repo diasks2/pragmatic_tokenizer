@@ -95,43 +95,9 @@ Or install it yourself as:
   **default** = `0`  
   The minimum number of characters a token should be.  
 
-**Additional Methods**  
+**Methods**  
 
-#### `#urls`
-Extract only valid URL tokens
-
-*Not Yet Implemented*
-
-<hr>
-
-#### `#emails`
-Extract only valid email tokens
-
-*Not Yet Implemented*
-
-<hr>
-
-#### `#hashtags`
-Extract only valid hashtag tokens
-
-*Not Yet Implemented*
-
-<hr>
-
-#### `#mentions`
-Extract only valid @ mention tokens
-
-<hr>
-
-#### `#emoticons`
-Extract only simple emoticon tokens
-
-<hr>
-
-#### `#emoji`
-Extract only valid† emoji tokens
-
-*†matches all 1012 single-character Unicode Emoji (all except for two-character flags)*
+#### `#tokenize`
 
 **Example Usage**
 ```ruby
@@ -175,6 +141,44 @@ PragmaticTokenizer::Tokenizer.new(text, minimum_length: 6).tokenize
 # => ["minimum", "length"]
 ```
 
+<hr>
+
+#### `#urls`
+Extract only valid URL tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#emails`
+Extract only valid email tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#hashtags`
+Extract only valid hashtag tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#mentions`
+Extract only valid @ mention tokens
+
+<hr>
+
+#### `#emoticons`
+Extract only simple emoticon tokens
+
+<hr>
+
+#### `#emoji`
+Extract only valid† emoji tokens
+
+*†matches all 1012 single-character Unicode Emoji (all except for two-character flags)*
+
 ## Language Support
 
 The following lists the current level of support for different languages. Pull requests or help for any languages that are not fully supported would be greatly appreciated.  
@@ -194,7 +198,7 @@ Stop Words: Yes
 Contractions: No  
 
 ##### Bulgarian
-Specs: No  
+Specs: More needed   
 Abbreviations: Yes  
 Stop Words: Yes  
 Contractions: No  
