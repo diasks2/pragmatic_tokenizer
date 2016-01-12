@@ -146,31 +146,65 @@ PragmaticTokenizer::Tokenizer.new(text, minimum_length: 6).tokenize
 #### `#urls`
 Extract only valid URL tokens
 
-*Not Yet Implemented*
+**Example Usage**
+```ruby
+text = "Go to http://www.example.com"
+
+PragmaticTokenizer::Tokenizer.new(text).urls
+# => ["http://www.example.com"]
+```
 
 <hr>
 
 #### `#emails`
 Extract only valid email tokens
 
-*Not Yet Implemented*
+**Example Usage**
+```ruby
+text = "Please email example@example.com for more info."
+
+PragmaticTokenizer::Tokenizer.new(text).emails
+# => ["example@example.com"]
+```
 
 <hr>
 
 #### `#hashtags`
 Extract only valid hashtag tokens
 
-*Not Yet Implemented*
+**Example Usage**
+```ruby
+text = "Find me all the #fun #hashtags and give me #backallofthem."
+
+PragmaticTokenizer::Tokenizer.new(text).hashtags
+# => ["#fun", "#hashtags", "#backallofthem"]
+```
 
 <hr>
 
 #### `#mentions`
 Extract only valid @ mention tokens
 
+**Example Usage**
+```ruby
+text = "Find me all the @awesome mentions."
+
+PragmaticTokenizer::Tokenizer.new(text).hashtags
+# => ["@awesome"]
+```
+
 <hr>
 
 #### `#emoticons`
 Extract only simple emoticon tokens
+
+**Example Usage**
+```ruby
+text = "Hello ;-) :) 😄"
+
+PragmaticTokenizer::Tokenizer.new(text).emoticons
+# => [";-)", ":)""]
+```
 
 <hr>
 
@@ -178,6 +212,14 @@ Extract only simple emoticon tokens
 Extract only valid† emoji tokens
 
 *†matches all 1012 single-character Unicode Emoji (all except for two-character flags)*
+
+**Example Usage**
+```ruby
+text = "Return the emoji 👿😍😱🐔🌚."
+
+PragmaticTokenizer::Tokenizer.new(text).emoticons
+# => ["👿", "😍", "😱", "🐔", "🌚"]
+```
 
 ## Language Support
 

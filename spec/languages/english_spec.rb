@@ -291,49 +291,74 @@ describe PragmaticTokenizer do
         )
         expect(pt.tokenize).to eq(["Cannot", "go", "tonight", ".", "Did", "not", "finish", "."])
       end
+
+      it 'tokenizes a string #041' do
+        pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
+        expect(pt.tokenize).to eq(["go", "to", "http://www.example.com", "."])
+      end
     end
 
     context 'other methods' do
       context 'hashtags' do
         it 'finds all valid hashtags #001' do
-          skip "NOT IMPLEMENTED"
-          pt = PragmaticTokenizer::Tokenizer.new('Find me all the #fun #hashtags and only give me #backallofthem')
+          pt = PragmaticTokenizer::Tokenizer.new('Find me all the #fun #hashtags and only give me #backallofthem.')
           expect(pt.hashtags).to eq(['#fun', '#hashtags', '#backallofthem'])
+        end
+
+        it 'finds all valid hashtags #002' do
+          pt = PragmaticTokenizer::Tokenizer.new('#fun #hashtags and only give me ＃backallofthem')
+          expect(pt.hashtags).to eq(['#fun', '#hashtags', '＃backallofthem'])
         end
       end
 
       context 'urls' do
         it 'finds all valid urls #001' do
-          skip "NOT IMPLEMENTED"
           pt = PragmaticTokenizer::Tokenizer.new('Check out http://www.google.com/?this_is_a_url/hello-world.html for more info.')
           expect(pt.urls).to eq(["http://www.google.com/?this_is_a_url/hello-world.html"])
         end
 
         it 'finds all valid urls #002' do
-          skip "NOT IMPLEMENTED"
           pt = PragmaticTokenizer::Tokenizer.new('Check out https://www.google.com/?this_is_a_url/hello-world.html for more info.')
           expect(pt.urls).to eq(["https://www.google.com/?this_is_a_url/hello-world.html"])
         end
 
         it 'finds all valid urls #003' do
-          skip "NOT IMPLEMENTED"
           pt = PragmaticTokenizer::Tokenizer.new('Check out www.google.com/?this_is_a_url/hello-world.html for more info.')
           expect(pt.urls).to eq(["www.google.com/?this_is_a_url/hello-world.html"])
+        end
+
+        it 'finds all valid urls #004' do
+          pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
+          expect(pt.urls).to eq(["http://www.example.com"])
         end
       end
 
       context 'emails' do
         it 'finds all valid emails #001' do
-          skip "NOT IMPLEMENTED"
           pt = PragmaticTokenizer::Tokenizer.new('Please email example@example.com for more info.')
           expect(pt.emails).to eq(['example@example.com'])
         end
+
+        it 'finds all valid emails #002' do
+          pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com Please email example@example.com for more info. test@hotmail.com')
+          expect(pt.emails).to eq(['123@gmail.com', 'example@example.com', 'test@hotmail.com'])
+        end
+
+        it 'finds all valid emails #003' do
+          pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com.')
+          expect(pt.emails).to eq(['123@gmail.com'])
+        end
       end
 
-      context 'metions' do
+      context 'mentions' do
         it 'finds all valid @ mentions #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Find me all the @johnny and @space mentions')
-          expect(pt.mentions).to eq(['@johnny', '@space'])
+          pt = PragmaticTokenizer::Tokenizer.new('Find me all the @johnny and @space mentions @john.')
+          expect(pt.mentions).to eq(['@johnny', '@space', '@john'])
+        end
+
+        it 'finds all valid @ mentions #002' do
+          pt = PragmaticTokenizer::Tokenizer.new('Find me all the ＠awesome mentions.')
+          expect(pt.mentions).to eq(["＠awesome"])
         end
       end
 
@@ -349,16 +374,17 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
           expect(pt.emoji).to eq(['😄'])
         end
-      end
 
-      context 'emoji' do
         it 'finds all valid emoji #002' do
           pt = PragmaticTokenizer::Tokenizer.new('I am a string with emoji 😍😍😱😱👿👿🐔🌚 and some other Unicode characters 比如中文 and numbers 55 33.')
           expect(pt.emoji).to eq(["😍", "😍", "😱", "😱", "👿", "👿", "🐔", "🌚"])
         end
+
+        it 'finds all valid emoji #003' do
+          pt = PragmaticTokenizer::Tokenizer.new("Return the emoji 👿😍😱🐔🌚.")
+          expect(pt.emoji).to eq(["👿", "😍", "😱", "🐔", "🌚"])
+        end
       end
-
-
     end
 
     context 'ending punctutation' do

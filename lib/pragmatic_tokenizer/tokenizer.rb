@@ -44,19 +44,19 @@ module PragmaticTokenizer
     end
 
     def urls
-      []
+      text.split(' ').delete_if { |t| t !~ /(http|https|www)(\.|:)/ }.map { |t| t.chomp('.') }
     end
 
     def emails
-      []
+      text.split(' ').delete_if { |t| t !~ /\S+(＠|@)\S+/ }.map { |t| t.chomp('.') }
     end
 
     def hashtags
-      []
+      text.split(' ').delete_if { |t| t !~ /(#|＃)/ }.map { |t| t.chomp('.') }
     end
 
     def mentions
-      text.split(' ').delete_if { |t| t !~ /\A(@|＠)/ }
+      text.split(' ').delete_if { |t| t !~ /(@|＠)/ }.map { |t| t.chomp('.') }
     end
 
     def emoticons
