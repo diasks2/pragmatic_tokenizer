@@ -22,7 +22,11 @@ module PragmaticTokenizer
       convert_sgl_quotes(text)
       shift_beginning_hyphen(text)
       shift_ending_hyphen(text)
-      tokens = separate_full_stop(text.squeeze(' ').split.map { |t| convert_sym_to_punct(t) })
+      tokens = separate_full_stop(text.squeeze(' ')
+        .split
+        .flat_map { |t| (t[0] == '‚' || t[0] == ',') && t.length > 1 ? t.split(/(,|‚)/).flatten : t }
+        .flat_map { |t| (t[-1] == '’' || t[-1] == "'") && t.length > 1 ? t.split(/(’|')/).flatten : t }
+        .map { |t| convert_sym_to_punct(t) })
       separate_other_ending_punc(tokens)
     end
 

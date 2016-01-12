@@ -11,8 +11,8 @@ module PragmaticTokenizer
           text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { $1 + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
           text.gsub!(/`(?!`)(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ') || text
           text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"]) || text
-          text.gsub!(/l\'/, '\1 l\' \2') || text
-          text.gsub!(/L\'/, '\1 L\' \2') || text
+          text.gsub!(/l\'/, '\1 l☮ \2') || text
+          text.gsub!(/L\'/, '\1 L☮ \2') || text
         end
       end
     end

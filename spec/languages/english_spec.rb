@@ -296,6 +296,16 @@ describe PragmaticTokenizer do
         pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
         expect(pt.tokenize).to eq(["go", "to", "http://www.example.com", "."])
       end
+
+      it 'tokenizes a string #042' do
+        pt = PragmaticTokenizer::Tokenizer.new('One of the lawyers from ‚Making a Murderer’ admitted a mistake')
+        expect(pt.tokenize).to eq(["one", "of", "the", "lawyers", "from", "‚", "making", "a", "murderer", "’", "admitted", "a", "mistake"])
+      end
+
+      it 'tokenizes a string #043' do
+        pt = PragmaticTokenizer::Tokenizer.new("One of the lawyers from 'Making a Murderer' admitted a mistake")
+        expect(pt.tokenize).to eq(["one", "of", "the", "lawyers", "from", "'", "making", "a", "murderer", "'", "admitted", "a", "mistake"])
+      end
     end
 
     context 'other methods' do
