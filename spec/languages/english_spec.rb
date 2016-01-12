@@ -343,6 +343,13 @@ describe PragmaticTokenizer do
         end
       end
 
+      context 'domains' do
+        it 'finds all valid domains #001' do
+          pt = PragmaticTokenizer::Tokenizer.new('See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83')
+          expect(pt.domains).to eq(['cnn.com/europe', 'english.alarabiya.net'])
+        end
+      end
+
       context 'emails' do
         it 'finds all valid emails #001' do
           pt = PragmaticTokenizer::Tokenizer.new('Please email example@example.com for more info.')

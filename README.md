@@ -156,6 +156,19 @@ PragmaticTokenizer::Tokenizer.new(text).urls
 
 <hr>
 
+#### `#domains`
+Extract only valid domain tokens
+
+**Example Usage**
+```ruby
+text = "See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83"
+
+PragmaticTokenizer::Tokenizer.new(text).urls
+# => ["cnn.com/europe", "english.alarabiya.net"]
+```
+
+<hr>
+
 #### `#emails`
 Extract only valid email tokens
 

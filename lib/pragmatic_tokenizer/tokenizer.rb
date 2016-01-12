@@ -43,6 +43,10 @@ module PragmaticTokenizer
       downcase_tokens(cleaner(remove_short_tokens(delete_numbers(delete_roman_numerals(find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))))))).reject { |t| t.empty? }
     end
 
+    def domains
+      text.split(' ').delete_if { |t| t !~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }.map { |t| t.chomp('.').chomp(',').chomp(';').chomp(':') }
+    end
+
     def urls
       text.split(' ').delete_if { |t| t !~ /(http|https|www)(\.|:)/ }.map { |t| t.chomp('.') }
     end
