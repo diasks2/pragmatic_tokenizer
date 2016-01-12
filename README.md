@@ -24,6 +24,7 @@ Or install it yourself as:
 
 * If no language is specified, the library will default to English.   
 * To specify a language use its two character [ISO 639-1 code](https://www.tm-town.com/languages).
+* Pragmatic Tokenizer will unescape any HTML entities.
 
 **Options**  
 
@@ -85,9 +86,52 @@ Or install it yourself as:
 
 <hr>
 
+##### `downcase`
+  **default** = `'true'`
+
+<hr>
+
 ##### `minimum_length`
   **default** = `0`  
   The minimum number of characters a token should be.  
+
+**Additional Methods**  
+
+#### `#urls`
+Extract only valid URL tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#emails`
+Extract only valid email tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#hashtags`
+Extract only valid hashtag tokens
+
+*Not Yet Implemented*
+
+<hr>
+
+#### `#mentions`
+Extract only valid @ mention tokens
+
+<hr>
+
+#### `#emoticons`
+Extract only simple emoticon tokens
+
+<hr>
+
+#### `#emoji`
+Extract only valid† emoji tokens
+
+*†matches all 1012 single-character Unicode Emoji (all except for two-character flags)*
 
 **Example Usage**
 ```ruby

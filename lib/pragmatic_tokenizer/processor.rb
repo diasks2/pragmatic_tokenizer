@@ -20,7 +20,9 @@ module PragmaticTokenizer
       shift_at_symbol(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
-      tokens = separate_full_stop(text.squeeze(' ').split.map { |t| convert_sym_to_punct(t.downcase) })
+      shift_beginning_hyphen(text)
+      shift_ending_hyphen(text)
+      tokens = separate_full_stop(text.squeeze(' ').split.map { |t| convert_sym_to_punct(t) })
       separate_other_ending_punc(tokens)
     end
 
@@ -56,6 +58,14 @@ module PragmaticTokenizer
 
     def shift_upsidedown_exclamation(text)
       text.gsub!(/¡/, ' ¡ ') || text
+    end
+
+    def shift_ending_hyphen(text)
+      text.gsub!(/-\s+/, ' - ') || text
+    end
+
+    def shift_beginning_hyphen(text)
+      text.gsub!(/\s+-/, ' - ') || text
     end
 
     def shift_special_quotes(text)
@@ -104,28 +114,32 @@ module PragmaticTokenizer
     end
 
     def separate_full_stop(tokens)
-      abbr = {}
-      @language::ABBREVIATIONS.each do |i|
-        abbr[i] = true
-      end
-      cleaned_tokens = []
-      tokens.each_with_index do |_t, i|
-        if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
-          w = $1
-          unless abbr[w.downcase] || w =~ /\A[a-z]\z/i ||
-            w =~ /[a-z](?:\.[a-z])+\z/i
-            cleaned_tokens <<  w
-            cleaned_tokens << '.'
-            next
-          end
+      if @language.eql?(Languages::English) || @language.eql?(Languages::Common)
+        abbr = {}
+        @language::ABBREVIATIONS.each do |i|
+          abbr[i] = true
         end
-        cleaned_tokens << tokens[i]
+        cleaned_tokens = []
+        tokens.each_with_index do |_t, i|
+          if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
+            w = $1
+            unless abbr[w.downcase] || w =~ /\A[a-z]\z/i ||
+              w =~ /[a-z](?:\.[a-z])+\z/i
+              cleaned_tokens <<  w
+              cleaned_tokens << '.'
+              next
+            end
+          end
+          cleaned_tokens << tokens[i]
+        end
+        if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/
+          cleaned_tokens[-1] = $1
+          cleaned_tokens.push '.'
+        end
+        cleaned_tokens
+      else
+        tokens.flat_map { |t| t =~ /\.\z/ && !@language::ABBREVIATIONS.include?(Unicode::downcase(t.split(".")[0])) && t.length > 2 ? t.split(".").flatten + ["."] : t }
       end
-      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/
-        cleaned_tokens[-1] = $1
-        cleaned_tokens.push '.'
-      end
-      cleaned_tokens
     end
 
     def separate_other_ending_punc(tokens)
