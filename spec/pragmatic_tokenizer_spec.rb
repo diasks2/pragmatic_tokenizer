@@ -14,9 +14,8 @@ describe PragmaticTokenizer do
       lambda { expect(PragmaticTokenizer::Tokenizer.new('', language: 'en').tokenize).to raise_error }
     end
 
-    it 'converts type to string' do
-      pt = PragmaticTokenizer::Tokenizer.new(5)
-      expect(pt.tokenize).to eq(['5'])
+    it 'raises an error if the text is not a string' do
+      lambda { expect(PragmaticTokenizer::Tokenizer.new(5).tokenize).to raise_error }
     end
 
     it "raises an error if the punctuation argument is not nil, 'all', 'semi', or 'none'" do

@@ -25,7 +25,8 @@ module PragmaticTokenizer
         # Punctuation 'only': Removes everything except punctuation. The
         # returned result is an array of only the punctuation.
       end
-      @text = CGI.unescapeHTML(text.to_s)
+      raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
+      @text = CGI.unescapeHTML(text)
       @language = language.to_s
       @language_module = Languages.get_language_by_code(language.to_s)
       @punctuation = punctuation.to_s
