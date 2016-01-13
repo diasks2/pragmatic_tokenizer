@@ -53,10 +53,11 @@ module PragmaticTokenizer
           split_at_middle_period_1(
           split_at_middle_period_2(
           split_beginning_period(
+          split_at_plus_sign(
           shift_no_spaces_between_sentences(
           split_at_forward_slash(
             processor.new(language: language_module).process(text: segment)
-          ))))))))))))).reject { |t| t.empty? }
+          )))))))))))))).reject { |t| t.empty? }
       end
       tokens.flatten
     end
@@ -190,6 +191,10 @@ module PragmaticTokenizer
 
     def split_at_forward_slash(tokens)
       tokens.flat_map { |t| t.include?("/") && t !~ /(http|https|www)(\.|:)/ ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
+    end
+
+    def split_at_plus_sign(tokens)
+      tokens.flat_map { |t| t.include?("+") ? t.gsub!(/\+/, '\1 \2').split(' ').flatten : t }
     end
 
     def find_contractions(tokens)
