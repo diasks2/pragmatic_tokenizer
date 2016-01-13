@@ -191,9 +191,9 @@ module PragmaticTokenizer
     def find_contractions(tokens)
       return tokens unless expand_contractions && language_module::CONTRACTIONS
       if downcase
-        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').flatten : t }
+        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? language_module::CONTRACTIONS[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
       else
-        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
+        tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? language_module::CONTRACTIONS[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
       end
     end
   end

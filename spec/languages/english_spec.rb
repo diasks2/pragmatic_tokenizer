@@ -488,6 +488,16 @@ describe PragmaticTokenizer do
           ["get", "a", "cnn.com", "subscription", "for", "$5", "month"]
         )
       end
+
+      # I'm unsure if tokens shouldn't be stripped of any "`s", "'s",... suffix
+      it 'handles apostrophes and quotes 1' do
+        skip "NOT IMPLEMENTED"
+        text = "Watch the video of @amandapalmer ́s song “Killing Type” here"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["watch", "the", "video", "of", "amandapalmeŕs", "song", "killing", "type", "here"]
+        )
+      end
     end
 
     context 'other methods' do
@@ -689,17 +699,17 @@ describe PragmaticTokenizer do
         expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["this", "is", "a", "question", "?", "!", "?"])
       end
 
-      it 'handles contractions' do
+      it 'handles contractions 1' do
         text = "How'd it go yesterday?"
         expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["how'd", "it", "go", "yesterday", "?"])
       end
 
-      it 'handles contractions' do
+      it 'handles contractions 2' do
         text = "You shouldn't worry."
         expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["you", "shouldn't", "worry", "."])
       end
 
-      it 'handles contractions' do
+      it 'handles contractions 3' do
         text = "We've gone too far. It'll be over when we're done."
         expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["we've", "gone", "too", "far", ".", "it'll", "be", "over", "when", "we're", "done", "."])
       end

@@ -137,7 +137,7 @@ module PragmaticTokenizer
         end
         cleaned_tokens
       else
-        tokens.flat_map { |t| t =~ /\.\z/ && !@language::ABBREVIATIONS.include?(Unicode::downcase(t.split(".")[0])) && t.length > 2 ? t.split(".").flatten + ["."] : t }
+        tokens.flat_map { |t| t =~ /\.\z/ && !@language::ABBREVIATIONS.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) && t.length > 2 ? t.split(".").flatten + ["."] : t }
       end
     end
 

@@ -36,7 +36,7 @@ describe PragmaticTokenizer do
 
     it 'handles words with a slash 1' do
       text = "We pay 3000 €/month"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["we", "pay", "3000", "€", "month"]
       )
@@ -44,7 +44,7 @@ describe PragmaticTokenizer do
 
     it 'handles words with a slash 2' do
       text = "Ich frage mich, wieso er nicht Herr der Lage war/ist."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["ich", "frage", "mich", "wieso", "er", "nicht", "herr", "der", "lage", "war", "ist"]
       )
@@ -52,7 +52,7 @@ describe PragmaticTokenizer do
 
     it 'handles words with a slash 3' do
       text = "Poison gas attack in Ghuta/Syria."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["poison", "gas", "attack", "in", "ghuta", "syria"]
       )
@@ -60,25 +60,15 @@ describe PragmaticTokenizer do
 
     it 'handles words with a question mark' do
       text = "Essen á la carte?Man ist versucht…"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["essen", "á", "la", "carte", "man", "ist", "versucht"]
       )
     end
 
-    # # I'm unsure if tokens shouldn't be stripped of any "`s", "'s",... suffix
-    it 'handles apostrophes and quotes 1' do
-      skip "NOT IMPLEMENTED"
-      text = "Watch the video of @amandapalmer ́s song “Killing Type” here"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
-      expect(pt.tokenize).to eq(
-        ["watch", "the", "video", "of", "amandapalmeŕs", "song", "killing", "type", "here"]
-      )
-    end
-
     it 'handles apostrophes and quotes 3' do
       text = "Die “Mitte der Gesellschaft” interessiert sich jetzt für “Feminismus”."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["die", "mitte", "der", "gesellschaft", "interessiert", "sich", "jetzt", "für", "feminismus"]
       )
@@ -87,7 +77,7 @@ describe PragmaticTokenizer do
     it 'handles apostrophes and quotes 4' do
       skip "NOT IMPLEMENTED"
       text = "Endlich regnet es ihm nicht mehr auf ́s Haupt!"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["endlich", "regnet", "es", "ihm", "nicht", "mehr", "auf́s", "haupt"]
       )
@@ -95,7 +85,7 @@ describe PragmaticTokenizer do
 
     it 'handles mentions 1' do
       text = "@RainerSteinke @_Sternchen_2015 1:0 für dich."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["@rainersteinke", "@_sternchen_2015", "1:0", "für", "dich"]
       )
@@ -103,7 +93,7 @@ describe PragmaticTokenizer do
 
     it 'handles mentions 2' do
       text = "@LandauDaniel @AnthZeto @julianfranz @S_Beck19 Yep!"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["@landaudaniel", "@anthzeto", "@julianfranz", "@s_beck19", "yep"]
       )
@@ -111,7 +101,7 @@ describe PragmaticTokenizer do
 
     it 'handles old school emoticons 1' do
       text = "du übertreibst maßlos :D"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', downcase: false)
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', downcase: false, language: 'de')
       expect(pt.tokenize).to eq(
         ["du", "übertreibst", "maßlos", ":D"]
       )
@@ -119,7 +109,7 @@ describe PragmaticTokenizer do
 
     it 'handles words with a symbol suffix' do
       text = "hier ist ein Whirlpool versteckt^^"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["hier", "ist", "ein", "whirlpool", "versteckt"]
       )
@@ -127,7 +117,7 @@ describe PragmaticTokenizer do
 
     it 'handles hashtags 1' do
       text = "„Was wir tun wird in diesem Land Leben retten“:#Obama"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["was", "wir", "tun", "wird", "in", "diesem", "land", "leben", "retten", "#obama"]
       )
@@ -135,7 +125,7 @@ describe PragmaticTokenizer do
 
     it 'handles numbers and words' do
       text = "Air Force Once ist 18.270-mal abgehoben."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["air", "force", "once", "ist", "18.270-mal", "abgehoben"]
       )
@@ -146,7 +136,7 @@ describe PragmaticTokenizer do
     it 'maintains the german gender-neutrality form 1' do
       skip "NOT IMPLEMENTED"
       text = "Wir brauchen eine/n erfahrene/n Informatiker/in."
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["wir", "brauchen", "eine/n", "erfahrene/n", "informatiker/in"]
       )
@@ -154,9 +144,25 @@ describe PragmaticTokenizer do
 
     it 'maintains the german gender-neutrality form 2' do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen"
-      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+      pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', language: 'de')
       expect(pt.tokenize).to eq(
         ["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen"]
+      )
+    end
+
+    it 'handles contractions 1' do
+      text = "gibt's"
+      pt = PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, language: 'de')
+      expect(pt.tokenize).to eq(
+        ["gibt", "es"]
+      )
+    end
+
+    it 'handles contractions 2' do
+      text = "gibt‘s schaut’s wenn＇s g›spür find´s"
+      pt = PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, language: 'de')
+      expect(pt.tokenize).to eq(
+        ["gibt", "es", "schaut", "es", "wenn", "es", "gespür", "finde", "es"]
       )
     end
   end
