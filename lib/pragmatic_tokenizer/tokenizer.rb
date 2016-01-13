@@ -40,21 +40,25 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      downcase_tokens(
-        cleaner(
-        remove_short_tokens(
-        delete_numbers(
-        delete_roman_numerals(
-        find_contractions(
-        delete_stop_words(
-        remove_punctuation(
-        split_at_middle_period_1(
-        split_at_middle_period_2(
-        split_beginning_period(
-        shift_no_spaces_between_sentences(
-        split_at_forward_slash(
-          processor.new(language: language_module).process(text: text)
-        ))))))))))))).reject { |t| t.empty? }
+      tokens = []
+      text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
+        tokens << downcase_tokens(
+          cleaner(
+          remove_short_tokens(
+          delete_numbers(
+          delete_roman_numerals(
+          find_contractions(
+          delete_stop_words(
+          remove_punctuation(
+          split_at_middle_period_1(
+          split_at_middle_period_2(
+          split_beginning_period(
+          shift_no_spaces_between_sentences(
+          split_at_forward_slash(
+            processor.new(language: language_module).process(text: segment)
+          ))))))))))))).reject { |t| t.empty? }
+      end
+      tokens.flatten
     end
 
     def domains
