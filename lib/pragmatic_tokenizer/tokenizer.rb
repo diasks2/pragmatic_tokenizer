@@ -7,10 +7,10 @@ module PragmaticTokenizer
 
     attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals, :downcase
     def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false, downcase: true)
-      unless punctuation.eql?('all') ||
-        punctuation.eql?('semi') ||
-        punctuation.eql?('none') ||
-        punctuation.eql?('only')
+      unless punctuation.to_s.eql?('all') ||
+        punctuation.to_s.eql?('semi') ||
+        punctuation.to_s.eql?('none') ||
+        punctuation.to_s.eql?('only')
         raise "Punctuation argument can be only be nil, 'all', 'semi', 'none', or 'only'"
         # Punctuation 'all': Does not remove any punctuation from the result
 
@@ -25,10 +25,10 @@ module PragmaticTokenizer
         # Punctuation 'only': Removes everything except punctuation. The
         # returned result is an array of only the punctuation.
       end
-      @text = CGI.unescapeHTML(text)
-      @language = language
-      @language_module = Languages.get_language_by_code(language)
-      @punctuation = punctuation
+      @text = CGI.unescapeHTML(text.to_s)
+      @language = language.to_s
+      @language_module = Languages.get_language_by_code(language.to_s)
+      @punctuation = punctuation.to_s
       @remove_stop_words = remove_stop_words
       @expand_contractions = expand_contractions
       @clean = clean
@@ -40,7 +40,21 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      downcase_tokens(cleaner(remove_short_tokens(delete_numbers(delete_roman_numerals(find_contractions(delete_stop_words(remove_punctuation(processor.new(language: language_module).process(text: text))))))))).reject { |t| t.empty? }
+      downcase_tokens(
+        cleaner(
+        remove_short_tokens(
+        delete_numbers(
+        delete_roman_numerals(
+        find_contractions(
+        delete_stop_words(
+        remove_punctuation(
+        split_at_middle_period_1(
+        split_at_middle_period_2(
+        split_beginning_period(
+        shift_no_spaces_between_sentences(
+        split_at_forward_slash(
+          processor.new(language: language_module).process(text: text)
+        ))))))))))))).reject { |t| t.empty? }
     end
 
     def domains
@@ -80,6 +94,35 @@ module PragmaticTokenizer
       Processor
     end
 
+    def split_at_middle_period_1(tokens)
+      tokens.flat_map { |t| t.include?(".") &&
+        t !~ /(http|https|www)(\.|:)/ &&
+        t.length > 1 &&
+        t !~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix &&
+        t !~ /\S+(＠|@)\S+/ &&
+        language_module::ABBREVIATIONS.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub!(/\./, '\1. \2').split(' ').flatten : t }
+    end
+
+    def split_at_middle_period_2(tokens)
+      tokens.flat_map { |t| t.include?(".") &&
+        t !~ /(http|https|www)(\.|:)/ &&
+        t !~ /\.(com|net|org|edu|gov|mil|int)/ &&
+        t !~ /\.[a-z]{2}/ &&
+        t.length > 2 &&
+        t.count(".") == 1 &&
+        t !~ /\d+/ &&
+        !language_module::ABBREVIATIONS.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) &&
+        t !~ /\S+(＠|@)\S+/ ? t.gsub!(/\./, '\1 . \2').split(' ').flatten : t }
+    end
+
+    def split_beginning_period(tokens)
+      tokens.flat_map { |t| t =~ /\A\.[^\.]/ && t.length > 1 ? t.gsub!(/\./, '\1 ').split(' ').flatten : t }
+    end
+
+    def shift_no_spaces_between_sentences(tokens)
+      tokens.flat_map { |t| t.include?("?") && t !~ /(http|https|www)(\.|:)/ && t.length > 1 ? t.gsub!(/\?/, '\1 \2').split(' ').flatten : t }
+    end
+
     def downcase_tokens(tokens)
       return tokens unless downcase
       tokens.map { |t| Unicode::downcase(t) }
@@ -101,7 +144,13 @@ module PragmaticTokenizer
 
     def cleaner(tokens)
       return tokens unless clean
-      tokens.delete_if { |t| t =~ /\A-+\z/ ||
+      tokens.flat_map { |t| t =~ /(\A|\s)\@/ ? t.gsub!(/\@/, '\1 ').split(' ').flatten : t }
+        .flat_map { |t| t =~ /(?<=\s)\_+/ ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\_+(?=\s)/ ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| t =~ /(?<=\A)\_+/ ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\_+(?=\z)/ ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\*+/ ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
+        .delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||
         t.length > 50 ||
@@ -135,14 +184,16 @@ module PragmaticTokenizer
       end
     end
 
+    def split_at_forward_slash(tokens)
+      tokens.flat_map { |t| t.include?("/") && t !~ /(http|https|www)(\.|:)/ ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
+    end
+
     def find_contractions(tokens)
       return tokens unless expand_contractions && language_module::CONTRACTIONS
       if downcase
         tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').flatten : t }
-          .flat_map { |t| t.include?("/") ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
       else
         tokens.flat_map { |t| language_module::CONTRACTIONS.has_key?(Unicode::downcase(t)) ? language_module::CONTRACTIONS[Unicode::downcase(t)].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
-          .flat_map { |t| t.include?("/") ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
       end
     end
   end

@@ -15,9 +15,8 @@ module PragmaticTokenizer
       shift_colon(text)
       shift_bracket(text)
       shift_semicolon(text)
-      shift_underscore(text)
-      shift_asterisk(text)
-      shift_at_symbol(text)
+      shift_caret(text)
+      shift_vertical_bar(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
       shift_beginning_hyphen(text)
@@ -35,8 +34,10 @@ module PragmaticTokenizer
     def convert_dbl_quotes(text)
       # Convert left double quotes to special character
       text.gsub!(/"(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
+      text.gsub!(/“(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['“'] + ' ') || text
       # Convert remaining quotes to special character
       text.gsub!(/"/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
+      text.gsub!(/”/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['”'] + ' ') || text
     end
 
     def convert_sgl_quotes(text)
@@ -49,6 +50,10 @@ module PragmaticTokenizer
 
     def shift_multiple_dash(text)
       text.gsub!(/--+/o, ' - ') || text
+    end
+
+    def shift_vertical_bar(text)
+      text.gsub!(/\|/, ' | ') || text
     end
 
     def shift_comma(text)
@@ -83,32 +88,24 @@ module PragmaticTokenizer
       text.gsub!(/([\(\[\{\}\]\)])/o) { ' ' + $1 + ' ' } || text
     end
 
-    def shift_underscore(text)
-      text.gsub!(/(?<=\s)\_+/, ' \1') || text
-      text.gsub!(/\_+(?=\s)/, ' \1') || text
-      text.gsub!(/(?<=\A)\_+/, '\1 ') || text
-      text.gsub!(/\_+(?=\z)/, ' \1') || text
-    end
-
-    def shift_asterisk(text)
-      text.gsub!(/\*+/, ' \1 ') || text
-    end
-
-    def shift_at_symbol(text)
-      text.gsub!(/(\A|\s)\@/, '\1 ') || text
-    end
-
     def shift_colon(text)
+      puts "Text: #{text}"
       return text unless text.include?(':') &&
-        !(/\A\d+/ == text.partition(':').last[0]) &&
-        !(/\A\d+/ == text.partition(':').first[-1])
+        text.partition(':').last[0] !~ /\A\d+/ &&
+        text.partition(':').first[-1] !~ /\A\d+/
+      puts "YOYOYO"
       # Ignore web addresses
       text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[":"]) || text
       text.gsub!(/:/o, ' :') || text
+      text.gsub!(/(?<=\s):(?=\#)/, ': ') || text
     end
 
     def shift_semicolon(text)
       text.gsub!(/([;])/o) { ' ' + $1 + ' ' } || text
+    end
+
+    def shift_caret(text)
+      text.gsub!(/\^/, ' ^ ') || text
     end
 
     def shift_ellipse(text)
@@ -167,7 +164,7 @@ module PragmaticTokenizer
     end
 
     def convert_sym_to_punct(token)
-      symbol = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚]/.match(token)
+      symbol = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘]/.match(token)
       if symbol.nil?
         return token
       else

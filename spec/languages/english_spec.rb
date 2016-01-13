@@ -100,10 +100,8 @@ describe PragmaticTokenizer do
       end
 
       it 'tokenizes a string #013' do
-        pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .",
-
-        )
-        expect(pt.tokenize).to eq(["hello", "."])
+        pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .")
+        expect(pt.tokenize).to eq(["hello", "____________________", "."])
       end
 
       it 'tokenizes a string #014' do
@@ -216,7 +214,7 @@ describe PragmaticTokenizer do
         pt = PragmaticTokenizer::Tokenizer.new("Some *interesting stuff* is __happening here__",
           punctuation: 'none',
         )
-        expect(pt.tokenize).to eq(["some", "interesting", "stuff", "is", "happening", "here"])
+        expect(pt.tokenize).to eq(["some", "*interesting", "stuff*", "is", "__happening", "here__"])
       end
 
       it 'tokenizes a string #029' do
@@ -305,6 +303,190 @@ describe PragmaticTokenizer do
       it 'tokenizes a string #043' do
         pt = PragmaticTokenizer::Tokenizer.new("One of the lawyers from 'Making a Murderer' admitted a mistake")
         expect(pt.tokenize).to eq(["one", "of", "the", "lawyers", "from", "'", "making", "a", "murderer", "'", "admitted", "a", "mistake"])
+      end
+
+      it 'also allows symbols for options' do
+        pt = PragmaticTokenizer::Tokenizer.new('His name is Mr. Smith.',
+          language: :en,
+          punctuation: :none
+        )
+        expect(pt.tokenize).to eq(['his', 'name', 'is', 'mr.', 'smith'])
+      end
+
+      it 'handles non-domain words with a dot 1' do
+        text = "They were being helped.This is solidarity."
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["they", "were", "being", "helped", "this", "is", "solidarity"]
+        )
+      end
+
+      it 'handles non-domain words with a dot 2' do
+        text = "picture was taken in sept.2015"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["picture", "was", "taken", "in", "sept.", "2015"]
+        )
+      end
+
+      it 'handles non-domain words with a dot 3' do
+        text = "They were being helped.This is solidarity. See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(["they", "were", "being", "helped", "this", "is", "solidarity", "see", "the", "breaking", "news", "stories", "about", "x", "on", "cnn.com", "europe", "and", "english.alarabiya.net", "here’s", "a", "screenshot", "https://t.co/s83k28f29d31s83"])
+      end
+
+      it 'handles numbers with symbols ' do
+        text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["pittsburgh", "steelers", "won", "18:16", "against", "cincinnati", "bengals"]
+        )
+      end
+
+      it 'handles numbers with symbols 1' do
+        text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["pittsburgh", "steelers", "won", "18:16", "against", "cincinnati", "bengals"]
+        )
+      end
+
+      it 'handles numbers with symbols 2' do
+        text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
+        pt = PragmaticTokenizer::Tokenizer.new(text)
+        expect(pt.tokenize).to eq(
+          ["pittsburgh", "steelers", "won", "18:16", "against", "cincinnati", "bengals", "!"]
+        )
+      end
+
+      it 'handles numbers with symbols 3' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello, that will be $5 dollars. You can pay at 5:00, after it is 500.")
+        expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "$5", "dollars", ".", "you", "can", "pay", "at", "5:00", ",", "after", "it", "is", "500", "."])
+      end
+
+      it 'handles apostrophes and quotes' do
+        text = "“Data Visualization: How to Tell Stories with Data — Jeff Korhan” by @AINewsletter"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["data", "visualization", "how", "to", "tell", "stories", "with", "data", "jeff", "korhan", "by", "@ainewsletter"]
+        )
+      end
+
+      it 'handles mentions' do
+        text = ".@someone I disagree"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["@someone", "i", "disagree"]
+        )
+      end
+
+      it 'tokenizes a string #044' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello; what is your: name @username **delete**",
+          punctuation: 'none'
+        )
+        expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name", "@username", "**delete**"])
+      end
+
+      it 'tokenizes a string #045' do
+        pt = PragmaticTokenizer::Tokenizer.new("Some *interesting stuff* is __happening here__",
+          punctuation: 'none',
+          clean: true
+        )
+        expect(pt.tokenize).to eq(["some", "interesting", "stuff", "is", "happening", "here"])
+      end
+
+      it 'tokenizes a string #046' do
+        pt = PragmaticTokenizer::Tokenizer.new("Hello ____________________ .",
+          punctuation: :none
+        )
+        expect(pt.tokenize).to eq(["hello"])
+      end
+
+      it 'handles old school emoticons 2' do
+        text = "oooh! <3"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["oooh", "<3"]
+        )
+      end
+
+      it 'handles old school emoticons 3' do
+        text = "@someone &lt;33"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["@someone", "<33"]
+        )
+      end
+
+      it 'handles words with a symbol prefix 1' do
+        text = "Yes! /cc @someone"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["yes", "cc", "@someone"]
+        )
+      end
+
+      it 'handles words with a emoticon suffix' do
+        skip "NOT IMPLEMENTED"
+        text = "look, a dog with shoes☺ !!"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["look", "a", "dog", "with", "shoes", "☺"]
+        )
+      end
+
+      it 'handles words with a emoji suffix' do
+        text = "Let's meet there.😝 ok?"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["let's", "meet", "there", "😝", "ok"]
+        )
+      end
+
+      it 'handles words with a symbol prefix 2' do
+        text = "blah blah |photo by @someone"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["blah", "blah", "photo", "by", "@someone"]
+        )
+      end
+
+      it 'handles hashtags 2' do
+        skip "NOT IMPLEMENTED"
+        text = "This is the #upper-#limit"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["this", "is", "the", "#upper", "#limit"]
+        )
+      end
+
+      it 'handles hashtags 3' do
+        skip "NOT IMPLEMENTED"
+        text = "The #2016-fun has just begun."
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["the", "#2016", "fun", "has", "just", "begun"]
+        )
+      end
+
+      # this would require a configurable option that splits a word at each hyphen
+      # as soon its total length is > n characters.
+      it 'splits too long words with hypens' do
+        skip "NOT IMPLEMENTED"
+        text = "hi-hat and old-school but not really-important-long-word"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none', long_word_split: 12)
+        expect(pt.tokenize).to eq(
+          ["hi-hat", "and", "old-school", "but", "not", "really", "important", "long", "word"]
+        )
+      end
+
+      it 'handles domains' do
+        skip "NOT IMPLEMENTED"
+        text = "Get a CNN.com-subscription for $5/month"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["get", "a", "cnn.com", "subscription", "for", "$5", "month"]
+        )
       end
     end
 
