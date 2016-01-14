@@ -480,13 +480,19 @@ describe PragmaticTokenizer do
         )
       end
 
-      # I'm unsure if tokens shouldn't be stripped of any "`s", "'s",... suffix
       it 'handles apostrophes and quotes 1' do
-        skip "NOT IMPLEMENTED"
-        text = "Watch the video of @amandapalmer ́s song “Killing Type” here"
+        text = "Watch the video of @amandapalmer's song “Killing Type” here"
         pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
         expect(pt.tokenize).to eq(
-          ["watch", "the", "video", "of", "amandapalmeŕs", "song", "killing", "type", "here"]
+          ["watch", "the", "video", "of", "@amandapalmer's", "song", "killing", "type", "here"]
+        )
+      end
+
+       it 'handles apostrophes and quotes 2' do
+        text = "Watch the video of @amandapalmer`s song “Killing Type” here"
+        pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none')
+        expect(pt.tokenize).to eq(
+          ["watch", "the", "video", "of", "@amandapalmer`s", "song", "killing", "type", "here"]
         )
       end
 
