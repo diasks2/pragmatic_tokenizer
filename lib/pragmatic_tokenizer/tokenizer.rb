@@ -5,8 +5,8 @@ require 'unicode'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals, :downcase
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false, downcase: true)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals, :downcase, :remove_en_stop_words
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false, downcase: true, remove_en_stop_words: false)
       unless punctuation.to_s.eql?('all') ||
         punctuation.to_s.eql?('semi') ||
         punctuation.to_s.eql?('none') ||
@@ -37,13 +37,15 @@ module PragmaticTokenizer
       @minimum_length = minimum_length
       @remove_roman_numerals = remove_roman_numerals
       @downcase = downcase
+      @remove_en_stop_words = remove_en_stop_words
     end
 
     def tokenize
       return [] unless text
       tokens = []
       text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
-        tokens << delete_stop_words(
+        tokens << delete_en_stop_words(
+          delete_stop_words(
           downcase_tokens(
           cleaner(
           remove_short_tokens(
@@ -58,7 +60,7 @@ module PragmaticTokenizer
           shift_no_spaces_between_sentences(
           split_at_forward_slash(
             processor.new(language: language_module).process(text: segment)
-          )))))))))))))).reject { |t| t.empty? }
+          ))))))))))))))).reject { |t| t.empty? }
       end
       tokens.flatten
     end
@@ -187,6 +189,15 @@ module PragmaticTokenizer
         tokens.map { |t| Unicode::downcase(t) } - language_module::STOP_WORDS
       else
         tokens.delete_if { |t| language_module::STOP_WORDS.include?(Unicode::downcase(t)) }
+      end
+    end
+
+    def delete_en_stop_words(tokens)
+      return tokens unless remove_en_stop_words
+      if downcase
+        tokens.map { |t| Unicode::downcase(t) } - PragmaticTokenizer::Languages::English::STOP_WORDS
+      else
+        tokens.delete_if { |t| PragmaticTokenizer::Languages::English::STOP_WORDS.include?(Unicode::downcase(t)) }
       end
     end
 

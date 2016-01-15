@@ -554,6 +554,22 @@ describe PragmaticTokenizer do
           ["4", "things", "marketers", "must", "do", "better", "in", "2016", "blah"]
         )
       end
+
+      it 'handles single quotes' do
+        text = "Recognised as one of the ‘good’ games."
+        pt = PragmaticTokenizer::Tokenizer.new(text,
+          language: 'en',
+          clean: true,
+          remove_numbers: true,
+          minimum_length: 3,
+          expand_contractions: true,
+          remove_stop_words: true,
+          punctuation: :none,
+          downcase: true)
+        expect(pt.tokenize).to eq(
+          ["recognised", "good", "games"]
+        )
+      end
     end
 
     context 'other methods' do

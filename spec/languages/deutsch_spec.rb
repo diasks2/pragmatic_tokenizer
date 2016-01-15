@@ -165,5 +165,21 @@ describe PragmaticTokenizer do
         ["gibt", "es", "schaut", "es", "wenn", "es", "gespür", "finde", "es"]
       )
     end
+
+    it 'removes English stopwords' do
+      text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
+      pt = PragmaticTokenizer::Tokenizer.new(text, remove_en_stop_words: true, language: 'de')
+      expect(pt.tokenize).to eq(
+        ["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "english", "."]
+      )
+    end
+
+    it 'does not removes English stopwords' do
+      text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
+      pt = PragmaticTokenizer::Tokenizer.new(text, language: 'de')
+      expect(pt.tokenize).to eq(
+        ["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "this", "has", "some", "english", "."]
+      )
+    end
   end
 end
