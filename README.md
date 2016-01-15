@@ -95,6 +95,15 @@ Or install it yourself as:
 
 <hr>
 
+##### `classic_filter`
+  **default** = `'false'`
+- `true`  
+  Removes dots from acronyms and 's from the end of tokens.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
 ##### `downcase`
   **default** = `'true'`
 

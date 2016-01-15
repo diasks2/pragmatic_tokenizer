@@ -5,8 +5,8 @@ require 'unicode'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals, :downcase, :remove_en_stop_words
-    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false, downcase: true, remove_en_stop_words: false)
+    attr_reader :text, :language, :punctuation, :remove_stop_words, :expand_contractions, :language_module, :clean, :remove_numbers, :minimum_length, :remove_roman_numerals, :downcase, :remove_en_stop_words, :classic_filter
+    def initialize(text, language: 'en', punctuation: 'all', remove_stop_words: false, expand_contractions: false, clean: false, remove_numbers: false, minimum_length: 0, remove_roman_numerals: false, downcase: true, remove_en_stop_words: false, classic_filter: false)
       unless punctuation.to_s.eql?('all') ||
         punctuation.to_s.eql?('semi') ||
         punctuation.to_s.eql?('none') ||
@@ -38,13 +38,15 @@ module PragmaticTokenizer
       @remove_roman_numerals = remove_roman_numerals
       @downcase = downcase
       @remove_en_stop_words = remove_en_stop_words
+      @classic_filter = classic_filter
     end
 
     def tokenize
       return [] unless text
       tokens = []
       text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
-        tokens << delete_en_stop_words(
+        tokens << run_classic_filter(
+          delete_en_stop_words(
           delete_stop_words(
           downcase_tokens(
           cleaner(
@@ -60,7 +62,7 @@ module PragmaticTokenizer
           shift_no_spaces_between_sentences(
           split_at_forward_slash(
             processor.new(language: language_module).process(text: segment)
-          ))))))))))))))).reject { |t| t.empty? }
+          )))))))))))))))).reject { |t| t.empty? }
       end
       tokens.flatten
     end
@@ -100,6 +102,11 @@ module PragmaticTokenizer
       language_module::Processor
     rescue
       Processor
+    end
+
+    def run_classic_filter(tokens)
+      return tokens unless classic_filter
+      tokens.map { |t| t.gsub('.', '').chomp("'s").chomp("’s").chomp("`s") }
     end
 
     def split_at_middle_period_1(tokens)

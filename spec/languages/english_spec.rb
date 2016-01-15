@@ -165,6 +165,17 @@ describe PragmaticTokenizer do
         end
       end
 
+      context 'option (classic_filter)' do
+        it 'tokenizes a string #001' do
+          # http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters#solr.ClassicFilterFactory
+          text = "I.B.M. cat's can't"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            classic_filter: true
+          )
+          expect(pt.tokenize).to eq(["ibm", "cat", "can't"])
+        end
+      end
+
       context 'option (language)' do
         it 'tokenizes a string #001' do
           text = "Hello Ms. Piggy, this is John. We are selling a new fridge for $5,000. That is a 20% discount over the Nev. retailers. It is a 'MUST BUY', so don't hesistate."
