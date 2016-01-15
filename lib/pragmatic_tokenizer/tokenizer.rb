@@ -43,13 +43,13 @@ module PragmaticTokenizer
       return [] unless text
       tokens = []
       text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
-        tokens << downcase_tokens(
+        tokens << delete_stop_words(
+          downcase_tokens(
           cleaner(
           remove_short_tokens(
           delete_numbers(
           delete_roman_numerals(
           find_contractions(
-          delete_stop_words(
           remove_punctuation(
           split_at_middle_period_1(
           split_at_middle_period_2(
