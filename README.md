@@ -53,7 +53,7 @@ Or install it yourself as:
 ##### `remove_en_stop_words`
   **default** = `'false'`
 - `true`  
-  Removes all English stop words (sometimes foreign language strings have English mixed in).
+  Removes all English stop words (sometimes strings not in English have English mixed in).
 - `false`   
   Does not remove English stop words.
 
