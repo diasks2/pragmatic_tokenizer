@@ -158,6 +158,7 @@ module PragmaticTokenizer
         .flat_map { |t| t =~ /(?<=\A)\_+/ ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
         .flat_map { |t| t =~ /\_+(?=\z)/ ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
         .flat_map { |t| t =~ /\*+/ ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
+        .map { |t| t.gsub(/[[:cntrl:]]/, '') }
         .delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||

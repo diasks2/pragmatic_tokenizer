@@ -570,6 +570,14 @@ describe PragmaticTokenizer do
           ["recognised", "good", "games"]
         )
       end
+
+      it 'removes control characters' do
+        text = "\u0000 \u001F \u007FHello test."
+        pt = PragmaticTokenizer::Tokenizer.new(text, language: 'en', clean: true)
+        expect(pt.tokenize).to eq(
+          ["hello", "test", "."]
+        )
+      end
     end
 
     context 'other methods' do
