@@ -2,9 +2,9 @@ module PragmaticTokenizer
   module Languages
     module Norwegian
       include Languages::Common
-      ABBREVIATIONS = []
-      STOP_WORDS = ["Å", "alle", "andre", "arbeid", "av", "begge", "bort", "bra", "bruke", "da", "denne", "der", "deres", "det", "din", "disse", "du", "eller", "en", "ene", "eneste", "enhver", "enn", "er", "et", "fÅ", "folk", "for", "fordi", "forsÛke", "fra", "fÛr", "fÛrst", "gÅ", "gjorde", "gjÛre", "god", "ha", "hadde", "han", "hans", "hennes", "her", "hva", "hvem", "hver", "hvilken", "hvis", "hvor", "hvordan", "hvorfor", "i", "ikke", "inn", "innen", "kan", "kunne", "lage", "lang", "lik", "like", "mÅ", "makt", "mange", "mÅte", "med", "meg", "meget", "men", "mens", "mer", "mest", "min", "mye", "nÅ", "nÅr", "navn", "nei", "ny", "og", "ogsÅ", "om", "opp", "oss", "over", "pÅ", "part", "punkt", "rett", "riktig", "sÅ", "samme", "sant", "si", "siden", "sist", "skulle", "slik", "slutt", "som", "start", "stille", "tid", "til", "tilbake", "tilstand", "under", "ut", "uten", "var", "vÅr", "ved", "verdi", "vi", "vil", "ville", "vite", "vÖre", "vÖrt", "Å", "har", "når", "dette", "deg", "bare", "jeg", "bruk", "seg", "også", "hun", "sett", "mot", "noen", "bli", "før"]
-      CONTRACTIONS = {}
+      ABBREVIATIONS = [].freeze
+      STOP_WORDS = ["alle", "andre", "arbeid", "av", "bare", "begge", "bli", "bort", "bra", "bruk", "bruke", "da", "deg", "denne", "der", "deres", "det", "dette", "din", "disse", "du", "eller", "en", "ene", "eneste", "enhver", "enn", "er", "et", "folk", "for", "fordi", "forsûke", "fra", "få", "før", "fûr", "fûrst", "gjorde", "gjûre", "god", "gå", "ha", "hadde", "han", "hans", "har", "hennes", "her", "hun", "hva", "hvem", "hver", "hvilken", "hvis", "hvor", "hvordan", "hvorfor", "i", "ikke", "inn", "innen", "jeg", "kan", "kunne", "lage", "lang", "lik", "like", "makt", "mange", "med", "meg", "meget", "men", "mens", "mer", "mest", "min", "mot", "mye", "må", "måte", "navn", "nei", "noen", "ny", "nå", "når", "og", "også", "om", "opp", "oss", "over", "part", "punkt", "på", "rett", "riktig", "samme", "sant", "seg", "sett", "si", "siden", "sist", "skulle", "slik", "slutt", "som", "start", "stille", "så", "tid", "til", "tilbake", "tilstand", "under", "ut", "uten", "var", "ved", "verdi", "vi", "vil", "ville", "vite", "vår", "vöre", "vört", "å"].freeze
+      CONTRACTIONS = {}.freeze
     end
   end
 end

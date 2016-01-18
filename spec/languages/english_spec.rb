@@ -3,6 +3,55 @@ require 'spec_helper'
 describe PragmaticTokenizer do
   context 'Language: English (en)' do
     context '#tokenize (example strings)' do
+
+      context 'user-supplied abbreviations' do
+        it 'tokenizes a regular string with an abbreviation' do
+          text = "Mr. Smith, hello world."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["mr.", "smith", ",", "hello", "world", "."])
+        end
+
+        it 'fails to recognize an English abbreviation if the user supplies an abbreviations array without it' do
+          text = "Mr. Smith, hello world."
+          abbreviations = ['mrs']
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["mr", ".", "smith", ",", "hello", "world", "."])
+        end
+
+        it 'recognizes a user-supplied abbreviation' do
+          text = "thisisnotanormalabbreviation. hello world."
+          abbreviations = ['thisisnotanormalabbreviation']
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation.", "hello", "world", "."])
+        end
+
+        it 'handles an empty user-supplied abbreviation array' do
+          text = "thisisnotanormalabbreviation. hello world."
+          abbreviations = []
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation", ".", "hello", "world", "."])
+        end
+
+        it 'handles abrreviations across multiple languages' do
+          text = "Mr. Smith how are ü. today."
+          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de])
+          expect(pt.tokenize).to eq(["mr.", "smith", "how", "are", "ü.", "today", "."])
+        end
+
+        it 'handles abrreviations for languages other than English' do
+          text = "Adj. Smith how are ü. today."
+          pt = PragmaticTokenizer::Tokenizer.new(text, language: :de)
+          expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
+        end
+
+        it 'handles abrreviations across multiple languages and user-supplied abbreviations' do
+          text = "Adj. Smith how are ü. today. thisisnotanormalabbreviation. is it?"
+          abbreviations = ['thisisnotanormalabbreviation']
+          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de], abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["adj.", "smith", "how", "are", "ü.", "today", ".", "thisisnotanormalabbreviation.", "is", "it", "?"])
+        end
+      end
+
       context 'no options selected' do
         it 'tokenizes a string #001' do
           text = "Hello world."
@@ -96,6 +145,40 @@ describe PragmaticTokenizer do
       end
 
       context 'option (expand_contractions)' do
+        it 'does not expand the contractions' do
+          # https://www.ibm.com/developerworks/community/blogs/nlp/entry/tokenization?lang=en
+          text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(['"', 'i', 'said', ',', "'", "what're", 'you', '?', 'crazy', '?', "'", '"', 'said', 'sandowsky', '.', '"', 'i', "can't", 'afford', 'to', 'do', 'that', '.', '"'])
+        end
+
+        it 'expands user-supplied contractions' do
+          text = "Hello supa'soo guy."
+          contractions = { "supa'soo" => "super smooth" }
+          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: true)
+          expect(pt.tokenize).to eq(["hello", "super", "smooth", "guy", "."])
+        end
+
+        it 'does not expands user-supplied contractions' do
+          text = "Hello supa'soo guy."
+          contractions = { "supa'soo" => "super smooth" }
+          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: false)
+          expect(pt.tokenize).to eq( ["hello", "supa'soo", "guy", "."])
+        end
+
+        it 'expands user-supplied contractions and language contractions' do
+          text = "Hello supa'soo guy. auf's wasn't it?"
+          contractions = { "supa'soo" => "super smooth" }
+          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: true, filter_languages: [:en, :de])
+          expect(pt.tokenize).to eq(["hello", "super", "smooth", "guy", ".", "auf", "das", "was", "not", "it", "?"])
+        end
+
+        it 'expands language contractions' do
+          text = "Hello supa'soo guy. auf's wasn't it?"
+          pt = PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, filter_languages: [:en, :de])
+          expect(pt.tokenize).to eq(["hello", "supa'soo", "guy", ".", "auf", "das", "was", "not", "it", "?"])
+        end
+
         it 'tokenizes a string #001' do
           # https://www.ibm.com/developerworks/community/blogs/nlp/entry/tokenization?lang=en
           text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
@@ -163,6 +246,30 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["this", "sentence", "has", "a", "long", "string", "of", "dots"])
         end
+
+        it 'tokenizes a string #005' do
+          text = "cnn.com mentions this *funny* #hashtag used by @obama http://cnn.com/something"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["cnn.com", "mentions", "this", "funny", "#hashtag", "used", "by", "@obama", "http://cnn.com/something"])
+        end
+
+        it 'does not remove a valid hashtag' do
+          text = "This #sentence has a long string of dots ......................."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["this", "#sentence", "has", "a", "long", "string", "of", "dots"])
+        end
+
+        it 'does not remove a valid mention' do
+          text = "This @sentence has a long string of dots ......................."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["this", "@sentence", "has", "a", "long", "string", "of", "dots"])
+        end
       end
 
       context 'option (classic_filter)' do
@@ -173,6 +280,15 @@ describe PragmaticTokenizer do
             classic_filter: true
           )
           expect(pt.tokenize).to eq(["ibm", "cat", "can't"])
+        end
+
+        it 'tokenizes a string #002' do
+          # http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters#solr.ClassicFilterFactory
+          text = "St.Veit, which usually would be written St. Veit was not visited by B.Obama reported CNN.com"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            classic_filter: true
+          )
+          expect(pt.tokenize).to eq(["st.veit", ",", "which", "usually", "would", "be", "written", "st", "veit", "was", "not", "visited", "by", "b.obama", "reported", "cnn.com"])
         end
       end
 
@@ -203,13 +319,53 @@ describe PragmaticTokenizer do
         end
       end
 
-      context 'option (remove_numbers)' do
+      context 'option (numbers)' do
         it 'tokenizes a string #001' do
           text = "Hello, that will be $5 dollars. You can pay at 5:00, after it is 500."
           pt = PragmaticTokenizer::Tokenizer.new(text,
-            remove_numbers: true
+            numbers: :all
+          )
+          expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "$5", "dollars", ".", "you", "can", "pay", "at", "5:00", ",", "after", "it", "is", "500", "."])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "Hello, that will be $5 dollars. You can pay at 5:00, after it is 500."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :none
           )
           expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "dollars", ".", "you", "can", "pay", "at", ",", "after", "it", "is", "."])
+        end
+
+        it 'tokenizes a string #003' do
+          text = "2pac U2 50cent blink-182 $500 zero7 M83 B-52s 500"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :semi
+          )
+          expect(pt.tokenize).to eq(["2pac", "u2", "50cent", "blink-182", "$500", "zero7", "m83", "b-52s"])
+        end
+
+        it 'tokenizes a string #004' do
+          text = "2pac U2 50cent blink-182 zero7 M83 B-52s 500 Hello"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :only
+          )
+          expect(pt.tokenize).to eq(["2pac", "u2", "50cent", "blink-182", "zero7", "m83", "b-52s", "500"])
+        end
+
+        it 'tokenizes a string #005' do
+          text = "2pac U2 50cent blink-182 $500 zero7 M83 B-52s 500"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :none
+          )
+          expect(pt.tokenize).to eq([])
+        end
+
+        it 'tokenizes a string #005' do
+          text = "2pac U2 50cent blink-182 $500 zero7 M83 B-52s 500 number iv VI"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :none
+          )
+          expect(pt.tokenize).to eq(["number"])
         end
       end
 
@@ -291,7 +447,7 @@ describe PragmaticTokenizer do
         it 'tokenizes a string #009' do
           text = "hello ;-) yes"
           pt = PragmaticTokenizer::Tokenizer.new(text,
-            punctuation: 'none'
+            punctuation: :none
           )
           expect(pt.tokenize).to eq(["hello", "yes"])
         end
@@ -486,6 +642,49 @@ describe PragmaticTokenizer do
         end
       end
 
+      context 'option (remove_stop_words)' do
+        it 'removes stop words' do
+          text = 'This is a short sentence with explanations and stop words.'
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: 'en',
+            remove_stop_words: true
+          )
+          expect(pt.tokenize).to eq(["short", "sentence", "explanations", "."])
+        end
+
+        it 'removes user-supplied stop words' do
+          text = 'This is a short sentence with explanations and stop words.'
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: 'en',
+            remove_stop_words: true,
+            stop_words: ["and", "a"]
+          )
+          expect(pt.tokenize).to eq(["this", "is", "short", "sentence", "with", "explanations", "stop", "words", "."])
+        end
+
+        it 'removes user-supplied stop words and default stop words' do
+          text = 'This is a short sentence with explanations and stop words.'
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: 'en',
+            remove_stop_words: true,
+            stop_words: ["sentence"],
+            filter_languages: [:en]
+          )
+          expect(pt.tokenize).to eq(["short", "explanations", "."])
+        end
+
+        it 'removes user-supplied stop words and default stop words across multiple languages' do
+          text = 'This is a short sentence with explanations and stop words. And achte German words.'
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: 'en',
+            remove_stop_words: true,
+            stop_words: ["sentence"],
+            filter_languages: [:en, :de]
+          )
+          expect(pt.tokenize).to eq(["short", "explanations", ".", "german", "."])
+        end
+      end
+
       context 'multiple options selected' do
         it 'tokenizes a string #001' do
           text = 'His name is Mr. Smith.'
@@ -528,8 +727,7 @@ describe PragmaticTokenizer do
         it 'tokenizes a string #005' do
           text = "Remove III Roman Numerals and IX. with a period."
           pt = PragmaticTokenizer::Tokenizer.new(text,
-            remove_numbers: true,
-            remove_roman_numerals: true
+            numbers: :none
           )
           expect(pt.tokenize).to eq(["remove", "roman", "numerals", "and", ".", "with", "a", "period", "."])
         end
@@ -539,7 +737,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text,
             language: 'en',
             clean: true,
-            remove_numbers: true,
+            numbers: :none,
             minimum_length: 3,
             expand_contractions: true,
             remove_stop_words: true,
@@ -554,7 +752,7 @@ describe PragmaticTokenizer do
             clean: true,
             punctuation: 'none'
           )
-          expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name", "username", "delete"])
+          expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name", "@username", "delete"])
         end
 
         it 'tokenizes a string #008' do
@@ -594,19 +792,32 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(['his', 'name', 'is', 'mr.', 'smith'])
         end
 
-        it 'handles long strings' do
+        it 'handles long strings 1' do
+          text = "Hello World. My name is Jonas. What is your name? My name is Jonas IV Smith. There it is! I found it. My name is Jonas E. Smith. Please turn to p. 55. Were Jane and co. at the party? They closed the deal with Pitt, Briggs & Co. at noon. Let's ask Jane and co. They should know. They closed the deal with Pitt, Briggs & Co. It closed yesterday. I can't see Mt. Fuji from here. St. Michael's Church is on 5th st. near the light. That is JFK Jr.'s book. I visited the U.S.A. last year. I live in the E.U. How about you? I live in the U.S. How about you? I work for the U.S. Government in Virginia. I have lived in the U.S. for 20 years. She has $100.00 in her bag. She has $100.00. It is in her bag. He teaches science (He previously worked for 5 years as an engineer.) at the local University. Her email is Jane.Doe@example.com. I sent her an email. The site is: https://www.example.50.com/new-site/awesome_content.html. Please check it out. She turned to him, 'This is great.' she said. She turned to him, \"This is great.\" she said. She turned to him, \"This is great.\" She held the book out to show him. Hello!! Long time no see. Hello?? Who is there? Hello!? Is that you? Hello?! Is that you? 1.) The first item 2.) The second item 1.) The first item. 2.) The second item. 1) The first item 2) The second item 1) The first item. 2) The second item. 1. The first item 2. The second item 1. The first item. 2. The second item. • 9. The first item • 10. The second item ⁃9. The first item ⁃10. The second item a. The first item b. The second item c. The third list item This is a sentence\ncut off in the middle because pdf. It was a cold \nnight in the city. features\ncontact manager\nevents, activities\n You can find it at N°. 1026.253.553. That is where the treasure is. She works at Yahoo! in the accounting department. We make a good team, you and I. Did you see Albert I. Jones yesterday? Thoreau argues that by simplifying one’s life, “the laws of the universe will appear less complex. . . .” \"Bohr [...] used the analogy of parallel stairways [...]\" (Smith 55). If words are left off at the end of a sentence, and that is all that is omitted, indicate the omission with ellipsis marks (preceded and followed by a space) and then indicate the end of the sentence with a period . . . . Next sentence. I never meant that.... She left the store. I wasn’t really ... well, what I mean...see . . . what I'm saying, the thing is . . . I didn’t mean it. One further habit which was somewhat weakened . . . was that of combining words into self-interpreting compounds. . . . The practice was not abandoned. . . ."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: 'en',
+            clean: true,
+            minimum_length: 3,
+            expand_contractions: true,
+            remove_stop_words: true,
+            numbers: :none,
+            punctuation: :none
+          )
+          expect(pt.tokenize).to eq(["jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "jane.doe@example.com", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned"])
+        end
+
+        it 'handles long strings 2' do
           text = "Hello World. My name is Jonas. What is your name? My name is Jonas IV Smith. There it is! I found it. My name is Jonas E. Smith. Please turn to p. 55. Were Jane and co. at the party? They closed the deal with Pitt, Briggs & Co. at noon. Let's ask Jane and co. They should know. They closed the deal with Pitt, Briggs & Co. It closed yesterday. I can't see Mt. Fuji from here. St. Michael's Church is on 5th st. near the light. That is JFK Jr.'s book. I visited the U.S.A. last year. I live in the E.U. How about you? I live in the U.S. How about you? I work for the U.S. Government in Virginia. I have lived in the U.S. for 20 years. She has $100.00 in her bag. She has $100.00. It is in her bag. He teaches science (He previously worked for 5 years as an engineer.) at the local University. Her email is Jane.Doe@example.com. I sent her an email. The site is: https://www.example.50.com/new-site/awesome_content.html. Please check it out. She turned to him, 'This is great.' she said. She turned to him, \"This is great.\" she said. She turned to him, \"This is great.\" She held the book out to show him. Hello!! Long time no see. Hello?? Who is there? Hello!? Is that you? Hello?! Is that you? 1.) The first item 2.) The second item 1.) The first item. 2.) The second item. 1) The first item 2) The second item 1) The first item. 2) The second item. 1. The first item 2. The second item 1. The first item. 2. The second item. • 9. The first item • 10. The second item ⁃9. The first item ⁃10. The second item a. The first item b. The second item c. The third list item This is a sentence\ncut off in the middle because pdf. It was a cold \nnight in the city. features\ncontact manager\nevents, activities\n You can find it at N°. 1026.253.553. That is where the treasure is. She works at Yahoo! in the accounting department. We make a good team, you and I. Did you see Albert I. Jones yesterday? Thoreau argues that by simplifying one’s life, “the laws of the universe will appear less complex. . . .” \"Bohr [...] used the analogy of parallel stairways [...]\" (Smith 55). If words are left off at the end of a sentence, and that is all that is omitted, indicate the omission with ellipsis marks (preceded and followed by a space) and then indicate the end of the sentence with a period . . . . Next sentence. I never meant that.... She left the store. I wasn’t really ... well, what I mean...see . . . what I'm saying, the thing is . . . I didn’t mean it. One further habit which was somewhat weakened . . . was that of combining words into self-interpreting compounds. . . . The practice was not abandoned. . . ." * 10
           pt = PragmaticTokenizer::Tokenizer.new(text,
             language: 'en',
             clean: true,
-            remove_numbers: true,
             minimum_length: 3,
             expand_contractions: true,
             remove_stop_words: true,
-            remove_roman_numerals: true,
-            punctuation: 'none'
+            numbers: :none,
+            punctuation: :none
           )
-          expect(pt.tokenize).to eq(["jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned", "jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned"])
+          expect(pt.tokenize).to eq(["jonas", "jonas", "smith", "jonas", "smith", "turn", "jane", "party", "closed", "deal", "pitt", "briggs", "noon", "jane", "closed", "deal", "pitt", "briggs", "closed", "yesterday", "mt.", "fuji", "st.", "michael's", "church", "st.", "light", "jfk", "jr.", "book", "visited", "u.s.a.", "year", "live", "e.u.", "live", "u.s.", "work", "u.s.", "government", "virginia", "lived", "u.s.", "years", "bag", "bag", "teaches", "science", "worked", "years", "engineer", "local", "university", "email", "jane.doe@example.com", "email", "site", "check", "turned", "great", "turned", "great", "turned", "great", "held", "book", "long", "time", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "item", "list", "item", "sentence", "cut", "middle", "pdf", "cold", "night", "city", "features", "contact", "manager", "events", "activities", "treasure", "works", "yahoo", "accounting", "department", "good", "team", "albert", "jones", "yesterday", "thoreau", "argues", "simplifying", "one’s", "life", "laws", "universe", "complex", "bohr", "analogy", "parallel", "stairways", "smith", "left", "sentence", "omission", "ellipsis", "marks", "preceded", "space", "sentence", "period", "sentence", "meant", "left", "store", "habit", "weakened", "combining", "self-interpreting", "compounds", "practice", "abandoned"] * 10)
         end
 
         it 'handles markdown' do
@@ -623,7 +834,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text,
             language: 'en',
             clean: true,
-            remove_numbers: true,
+            numbers: :none,
             minimum_length: 3,
             expand_contractions: true,
             remove_stop_words: true,
@@ -655,101 +866,101 @@ describe PragmaticTokenizer do
       end
     end
 
-    context 'other methods' do
-      context 'hashtags' do
-        it 'finds all valid hashtags #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Find me all the #fun #hashtags and only give me #backallofthem.')
-          expect(pt.hashtags).to eq(['#fun', '#hashtags', '#backallofthem'])
-        end
+    # context 'other methods' do
+    #   context 'hashtags' do
+    #     it 'finds all valid hashtags #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the #fun #hashtags and only give me #backallofthem.')
+    #       expect(pt.hashtags).to eq(['#fun', '#hashtags', '#backallofthem'])
+    #     end
 
-        it 'finds all valid hashtags #002' do
-          pt = PragmaticTokenizer::Tokenizer.new('#fun #hashtags and only give me ＃backallofthem')
-          expect(pt.hashtags).to eq(['#fun', '#hashtags', '＃backallofthem'])
-        end
-      end
+    #     it 'finds all valid hashtags #002' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('#fun #hashtags and only give me ＃backallofthem')
+    #       expect(pt.hashtags).to eq(['#fun', '#hashtags', '＃backallofthem'])
+    #     end
+    #   end
 
-      context 'urls' do
-        it 'finds all valid urls #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Check out http://www.google.com/?this_is_a_url/hello-world.html for more info.')
-          expect(pt.urls).to eq(["http://www.google.com/?this_is_a_url/hello-world.html"])
-        end
+    #   context 'urls' do
+    #     it 'finds all valid urls #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Check out http://www.google.com/?this_is_a_url/hello-world.html for more info.')
+    #       expect(pt.urls).to eq(["http://www.google.com/?this_is_a_url/hello-world.html"])
+    #     end
 
-        it 'finds all valid urls #002' do
-          pt = PragmaticTokenizer::Tokenizer.new('Check out https://www.google.com/?this_is_a_url/hello-world.html for more info.')
-          expect(pt.urls).to eq(["https://www.google.com/?this_is_a_url/hello-world.html"])
-        end
+    #     it 'finds all valid urls #002' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Check out https://www.google.com/?this_is_a_url/hello-world.html for more info.')
+    #       expect(pt.urls).to eq(["https://www.google.com/?this_is_a_url/hello-world.html"])
+    #     end
 
-        it 'finds all valid urls #003' do
-          pt = PragmaticTokenizer::Tokenizer.new('Check out www.google.com/?this_is_a_url/hello-world.html for more info.')
-          expect(pt.urls).to eq(["www.google.com/?this_is_a_url/hello-world.html"])
-        end
+    #     it 'finds all valid urls #003' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Check out www.google.com/?this_is_a_url/hello-world.html for more info.')
+    #       expect(pt.urls).to eq(["www.google.com/?this_is_a_url/hello-world.html"])
+    #     end
 
-        it 'finds all valid urls #004' do
-          pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
-          expect(pt.urls).to eq(["http://www.example.com"])
-        end
-      end
+    #     it 'finds all valid urls #004' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
+    #       expect(pt.urls).to eq(["http://www.example.com"])
+    #     end
+    #   end
 
-      context 'domains' do
-        it 'finds all valid domains #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83')
-          expect(pt.domains).to eq(['cnn.com/europe', 'english.alarabiya.net'])
-        end
-      end
+    #   context 'domains' do
+    #     it 'finds all valid domains #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83')
+    #       expect(pt.domains).to eq(['cnn.com/europe', 'english.alarabiya.net'])
+    #     end
+    #   end
 
-      context 'emails' do
-        it 'finds all valid emails #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Please email example@example.com for more info.')
-          expect(pt.emails).to eq(['example@example.com'])
-        end
+    #   context 'emails' do
+    #     it 'finds all valid emails #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Please email example@example.com for more info.')
+    #       expect(pt.emails).to eq(['example@example.com'])
+    #     end
 
-        it 'finds all valid emails #002' do
-          pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com Please email example@example.com for more info. test@hotmail.com')
-          expect(pt.emails).to eq(['123@gmail.com', 'example@example.com', 'test@hotmail.com'])
-        end
+    #     it 'finds all valid emails #002' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com Please email example@example.com for more info. test@hotmail.com')
+    #       expect(pt.emails).to eq(['123@gmail.com', 'example@example.com', 'test@hotmail.com'])
+    #     end
 
-        it 'finds all valid emails #003' do
-          pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com.')
-          expect(pt.emails).to eq(['123@gmail.com'])
-        end
-      end
+    #     it 'finds all valid emails #003' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com.')
+    #       expect(pt.emails).to eq(['123@gmail.com'])
+    #     end
+    #   end
 
-      context 'mentions' do
-        it 'finds all valid @ mentions #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Find me all the @johnny and @space mentions @john.')
-          expect(pt.mentions).to eq(['@johnny', '@space', '@john'])
-        end
+    #   context 'mentions' do
+    #     it 'finds all valid @ mentions #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the @johnny and @space mentions @john.')
+    #       expect(pt.mentions).to eq(['@johnny', '@space', '@john'])
+    #     end
 
-        it 'finds all valid @ mentions #002' do
-          pt = PragmaticTokenizer::Tokenizer.new('Find me all the ＠awesome mentions.')
-          expect(pt.mentions).to eq(["＠awesome"])
-        end
-      end
+    #     it 'finds all valid @ mentions #002' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the ＠awesome mentions.')
+    #       expect(pt.mentions).to eq(["＠awesome"])
+    #     end
+    #   end
 
-      context 'emoticons' do
-        it 'finds simple emoticons #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
-          expect(pt.emoticons).to eq([';-)', ':)'])
-        end
-      end
+    #   context 'emoticons' do
+    #     it 'finds simple emoticons #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
+    #       expect(pt.emoticons).to eq([';-)', ':)'])
+    #     end
+    #   end
 
-      context 'emoji' do
-        it 'finds all valid emoji #001' do
-          pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
-          expect(pt.emoji).to eq(['😄'])
-        end
+    #   context 'emoji' do
+    #     it 'finds all valid emoji #001' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
+    #       expect(pt.emoji).to eq(['😄'])
+    #     end
 
-        it 'finds all valid emoji #002' do
-          pt = PragmaticTokenizer::Tokenizer.new('I am a string with emoji 😍😍😱😱👿👿🐔🌚 and some other Unicode characters 比如中文 and numbers 55 33.')
-          expect(pt.emoji).to eq(["😍", "😍", "😱", "😱", "👿", "👿", "🐔", "🌚"])
-        end
+    #     it 'finds all valid emoji #002' do
+    #       pt = PragmaticTokenizer::Tokenizer.new('I am a string with emoji 😍😍😱😱👿👿🐔🌚 and some other Unicode characters 比如中文 and numbers 55 33.')
+    #       expect(pt.emoji).to eq(["😍", "😍", "😱", "😱", "👿", "👿", "🐔", "🌚"])
+    #     end
 
-        it 'finds all valid emoji #003' do
-          pt = PragmaticTokenizer::Tokenizer.new("Return the emoji 👿😍😱🐔🌚.")
-          expect(pt.emoji).to eq(["👿", "😍", "😱", "🐔", "🌚"])
-        end
-      end
-    end
+    #     it 'finds all valid emoji #003' do
+    #       pt = PragmaticTokenizer::Tokenizer.new("Return the emoji 👿😍😱🐔🌚.")
+    #       expect(pt.emoji).to eq(["👿", "😍", "😱", "🐔", "🌚"])
+    #     end
+    #   end
+    # end
 
     context 'ending punctutation' do
       it 'handles ending question marks' do

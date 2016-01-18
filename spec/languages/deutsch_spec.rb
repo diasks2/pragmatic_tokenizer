@@ -14,7 +14,7 @@ describe PragmaticTokenizer do
         downcase: false,
         remove_stop_words: true,
         punctuation: 'none',
-        remove_numbers: true
+        numbers: :none
       ).tokenize).to eq(["größte", "Ausdehnung", "Landes", "Westen", "Osten", "beträgt", "Nord", "Süd", "europäischen", "Staaten", "Weißrussland", "flächenmäßig"])
     end
 
@@ -171,10 +171,21 @@ describe PragmaticTokenizer do
     it 'removes English stopwords' do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
       pt = PragmaticTokenizer::Tokenizer.new(text,
-        remove_en_stop_words: true,
+        filter_languages: [:en],
+        remove_stop_words: true,
         language: 'de'
       )
       expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "english", "."])
+    end
+
+     it 'removes English and German stopwords' do
+      text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
+      pt = PragmaticTokenizer::Tokenizer.new(text,
+        filter_languages: [:en, :de],
+        remove_stop_words: true,
+        language: 'de'
+      )
+      expect(pt.tokenize).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
     end
 
     it 'does not remove English stopwords' do

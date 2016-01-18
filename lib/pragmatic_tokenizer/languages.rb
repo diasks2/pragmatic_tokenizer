@@ -1,5 +1,3 @@
-require 'pragmatic_tokenizer/processor'
-
 require 'pragmatic_tokenizer/languages/common'
 
 require 'pragmatic_tokenizer/languages/english'

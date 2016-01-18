@@ -21,5 +21,9 @@ describe PragmaticTokenizer do
     it "raises an error if the punctuation argument is not nil, 'all', 'semi', or 'none'" do
       lambda { expect(PragmaticTokenizer::Tokenizer.new('', language: 'en', punctuation: 'world').tokenize).to raise_error }
     end
+
+    it "raises an error if the numbers argument is not nil, 'all', 'semi', or 'none'" do
+      lambda { expect(PragmaticTokenizer::Tokenizer.new('', language: 'en', numbers: 'world').tokenize).to raise_error }
+    end
   end
 end

@@ -124,39 +124,28 @@ text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do
 PragmaticTokenizer::Tokenizer.new(text).tokenize
 # => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
 
-PragmaticTokenizer::Tokenizer.new(text, remove_stop_words: true).tokenize
-# => ["\"", ",", "'", "what're", "?", "crazy", "?", "'", "\"", "sandowsky", ".", "\"", "afford", ".", "\""]
-
-PragmaticTokenizer::Tokenizer.new(text, punctuation: 'none').tokenize
-# => ["i", "said", "what're", "you", "crazy", "said", "sandowsky", "i", "can't", "afford", "to", "do", "that"]
-
-PragmaticTokenizer::Tokenizer.new(text, punctuation: 'only').tokenize
-# => ["\"", ",", "'", "?", "?", "'", "\"", ".", "\"", ".", "\""]
-
-PragmaticTokenizer::Tokenizer.new(text, punctuation: 'semi').tokenize
-# => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", "\"", "i", "can't", "afford", "to", "do", "that", "\""]
-
-PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true).tokenize
-# => ['"', 'i', 'said', ',', "'", 'what', 'are', 'you', '?', 'crazy', '?', "'", '"', 'said', 'sandowsky', '.', '"', 'i', 'cannot', 'afford', 'to', 'do', 'that', '.', '"']
-
-PragmaticTokenizer::Tokenizer.new(text, 
-  expand_contractions: true, 
-  remove_stop_words: true, 
-  punctuation: 'none'
-).tokenize
-# => ["crazy", "sandowsky", "afford"]
-
-text = "The price is $5.50 and it works for 5 hours."
-PragmaticTokenizer::Tokenizer.new(text, remove_numbers: true).tokenize
-# => ["the", "price", "is", "and", "it", "works", "for", "hours", "."]
-
-text = "Hello ______ ."
-PragmaticTokenizer::Tokenizer.new(text, clean: true).tokenize
-# => ["hello", "."]
-
-text = "Let's test the minimum length."
-PragmaticTokenizer::Tokenizer.new(text, minimum_length: 6).tokenize
-# => ["minimum", "length"]
+options = {
+  abbreviations:       ['a.b', 'a'],
+  stop_words:          ['is', 'the'],
+  contractions:        { "i'm" => "i am" },
+  filter_languages:    [:en, :de],
+  emojis:              :remove,
+  urls:                :remove,
+  hashtags:            :keep_and_clean,
+  mentions:            :keep_and_clean,
+  email_addresses:     :keep_original,
+  domains:             :keep_original,
+  expand_contractions: true,
+  clean:               true,
+  classic_filter:      false,
+  language:            :en,
+  punctuation:         :none,
+  numbers:             :none,
+  roman_numerals:      :none,
+  downcase:            true,
+  minimum_length:      3,
+  long_word_split:     10
+}
 ```
 
 <hr>
