@@ -12,6 +12,8 @@ module PragmaticTokenizer
 
       class SingleQuotes
         def handle_single_quotes(text)
+          # Convert left quotes to special character except for 'Twas or 'twas
+          text.gsub!(/(\W|^)'(?=.*\w)(?!twas)(?!Twas)/o) { $1 ? $1 + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' : ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
           text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"]) || text
           # Separate right single quotes
           text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { $1 + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text

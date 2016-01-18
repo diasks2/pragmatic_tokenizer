@@ -34,6 +34,13 @@ describe PragmaticTokenizer do
       ).tokenize).to eq(['der', 'Kaffee-Ersatz'])
     end
 
+    it 'tokenizes a string #005' do
+      text = "Charlie Hebdo backlash over 'racist' Alan Kurdi cartoon - https://t.co/J8N2ylVV3w"
+      expect(PragmaticTokenizer::Tokenizer.new(text,
+        language: 'de',
+      ).tokenize).to eq(["charlie", "hebdo", "backlash", "over", "'", "racist", "'", "alan", "kurdi", "cartoon", "-", "https://t.co/j8n2ylvv3w"])
+    end
+
     it 'handles words with a slash 1' do
       text = "We pay 3000 €/month"
       pt = PragmaticTokenizer::Tokenizer.new(text,
