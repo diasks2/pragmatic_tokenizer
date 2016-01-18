@@ -214,6 +214,140 @@ describe PragmaticTokenizer do
         end
       end
 
+      context 'option (emojis)' do
+        it 'removes emoji' do
+          text = "Return the emoji 👿😍😱🐔🌚. 🌚"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emoji: true
+          )
+          expect(pt.tokenize).to eq(["return", "the", "emoji", "."])
+        end
+
+        it 'does not remove emoji' do
+          text = "Return the emoji 👿😍😱🐔🌚. 🌚"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["return", "the", "emoji", "👿", "😍", "😱", "🐔", "🌚", ".", "🌚"])
+        end
+      end
+
+      context 'option (hashtags)' do
+        it 'tokenizes a string #001' do
+          text = "This is a #hashtag yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            hashtags: :remove
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "yay", "!"])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "This is a #hashtag yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            hashtags: :keep_and_clean
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "hashtag", "yay", "!"])
+        end
+
+        it 'tokenizes a string #003' do
+          text = "This is a #hashtag yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            hashtags: :keep_original
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "#hashtag", "yay", "!"])
+        end
+      end
+
+      context 'option (mentions)' do
+        it 'tokenizes a string #001' do
+          text = "This is a @mention ＠mention2 yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            mentions: :remove
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "yay", "!"])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "This is a @mention ＠mention2 yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            mentions: :keep_and_clean
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "mention", "mention2", "yay", "!"])
+        end
+
+        it 'tokenizes a string #003' do
+          text = "This is a @mention ＠mention2 yay!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            mentions: :keep_original
+          )
+          expect(pt.tokenize).to eq(["this", "is", "a", "@mention", "＠mention2", "yay", "!"])
+        end
+      end
+
+      context 'option (email addresses)' do
+        it 'tokenizes a string #001' do
+          text = "Here are some emails jon@hotmail.com ben123＠gmail.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emails: :true
+          )
+          expect(pt.tokenize).to eq(["here", "are", "some", "emails", "."])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "Here are some emails jon@hotmail.com ben123＠gmail.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["here", "are", "some", "emails", "jon@hotmail.com", "ben123＠gmail.com", "."])
+        end
+      end
+
+      context 'option (urls)' do
+        it 'tokenizes a string #001' do
+          text = "Here are some domains and urls google.com https://www.google.com www.google.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_urls: :true
+          )
+          expect(pt.tokenize).to eq(["here", "are", "some", "domains", "and", "urls", "google.com", "www.google.com", "."])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "Here are some domains and urls google.com https://www.google.com www.google.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["here", "are", "some", "domains", "and", "urls", "google.com", "https://www.google.com", "www.google.com", "."])
+        end
+      end
+
+      context 'option (domains)' do
+        it 'tokenizes a string #001' do
+          text = "Here are some domains and urls google.com https://www.google.com www.google.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_domains: :true
+          )
+          expect(pt.tokenize).to eq(["here", "are", "some", "domains", "and", "urls", "https://www.google.com", "."])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "Here are some domains and urls google.com https://www.google.com www.google.com."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["here", "are", "some", "domains", "and", "urls", "google.com", "https://www.google.com", "www.google.com", "."])
+        end
+      end
+
+      context 'option (long_word_split)' do
+        it 'tokenizes a string #001' do
+          text = "Some main-categories of the mathematics-test have sub-examples that most 14-year olds can't answer, therefor the implementation-instruction made in the 1990-years needs to be revised."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            long_word_split: 10
+          )
+          expect(pt.tokenize).to eq(["some", "main", "categories", "of", "the", "mathematics", "test", "have", "sub", "examples", "that", "most", "14-year", "olds", "can't", "answer", ",", "therefor", "the", "implementation", "instruction", "made", "in", "the", "1990-years", "needs", "to", "be", "revised", "."])
+        end
+
+        it 'tokenizes a string #002' do
+          text = "Some main-categories of the mathematics-test have sub-examples that most 14-year olds can't answer, therefor the implementation-instruction made in the 1990-years needs to be revised."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            long_word_split: 4
+          )
+          expect(pt.tokenize).to eq(["some", "main", "categories", "of", "the", "mathematics", "test", "have", "sub", "examples", "that", "most", "14", "year", "olds", "can't", "answer", ",", "therefor", "the", "implementation", "instruction", "made", "in", "the", "1990", "years", "needs", "to", "be", "revised", "."])
+        end
+      end
+
       context 'option (clean)' do
         it 'tokenizes a string #001' do
           text = "Hello ---------------."
@@ -606,7 +740,6 @@ describe PragmaticTokenizer do
         end
 
         it 'handles hashtags 2' do
-          skip "NOT IMPLEMENTED"
           text = "This is the #upper-#limit"
           pt = PragmaticTokenizer::Tokenizer.new(text,
             punctuation: 'none'
@@ -615,7 +748,6 @@ describe PragmaticTokenizer do
         end
 
         it 'handles hashtags 3' do
-          skip "NOT IMPLEMENTED"
           text = "The #2016-fun has just begun."
           pt = PragmaticTokenizer::Tokenizer.new(text,
             punctuation: 'none'
@@ -623,13 +755,20 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["the", "#2016", "fun", "has", "just", "begun"])
         end
 
-        it 'identifies emojis' do
-          skip "NOT IMPLEMENTED"
+        it 'handles emoji 1' do
           text = "How bad!😝"
           pt = PragmaticTokenizer::Tokenizer.new(text,
             punctuation: 'none'
           )
           expect(pt.tokenize).to eq(["how", "bad", "😝"])
+        end
+
+        it 'handles emoji 2' do
+          text = "😝How bad!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: 'none'
+          )
+          expect(pt.tokenize).to eq(["😝", "how", "bad"])
         end
 
         it 'identifies old school emoticons' do
@@ -852,10 +991,7 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["hello", "test", "."])
         end
 
-        # this would require a configurable option that splits a word at each hyphen
-        # as soon its total length is > n characters.
         it 'splits too long words with hypens' do
-          skip "NOT IMPLEMENTED"
           text = "hi-hat and old-school but not really-important-long-word"
           pt = PragmaticTokenizer::Tokenizer.new(text,
             punctuation: 'none',
@@ -865,102 +1001,6 @@ describe PragmaticTokenizer do
         end
       end
     end
-
-    # context 'other methods' do
-    #   context 'hashtags' do
-    #     it 'finds all valid hashtags #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the #fun #hashtags and only give me #backallofthem.')
-    #       expect(pt.hashtags).to eq(['#fun', '#hashtags', '#backallofthem'])
-    #     end
-
-    #     it 'finds all valid hashtags #002' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('#fun #hashtags and only give me ＃backallofthem')
-    #       expect(pt.hashtags).to eq(['#fun', '#hashtags', '＃backallofthem'])
-    #     end
-    #   end
-
-    #   context 'urls' do
-    #     it 'finds all valid urls #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Check out http://www.google.com/?this_is_a_url/hello-world.html for more info.')
-    #       expect(pt.urls).to eq(["http://www.google.com/?this_is_a_url/hello-world.html"])
-    #     end
-
-    #     it 'finds all valid urls #002' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Check out https://www.google.com/?this_is_a_url/hello-world.html for more info.')
-    #       expect(pt.urls).to eq(["https://www.google.com/?this_is_a_url/hello-world.html"])
-    #     end
-
-    #     it 'finds all valid urls #003' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Check out www.google.com/?this_is_a_url/hello-world.html for more info.')
-    #       expect(pt.urls).to eq(["www.google.com/?this_is_a_url/hello-world.html"])
-    #     end
-
-    #     it 'finds all valid urls #004' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Go to http://www.example.com.')
-    #       expect(pt.urls).to eq(["http://www.example.com"])
-    #     end
-    #   end
-
-    #   context 'domains' do
-    #     it 'finds all valid domains #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83')
-    #       expect(pt.domains).to eq(['cnn.com/europe', 'english.alarabiya.net'])
-    #     end
-    #   end
-
-    #   context 'emails' do
-    #     it 'finds all valid emails #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Please email example@example.com for more info.')
-    #       expect(pt.emails).to eq(['example@example.com'])
-    #     end
-
-    #     it 'finds all valid emails #002' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com Please email example@example.com for more info. test@hotmail.com')
-    #       expect(pt.emails).to eq(['123@gmail.com', 'example@example.com', 'test@hotmail.com'])
-    #     end
-
-    #     it 'finds all valid emails #003' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('123@gmail.com.')
-    #       expect(pt.emails).to eq(['123@gmail.com'])
-    #     end
-    #   end
-
-    #   context 'mentions' do
-    #     it 'finds all valid @ mentions #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the @johnny and @space mentions @john.')
-    #       expect(pt.mentions).to eq(['@johnny', '@space', '@john'])
-    #     end
-
-    #     it 'finds all valid @ mentions #002' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Find me all the ＠awesome mentions.')
-    #       expect(pt.mentions).to eq(["＠awesome"])
-    #     end
-    #   end
-
-    #   context 'emoticons' do
-    #     it 'finds simple emoticons #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
-    #       expect(pt.emoticons).to eq([';-)', ':)'])
-    #     end
-    #   end
-
-    #   context 'emoji' do
-    #     it 'finds all valid emoji #001' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('Hello ;-) :) 😄')
-    #       expect(pt.emoji).to eq(['😄'])
-    #     end
-
-    #     it 'finds all valid emoji #002' do
-    #       pt = PragmaticTokenizer::Tokenizer.new('I am a string with emoji 😍😍😱😱👿👿🐔🌚 and some other Unicode characters 比如中文 and numbers 55 33.')
-    #       expect(pt.emoji).to eq(["😍", "😍", "😱", "😱", "👿", "👿", "🐔", "🌚"])
-    #     end
-
-    #     it 'finds all valid emoji #003' do
-    #       pt = PragmaticTokenizer::Tokenizer.new("Return the emoji 👿😍😱🐔🌚.")
-    #       expect(pt.emoji).to eq(["👿", "😍", "😱", "🐔", "🌚"])
-    #     end
-    #   end
-    # end
 
     context 'ending punctutation' do
       it 'handles ending question marks' do

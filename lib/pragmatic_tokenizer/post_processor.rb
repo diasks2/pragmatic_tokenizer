@@ -13,10 +13,10 @@ module PragmaticTokenizer
         .flat_map { |t| (t[-1] == '’' || t[-1] == "'" || t[-1] == '‘' || t[-1] == '`') && t.length > 1 ? t.split(/(’|'|‘|`)/).flatten : t }
         .map { |t| convert_sym_to_punct(t) }
       full_stop_separated_tokens = FullStopSeparator.new(tokens: tokens, abbreviations: abbreviations).separate
-      EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate.flat_map { |t| t.include?("/") && t !~ /(http|https|www)(\.|:)/ ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
-        .flat_map { |t| t.include?("?") && t !~ /(http|https|www)(\.|:)/ && t.length > 1 ? t.gsub!(/\?/, '\1 \2').split(' ').flatten : t }
+      EndingPunctuationSeparator.new(tokens: EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate.flat_map { |t| t.include?("/") && t !~ /(http|https|www)(\.|:)/ ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
+        .flat_map { |t| t.include?("?") && t !~ /(http|https|www)(\.|:)/ && t.length > 1 ? t.gsub(/\?/, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t.include?("+") ? t.gsub!(/\+/, '\1 \2').split(' ').flatten : t }
-        .flat_map { |t| t =~ /\A\.[^\.]/ && t.length > 1 ? t.gsub!(/\./, '\1 ').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\A\.[^\.]/ && t.length > 1 ? t.gsub(/\./, '\1 ').split(' ').flatten : t }
         .flat_map { |t| t.include?(".") &&
           t !~ /(http|https|www)(\.|:)/ &&
           t !~ /\.(com|net|org|edu|gov|mil|int)/ &&
@@ -26,13 +26,17 @@ module PragmaticTokenizer
           t.count(".") == 1 &&
           t !~ /\d+/ &&
           !abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) &&
-          t !~ /\S+(＠|@)\S+/ ? t.gsub!(/\./, '\1 . \2').split(' ').flatten : t }
+          t !~ /\S+(＠|@)\S+/ ? t.gsub(/\./, '\1 . \2').split(' ').flatten : t }
         .flat_map { |t| t.include?(".") &&
           t !~ /(http|https|www)(\.|:)/ &&
           t.length > 1 &&
           t !~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix &&
           t !~ /\S+(＠|@)\S+/ &&
-          abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub!(/\./, '\1. \2').split(' ').flatten : t }
+          abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub(/\./, '\1. \2').split(' ').flatten : t }
+        .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
+        .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
+      ).separate
     end
 
     private

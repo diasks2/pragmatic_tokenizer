@@ -9,14 +9,43 @@ require 'unicode'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :punctuation, :language_module, :expand_contractions, :numbers, :minimum_length, :downcase, :classic_filter, :filter_languages, :abbreviations, :contractions, :clean, :remove_stop_words, :stop_words
+    attr_reader :text, :punctuation, :language_module, :expand_contractions, :numbers, :minimum_length, :downcase, :classic_filter, :filter_languages, :abbreviations, :contractions, :clean, :remove_stop_words, :stop_words, :remove_emoji, :remove_emails, :mentions, :hashtags, :remove_urls, :remove_domains, :long_word_split
 
     # @param [String] text to be tokenized
     # @param [Hash] opts optional arguments
-    # @option opts [Array] :abbreviations user-supplied array of abbreviations (each element should be downcased with final period removed)
-    # @option opts [Array] :stop_words user-supplied array of stop words
-    # @option opts [Hash]  :contractions user-supplied hash of contractions (key is the contracted form, value is the expanded form - both the key and value should be downcased)
-    # @option opts [Array] :filter_languages user-supplied array of languages from which that language's stop words, abbreviations and contractions should be used when calculating the resulting tokens
+
+    # @option opts [Array] :filter_languages - user-supplied array of languages from which that language's stop words, abbreviations and contractions should be used when calculating the resulting tokens - array elements should be of the String class or can be symbols
+    # @option opts [String] :language - two character ISO 639-1 code - can be a String or symbol (i.e. :en or 'en')
+    # @option opts [Boolean] :expand_contractions - (default: false)
+    # @option opts [Boolean] :remove_stop_words - (default: false)
+    # @option opts [Array] :abbreviations - user-supplied array of abbreviations (each element should be downcased with final period removed) - array elements should be of the String class
+    # @option opts [Array] :stop_words - user-supplied array of stop words - array elements should be of the String class
+    # @option opts [Hash]  :contractions - user-supplied hash of contractions (key is the contracted form; value is the expanded form - both the key and value should be downcased)
+    # @option opts [String] :punctuation - see description below - can be a String or symbol (i.e. :none or 'none')
+      # Punctuation 'all': Does not remove any punctuation from the result
+      # Punctuation 'semi': Removes common punctuation (such as full stops)
+      # and does not remove less common punctuation (such as questions marks)
+      # This is useful for text alignment as less common punctuation can help
+      # identify a sentence (like a fingerprint) while common punctuation
+      # (like stop words) should be removed.
+      # Punctuation 'none': Removes all punctuation from the result
+      # Punctuation 'only': Removes everything except punctuation. The
+      # returned result is an array of only the punctuation.
+    # @option opts [String] :numbers - see description below - can be a String or symbol (i.e. :none or 'none')
+      # Numbers 'all': Does not remove any numbers from the result
+      # Numbers 'semi': Removes tokens that include only digits
+      # Numbers 'none': Removes all tokens that include a number from the result (including Roman numerals)
+      # Numbers 'only': Removes everything except tokens that include a number
+    # @option opts [Integer] :minimum_length - minimum length of the token in characters
+    # @option opts [Integer] :long_word_split - the specified length to split long words at any hyphen or underscore.
+    # @option opts [String] :mentions - :remove (will completely remove it), :keep_and_clean (will prefix) and :keep_original (don't alter the token at all). - can be a String or symbol (i.e. :keep_and_clean or 'keep_and_clean')
+    # @option opts [String] :hashtags - :remove (will completely remove it), :keep_and_clean (will prefix) and :keep_original (don't alter the token at all). - can be a String or symbol (i.e. :keep_and_clean or 'keep_and_clean')
+    # @option opts [Boolean] :downcase - (default: true)
+    # @option opts [Boolean] :classic_filter - removes dots from acronyms and 's from the end of tokens - (default: false)
+    # @option opts [Boolean] :remove_emoji - (default: false)
+    # @option opts [Boolean] :remove_emails - (default: false)
+    # @option opts [Boolean] :remove_urls - (default: false)
+    # @option opts [Boolean] :remove_domains - (default: false)
 
     def initialize(text, opts = {})
       @text                     = CGI.unescapeHTML(text)
@@ -46,44 +75,39 @@ module PragmaticTokenizer
         @stop_words             =  merged_stop_words.flatten
       end
       @punctuation              = opts[:punctuation] || 'all'
-      @clean                    = opts[:clean] || false
       @numbers                  = opts[:numbers] || 'all'
       @minimum_length           = opts[:minimum_length] || 0
+      @long_word_split          = opts[:long_word_split]
+      @mentions                 = opts[:mentions] || 'keep_original'
+      @hashtags                 = opts[:hashtags] || 'keep_original'
       @downcase                 = opts[:downcase].nil? ? true : opts[:downcase]
+      @clean                    = opts[:clean] || false
       @classic_filter           = opts[:classic_filter] || false
+      @remove_emoji             = opts[:remove_emoji] || false
+      @remove_emails            = opts[:remove_emails] || false
+      @remove_urls              = opts[:remove_urls] || false
+      @remove_domains           = opts[:remove_domains] || false
 
       unless punctuation.to_s.eql?('all') ||
         punctuation.to_s.eql?('semi') ||
         punctuation.to_s.eql?('none') ||
         punctuation.to_s.eql?('only')
         raise "Punctuation argument can be only be nil, 'all', 'semi', 'none', or 'only'"
-        # Punctuation 'all': Does not remove any punctuation from the result
-
-        # Punctuation 'semi': Removes common punctuation (such as full stops)
-        # and does not remove less common punctuation (such as questions marks)
-        # This is useful for text alignment as less common punctuation can help
-        # identify a sentence (like a fingerprint) while common punctuation
-        # (like stop words) should be removed.
-
-        # Punctuation 'none': Removes all punctuation from the result
-
-        # Punctuation 'only': Removes everything except punctuation. The
-        # returned result is an array of only the punctuation.
       end
       unless numbers.to_s.eql?('all') ||
         numbers.to_s.eql?('semi') ||
         numbers.to_s.eql?('none') ||
         numbers.to_s.eql?('only')
         raise "Numbers argument can be only be nil, 'all', 'semi', 'none', or 'only'"
-        # Numbers 'all': Does not remove any numbers from the result
-
-        # Numbers 'semi': Removes tokens that include only digits
-
-        # Numbers 'none': Removes all tokens that include a number from the result (including Roman numerals)
-
-        # Numbers 'only': Removes everything except tokens that include a number
+      end
+      unless mentions.to_s.eql?('keep_original') ||
+        mentions.to_s.eql?('keep_and_clean') ||
+        mentions.to_s.eql?('remove')
+        raise "Mentions argument can be only be nil, 'keep_original', 'keep_and_clean', or 'remove'"
       end
       raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
+      raise "In Pragmatic Tokenizer minimum_length must be an Integer" unless minimum_length.class == Fixnum || minimum_length.nil?
+      raise "In Pragmatic Tokenizer long_word_split must be an Integer" unless long_word_split.class == Fixnum || long_word_split.nil?
     end
 
     def tokenize
@@ -107,6 +131,13 @@ module PragmaticTokenizer
       remove_short_tokens! if minimum_length > 0
       process_punctuation!
       remove_stop_words!(stop_words) if remove_stop_words
+      remove_emoji! if remove_emoji
+      remove_emails! if remove_emails
+      mentions! if mentions
+      hashtags! if hashtags
+      remove_urls! if remove_urls
+      remove_domains! if remove_domains
+      split_long_words! if long_word_split
       @tokens.reject { |t| t.empty? }
     end
 
@@ -173,6 +204,45 @@ module PragmaticTokenizer
       else
         @tokens.delete_if { |t| stop_words.include?(Unicode::downcase(t)) }
       end
+    end
+
+    def remove_emoji!
+      @tokens.delete_if { |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX }
+    end
+
+    def remove_emails!
+      @tokens.delete_if { |t| t =~ /\S+(＠|@)\S+/ }.map { |t| t.chomp('.') }
+    end
+
+    def mentions!
+      case mentions.to_s
+      when 'remove'
+        @tokens.delete_if { |t| t =~ /\A(@|＠)/ }
+      when 'keep_and_clean'
+        @tokens.map! { |t| t =~ /\A(@|＠)/ ? t.gsub!(/(?<=\A)(@|＠)/, '') : t }
+      end
+    end
+
+    def hashtags!
+      case hashtags.to_s
+      when 'remove'
+        @tokens.delete_if { |t| t =~ /\A(#|＃)/ }
+      when 'keep_and_clean'
+        @tokens.map! { |t| t =~ /\A(#|＃)/ ? t.gsub!(/(?<=\A)(#|＃)/, '') : t }
+      end
+    end
+
+    def remove_urls!
+      @tokens.delete_if { |t| t =~ /(http|https)(\.|:)/ }
+    end
+
+    def remove_domains!
+      @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
+    end
+
+    def split_long_words!
+      @tokens.map! { |t| t.length > long_word_split ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
+        .map! { |t| t.length > long_word_split ? t.gsub(/\_/, '\1 \2').split(' ').flatten : t }
     end
   end
 end

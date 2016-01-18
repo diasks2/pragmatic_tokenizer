@@ -26,18 +26,61 @@ Or install it yourself as:
 * To specify a language use its two character [ISO 639-1 code](https://www.tm-town.com/languages).
 * Pragmatic Tokenizer will unescape any HTML entities.
 
+**Example Usage**
+```ruby
+text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
+
+PragmaticTokenizer::Tokenizer.new(text).tokenize
+# => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
+
+# You can pass many different options:
+options = {
+  language:            :en, # the language of the string you are tokenizing
+  abbreviations:       ['a.b', 'a'], # a user-supplied array of abbreviations (downcased with ending period removed)
+  stop_words:          ['is', 'the'], # a user-supplied array of stop words (downcased)
+  remove_stop_words:   true, # remove stop words
+  contractions:        { "i'm" => "i am" }, # a user-supplied hash of contractions (key is the contracted form; value is the expanded form - both the key and value should be downcased)
+  expand_contractions: true, # (i.e. ["isn't"] will change to two tokens ["is", "not"])
+  filter_languages:    [:en, :de], # process abbreviations, contractions and stop words for this array of languages
+  punctuation:         :none, # see below for more details
+  numbers:             :none, # see below for more details
+  remove_emoji:        :true, # remove any emoji tokens
+  remove_urls:         :true, # remove any urls
+  remove_emails:       :true, # remove any emails
+  remove_domains:      :true, # remove any domains
+  hashtags:            :keep_and_clean, # remove the hastag prefix
+  mentions:            :keep_and_clean, # remove the @ prefix
+  clean:               true, # remove some special characters
+  classic_filter:      true, # removes dots from acronyms and 's from the end of tokens
+  downcase:            false, # do not downcase tokens
+  minimum_length:      3, # remove any tokens less than 3 characters
+  long_word_split:     10 # split tokens longer than 10 characters at hypens or underscores
+}
+```
+
 **Options**  
 
-##### `punctuation`
-  **default** = `'all'`
-- `'all'`  
-  Does not remove any punctuation from the result.
-- `'semi'`   
-  Removes full stops (i.e. periods) ['。', '．', '.'].
-- `'none'`  
-  Removes all punctuation from the result.
-- `'only'`  
-  Removes everything except punctuation. The returned result is an array of only the punctuation.
+##### `language`
+  **default** = `'en'`
+- To specify a language use its two character [ISO 639-1 code](https://www.tm-town.com/languages) as a symbol (i.e. `:en`) or string (i.e. `'en'`)
+
+<hr>
+
+##### `abbreviations`
+  **default** = `nil`
+- You can pass an array of abbreviations to overide or compliment the abbreviations that come stored in this gem. Each element of the array should be a downcased String with the ending period removed.
+
+<hr>
+
+##### `stop_words`
+  **default** = `nil`
+- You can pass an array of stop words to overide or compliment the stop words that come stored in this gem. Each element of the array should be a downcased String.
+
+<hr>
+
+##### `contractions`
+  **default** = `nil`
+- You can pass a hash of contractions to overide or compliment the contractions that come stored in this gem. Each key is the contracted form downcased and each value is the expanded form downcased.
 
 <hr>
 
@@ -50,21 +93,80 @@ Or install it yourself as:
 
 <hr>
 
-##### `remove_en_stop_words`
-  **default** = `'false'`
-- `true`  
-  Removes all English stop words (sometimes strings not in English have English mixed in).
-- `false`   
-  Does not remove English stop words.
-
-<hr>
-
 ##### `expand_contractions`
   **default** = `'false'`
 - `true`  
   Expands contractions (i.e. i'll -> i will).
 - `false`   
   Leaves contractions as is.
+
+<hr>
+
+##### `filter_languages`
+  **default** = `nil`
+- You can pass an array of languages of which you would like to process abbreviations, stop words and contractions. This language can be indepedent of the language of the string you are tokenizing (for example your tex might be German but contain so English stop words that you want to remove). If you supply your own abbreviations, stop words or contractions they will be merged with the abbreviations, stop words and contractions of any languages you add in this option. You can pass an array of symbols or strings (i.e. `[:en, :de]` or `['en', 'de']`)
+
+<hr>
+
+##### `punctuation`
+  **default** = `'all'`
+- `:all`  
+  Does not remove any punctuation from the result.
+- `:semi`   
+  Removes full stops (i.e. periods) ['。', '．', '.'].
+- `:none`  
+  Removes all punctuation from the result.
+- `:only`  
+  Removes everything except punctuation. The returned result is an array of only the punctuation.
+
+<hr>
+
+##### `numbers`
+  **default** = `'all'`
+- `:all`  
+  Does not remove any numbers from the result
+- `:semi`   
+  Removes tokens that include only digits
+- `:none`  
+  Removes all tokens that include a number from the result (including Roman numerals)
+- `:only`  
+  Removes everything except tokens that include a number
+
+<hr>
+
+##### `remove_emoji`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains an emoji.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
+##### `remove_urls`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains a URL.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
+##### `remove_domains`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains a domain.
+- `false`   
+  Leaves tokens as is.
+
+<hr>
+
+##### `remove_domains`
+  **default** = `'false'`
+- `true`  
+  Removes any token that contains a domain.
+- `false`   
+  Leaves tokens as is.
 
 <hr>
 
@@ -77,21 +179,25 @@ Or install it yourself as:
 
 <hr>
 
-##### `remove_numbers`
-  **default** = `'false'`
-- `true`  
-  Removes any token that contains a number.
-- `false`   
-  Leaves tokens as is.
+##### `hashtags`
+  **default** = `'keep_original'`
+- `:keep_original`  
+  Does not alter the token at all.
+- `:keep_and_clean`   
+  Removes the hashtag (#) prefix from the token.
+- `:remove`   
+  Removes the token completely.
 
 <hr>
 
-##### `remove_roman_numerals`
-  **default** = `'false'`
-- `true`  
-  Removes any token that contains a Roman numeral.
-- `false`   
-  Leaves tokens as is.
+##### `mentions`
+  **default** = `'keep_original'`
+- `:keep_original`  
+  Does not alter the token at all.
+- `:keep_and_clean`   
+  Removes the mention (@) prefix from the token.
+- `:remove`   
+  Removes the token completely.
 
 <hr>
 
@@ -113,133 +219,11 @@ Or install it yourself as:
   **default** = `0`  
   The minimum number of characters a token should be.  
 
-**Methods**  
-
-#### `#tokenize`
-
-**Example Usage**
-```ruby
-text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
-
-PragmaticTokenizer::Tokenizer.new(text).tokenize
-# => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
-
-options = {
-  abbreviations:       ['a.b', 'a'],
-  stop_words:          ['is', 'the'],
-  contractions:        { "i'm" => "i am" },
-  filter_languages:    [:en, :de],
-  emojis:              :remove,
-  urls:                :remove,
-  hashtags:            :keep_and_clean,
-  mentions:            :keep_and_clean,
-  email_addresses:     :keep_original,
-  domains:             :keep_original,
-  expand_contractions: true,
-  clean:               true,
-  classic_filter:      false,
-  language:            :en,
-  punctuation:         :none,
-  numbers:             :none,
-  roman_numerals:      :none,
-  downcase:            true,
-  minimum_length:      3,
-  long_word_split:     10
-}
-```
-
 <hr>
 
-#### `#urls`
-Extract only valid URL tokens
-
-**Example Usage**
-```ruby
-text = "Go to http://www.example.com"
-
-PragmaticTokenizer::Tokenizer.new(text).urls
-# => ["http://www.example.com"]
-```
-
-<hr>
-
-#### `#domains`
-Extract only valid domain tokens
-
-**Example Usage**
-```ruby
-text = "See the breaking news stories about X on cnn.com/europe and english.alarabiya.net, here’s a screenshot: https://t.co/s83k28f29d31s83"
-
-PragmaticTokenizer::Tokenizer.new(text).urls
-# => ["cnn.com/europe", "english.alarabiya.net"]
-```
-
-<hr>
-
-#### `#emails`
-Extract only valid email tokens
-
-**Example Usage**
-```ruby
-text = "Please email example@example.com for more info."
-
-PragmaticTokenizer::Tokenizer.new(text).emails
-# => ["example@example.com"]
-```
-
-<hr>
-
-#### `#hashtags`
-Extract only valid hashtag tokens
-
-**Example Usage**
-```ruby
-text = "Find me all the #fun #hashtags and give me #backallofthem."
-
-PragmaticTokenizer::Tokenizer.new(text).hashtags
-# => ["#fun", "#hashtags", "#backallofthem"]
-```
-
-<hr>
-
-#### `#mentions`
-Extract only valid @ mention tokens
-
-**Example Usage**
-```ruby
-text = "Find me all the @awesome mentions."
-
-PragmaticTokenizer::Tokenizer.new(text).hashtags
-# => ["@awesome"]
-```
-
-<hr>
-
-#### `#emoticons`
-Extract only simple emoticon tokens
-
-**Example Usage**
-```ruby
-text = "Hello ;-) :) 😄"
-
-PragmaticTokenizer::Tokenizer.new(text).emoticons
-# => [";-)", ":)""]
-```
-
-<hr>
-
-#### `#emoji`
-Extract only valid† emoji tokens
-
-*†matches all 1012 single-character Unicode Emoji (all except for two-character flags)*
-
-**Example Usage**
-```ruby
-text = "Return the emoji 👿😍😱🐔🌚."
-
-PragmaticTokenizer::Tokenizer.new(text).emoticons
-# => ["👿", "😍", "😱", "🐔", "🌚"]
-```
+##### `long_word_split`
+  **default** = `nil`  
+  The number of characters after which a token should be split at hypens or underscores.
 
 ## Language Support
 
