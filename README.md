@@ -85,7 +85,7 @@ options = {
 <hr>
 
 ##### `remove_stop_words`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes all stop words.
 - `false`   
@@ -94,7 +94,7 @@ options = {
 <hr>
 
 ##### `expand_contractions`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Expands contractions (i.e. i'll -> i will).
 - `false`   
@@ -135,7 +135,7 @@ options = {
 <hr>
 
 ##### `remove_emoji`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes any token that contains an emoji.
 - `false`   
@@ -144,7 +144,7 @@ options = {
 <hr>
 
 ##### `remove_urls`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes any token that contains a URL.
 - `false`   
@@ -153,7 +153,7 @@ options = {
 <hr>
 
 ##### `remove_domains`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes any token that contains a domain.
 - `false`   
@@ -162,7 +162,7 @@ options = {
 <hr>
 
 ##### `remove_domains`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes any token that contains a domain.
 - `false`   
@@ -171,7 +171,7 @@ options = {
 <hr>
 
 ##### `clean`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes tokens consisting of only hypens, underscores, or periods as well as some special characters (®, ©, ™). Also removes long tokens or tokens with a backslash.
 - `false`   
@@ -202,7 +202,7 @@ options = {
 <hr>
 
 ##### `classic_filter`
-  **default** = `'false'`
+  **default** = `false`
 - `true`  
   Removes dots from acronyms and 's from the end of tokens.
 - `false`   
@@ -211,7 +211,7 @@ options = {
 <hr>
 
 ##### `downcase`
-  **default** = `'true'`
+  **default** = `true`
 
 <hr>
 
