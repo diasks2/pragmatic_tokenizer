@@ -180,7 +180,7 @@ options = {
 <hr>
 
 ##### `hashtags`
-  **default** = `'keep_original'`
+  **default** = `:keep_original`
 - `:keep_original`  
   Does not alter the token at all.
 - `:keep_and_clean`   
@@ -191,7 +191,7 @@ options = {
 <hr>
 
 ##### `mentions`
-  **default** = `'keep_original'`
+  **default** = `:keep_original`
 - `:keep_original`  
   Does not alter the token at all.
 - `:keep_and_clean`   
