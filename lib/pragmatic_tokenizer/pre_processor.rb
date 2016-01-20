@@ -122,7 +122,6 @@ module PragmaticTokenizer
     end
 
     def convert_apostrophe_s(text)
-      puts "Text: #{text.include?("\u{0301}")}"
       text.gsub!(/\s\u{0301}(?=s(\s|\z))/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['`']) || text
     end
 

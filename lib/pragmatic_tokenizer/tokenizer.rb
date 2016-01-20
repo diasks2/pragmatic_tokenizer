@@ -122,9 +122,7 @@ module PragmaticTokenizer
     private
 
     def post_process(text)
-      puts "Text: #{text}"
       @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
-      puts "Tokens: #{@tokens}"
       downcase! if downcase
       expand_contractions!(contractions) if expand_contractions
       clean! if clean
