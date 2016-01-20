@@ -136,6 +136,24 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["🤔", "🙄"])
         end
+
+        it 'handles snowflakes 1' do
+          text = "❄️❄️❄️"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["❄️", "❄️", "❄️"])
+        end
+
+        it 'handles snowflakes 2' do
+          text = "\u2744\uFE0E\u2744\uFE0E\u2744\uFE0E"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["❄︎", "❄︎", "❄︎"])
+        end
+
+        it 'handles snowflakes 3' do
+          text = "\u2744\u2744\u2744"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["\u2744", "\u2744", "\u2744"])
+        end
       end
 
       context 'user-supplied abbreviations' do
@@ -269,6 +287,30 @@ describe PragmaticTokenizer do
           text = "Return the emoji 👿😍😱🐔🌚. 🌚"
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["return", "the", "emoji", "👿", "😍", "😱", "🐔", "🌚", ".", "🌚"])
+        end
+
+        it 'removes snowflakes 1' do
+          text = "hello❄️❄️❄️"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emoji: true
+          )
+          expect(pt.tokenize).to eq(["hello"])
+        end
+
+        it 'removes snowflakes 2' do
+          text = "hello\u2744\uFE0E\u2744\uFE0E\u2744\uFE0E"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emoji: true
+          )
+          expect(pt.tokenize).to eq(["hello"])
+        end
+
+        it 'removes snowflakes 3' do
+          text = "hello\u2744\u2744\u2744"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emoji: true
+          )
+          expect(pt.tokenize).to eq(["hello"])
         end
       end
 

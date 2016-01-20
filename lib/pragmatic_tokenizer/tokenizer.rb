@@ -213,7 +213,11 @@ module PragmaticTokenizer
     end
 
     def remove_emoji!
-      @tokens.delete_if { |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX }
+      @tokens.delete_if { |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
+        t =~ /\u{2744}\u{FE0F}/ ||
+        t =~ /\u{2744}\u{FE0E}/ ||
+        t =~ /\u{2744}/
+      }
     end
 
     def remove_emails!
