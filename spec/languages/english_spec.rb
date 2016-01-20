@@ -4,7 +4,7 @@ describe PragmaticTokenizer do
   context 'Language: English (en)' do
     context '#tokenize (example strings)' do
 
-            context 'no options selected' do
+      context 'no options selected' do
         it 'tokenizes a string #001' do
           text = "Hello world."
           pt = PragmaticTokenizer::Tokenizer.new(text)
@@ -129,6 +129,12 @@ describe PragmaticTokenizer do
           text = "this is a sentence.#yay this too.#withnumbers123"
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["this", "is", "a", "sentence", ".", "#yay", "this", "too", ".", "#withnumbers123"])
+        end
+
+        it 'splits emojis' do
+          text = "🤔🙄"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["🤔", "🙄"])
         end
       end
 
@@ -516,6 +522,14 @@ describe PragmaticTokenizer do
             classic_filter: true
           )
           expect(pt.tokenize).to eq(["st.veit", ",", "which", "usually", "would", "be", "written", "st", "veit", "was", "not", "visited", "by", "b.obama", "reported", "cnn.com"])
+        end
+
+        it 'optimizes the classic filter' do
+          text = "therés something"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            classic_filter: true
+          )
+          expect(pt.tokenize).to eq(["there", "something"])
         end
       end
 

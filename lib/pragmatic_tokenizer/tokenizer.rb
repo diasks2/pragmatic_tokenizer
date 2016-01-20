@@ -175,7 +175,7 @@ module PragmaticTokenizer
     end
 
     def classic_filter!
-      @tokens.map! { |t| abbreviations.include?(t.chomp(".")) ? t.gsub('.', '').chomp("'s").chomp("’s").chomp("`s") : t.chomp("'s").chomp("’s").chomp("`s") }
+      @tokens.map! { |t| abbreviations.include?(t.chomp(".")) ? t.gsub('.', '').chomp("'s").chomp("’s").chomp("`s").chomp("́s") : t.chomp("'s").chomp("’s").chomp("`s").chomp("́s") }
     end
 
     def process_numbers!
