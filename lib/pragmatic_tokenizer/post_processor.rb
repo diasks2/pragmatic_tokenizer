@@ -35,7 +35,6 @@ module PragmaticTokenizer
           abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub(/\./, '\1. \2').split(' ').flatten : t }
         .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
-        .flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
       ).separate
     end
 

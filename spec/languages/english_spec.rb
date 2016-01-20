@@ -4,55 +4,7 @@ describe PragmaticTokenizer do
   context 'Language: English (en)' do
     context '#tokenize (example strings)' do
 
-      context 'user-supplied abbreviations' do
-        it 'tokenizes a regular string with an abbreviation' do
-          text = "Mr. Smith, hello world."
-          pt = PragmaticTokenizer::Tokenizer.new(text)
-          expect(pt.tokenize).to eq(["mr.", "smith", ",", "hello", "world", "."])
-        end
-
-        it 'fails to recognize an English abbreviation if the user supplies an abbreviations array without it' do
-          text = "Mr. Smith, hello world."
-          abbreviations = ['mrs']
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
-          expect(pt.tokenize).to eq(["mr", ".", "smith", ",", "hello", "world", "."])
-        end
-
-        it 'recognizes a user-supplied abbreviation' do
-          text = "thisisnotanormalabbreviation. hello world."
-          abbreviations = ['thisisnotanormalabbreviation']
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
-          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation.", "hello", "world", "."])
-        end
-
-        it 'handles an empty user-supplied abbreviation array' do
-          text = "thisisnotanormalabbreviation. hello world."
-          abbreviations = []
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
-          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation", ".", "hello", "world", "."])
-        end
-
-        it 'handles abrreviations across multiple languages' do
-          text = "Mr. Smith how are ü. today."
-          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de])
-          expect(pt.tokenize).to eq(["mr.", "smith", "how", "are", "ü.", "today", "."])
-        end
-
-        it 'handles abrreviations for languages other than English' do
-          text = "Adj. Smith how are ü. today."
-          pt = PragmaticTokenizer::Tokenizer.new(text, language: :de)
-          expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
-        end
-
-        it 'handles abrreviations across multiple languages and user-supplied abbreviations' do
-          text = "Adj. Smith how are ü. today. thisisnotanormalabbreviation. is it?"
-          abbreviations = ['thisisnotanormalabbreviation']
-          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de], abbreviations: abbreviations)
-          expect(pt.tokenize).to eq(["adj.", "smith", "how", "are", "ü.", "today", ".", "thisisnotanormalabbreviation.", "is", "it", "?"])
-        end
-      end
-
-      context 'no options selected' do
+            context 'no options selected' do
         it 'tokenizes a string #001' do
           text = "Hello world."
           pt = PragmaticTokenizer::Tokenizer.new(text)
@@ -131,6 +83,12 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["the", "“", "star-trek", "“", "-", "inventor"])
         end
 
+        it 'tokenizes a string #014' do
+          text = "#ab-cd"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["#ab-cd"])
+        end
+
         it 'handles numbers with symbols 2' do
           text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
           pt = PragmaticTokenizer::Tokenizer.new(text)
@@ -141,6 +99,54 @@ describe PragmaticTokenizer do
           text = "Hello, that will be $5 dollars. You can pay at 5:00, after it is 500."
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "$5", "dollars", ".", "you", "can", "pay", "at", "5:00", ",", "after", "it", "is", "500", "."])
+        end
+      end
+
+      context 'user-supplied abbreviations' do
+        it 'tokenizes a regular string with an abbreviation' do
+          text = "Mr. Smith, hello world."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["mr.", "smith", ",", "hello", "world", "."])
+        end
+
+        it 'fails to recognize an English abbreviation if the user supplies an abbreviations array without it' do
+          text = "Mr. Smith, hello world."
+          abbreviations = ['mrs']
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["mr", ".", "smith", ",", "hello", "world", "."])
+        end
+
+        it 'recognizes a user-supplied abbreviation' do
+          text = "thisisnotanormalabbreviation. hello world."
+          abbreviations = ['thisisnotanormalabbreviation']
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation.", "hello", "world", "."])
+        end
+
+        it 'handles an empty user-supplied abbreviation array' do
+          text = "thisisnotanormalabbreviation. hello world."
+          abbreviations = []
+          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["thisisnotanormalabbreviation", ".", "hello", "world", "."])
+        end
+
+        it 'handles abrreviations across multiple languages' do
+          text = "Mr. Smith how are ü. today."
+          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de])
+          expect(pt.tokenize).to eq(["mr.", "smith", "how", "are", "ü.", "today", "."])
+        end
+
+        it 'handles abrreviations for languages other than English' do
+          text = "Adj. Smith how are ü. today."
+          pt = PragmaticTokenizer::Tokenizer.new(text, language: :de)
+          expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
+        end
+
+        it 'handles abrreviations across multiple languages and user-supplied abbreviations' do
+          text = "Adj. Smith how are ü. today. thisisnotanormalabbreviation. is it?"
+          abbreviations = ['thisisnotanormalabbreviation']
+          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de], abbreviations: abbreviations)
+          expect(pt.tokenize).to eq(["adj.", "smith", "how", "are", "ü.", "today", ".", "thisisnotanormalabbreviation.", "is", "it", "?"])
         end
       end
 
@@ -742,17 +748,19 @@ describe PragmaticTokenizer do
         it 'handles hashtags 2' do
           text = "This is the #upper-#limit"
           pt = PragmaticTokenizer::Tokenizer.new(text,
-            punctuation: 'none'
+            punctuation: 'none',
+            hashtags: :keep_and_clean
           )
-          expect(pt.tokenize).to eq(["this", "is", "the", "#upper", "#limit"])
+          expect(pt.tokenize).to eq(["this", "is", "the", "upper", "limit"])
         end
 
         it 'handles hashtags 3' do
           text = "The #2016-fun has just begun."
           pt = PragmaticTokenizer::Tokenizer.new(text,
-            punctuation: 'none'
+            punctuation: 'none',
+            hashtags: :keep_and_clean
           )
-          expect(pt.tokenize).to eq(["the", "#2016", "fun", "has", "just", "begun"])
+          expect(pt.tokenize).to eq(["the", "2016", "fun", "has", "just", "begun"])
         end
 
         it 'handles emoji 1' do

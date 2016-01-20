@@ -228,6 +228,7 @@ module PragmaticTokenizer
       when 'remove'
         @tokens.delete_if { |t| t =~ /\A(#|＃)/ }
       when 'keep_and_clean'
+        @tokens = @tokens.flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
         @tokens.map! { |t| t =~ /\A(#|＃)/ ? t.gsub!(/(?<=\A)(#|＃)/, '') : t }
       end
     end
