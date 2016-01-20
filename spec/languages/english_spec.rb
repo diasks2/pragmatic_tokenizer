@@ -166,6 +166,12 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["this", "is", "sentence", "one", "!", "this", "is", "sentence", "two", ".", "@someone"])
         end
+
+        it 'handles weird apostrophes' do
+          text = [116, 104, 101, 114, 101, 32, 769, 115, 32, 115, 111, 109, 101, 116, 104, 105, 110, 103].pack("U*")
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["there`s", "something"])
+        end
       end
 
       context 'user-supplied abbreviations' do
@@ -596,6 +602,14 @@ describe PragmaticTokenizer do
 
         it 'optimizes the classic filter' do
           text = "therés something"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            classic_filter: true
+          )
+          expect(pt.tokenize).to eq(["there", "something"])
+        end
+
+        it 'optimizes the classic filter' do
+          text = [116, 104, 101, 114, 101, 32, 769, 115, 32, 115, 111, 109, 101, 116, 104, 105, 110, 103].pack("U*")
           pt = PragmaticTokenizer::Tokenizer.new(text,
             classic_filter: true
           )

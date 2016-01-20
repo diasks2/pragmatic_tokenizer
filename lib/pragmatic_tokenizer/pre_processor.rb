@@ -23,6 +23,7 @@ module PragmaticTokenizer
       shift_vertical_bar(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
+      convert_apostrophe_s(text)
       shift_beginning_hyphen(text)
       shift_ending_hyphen(text)
       text.squeeze(' ')
@@ -118,6 +119,11 @@ module PragmaticTokenizer
       else
         PragmaticTokenizer::Languages::Common::SingleQuotes.new.handle_single_quotes(text)
       end
+    end
+
+    def convert_apostrophe_s(text)
+      puts "Text: #{text.include?("\u{0301}")}"
+      text.gsub!(/\s\u{0301}(?=s(\s|\z))/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['`']) || text
     end
 
     def shift_beginning_hyphen(text)
