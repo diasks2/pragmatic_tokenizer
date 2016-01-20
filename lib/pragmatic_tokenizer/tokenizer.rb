@@ -162,9 +162,10 @@ module PragmaticTokenizer
         .map { |t| t.gsub(/[[:cntrl:]]/, '') }
         .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
         .map { |t| t.gsub(/(?<=\A)!+(?=.+)/, '') }
-        .map { |t| t.gsub(/1+(?=\z)/, '') }
+        .map { |t| t !~ /[＠@#|＃]/ ? t.gsub(/(?<=\D)1+(?=\z)/, '') : t }
         .map { |t| t.gsub(/!+(?=\z)/, '') }
         .map { |t| t.gsub(/!+(1*!*)*(?=\z)/, '') }
+        .map { |t| t.gsub(/\u{00AD}/, '') }
         .delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||

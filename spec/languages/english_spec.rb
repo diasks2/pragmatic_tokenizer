@@ -154,6 +154,18 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["\u2744", "\u2744", "\u2744"])
         end
+
+        it 'separates tokens' do
+          text = "football≠soccer"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["football", "≠", "soccer"])
+        end
+
+        it 'deals with missing whitespaces' do
+          text = "this is sentence one!this is sentence two.@someone"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["this", "is", "sentence", "one", "!", "this", "is", "sentence", "two", ".", "@someone"])
+        end
       end
 
       context 'user-supplied abbreviations' do
@@ -386,7 +398,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text,
             remove_emails: true
           )
-          expect(pt.tokenize).to eq(["the", "great", "cook.@someone", "something", "else@whoever"])
+          expect(pt.tokenize).to eq(["the", "great", "cook", ".", "@someone", "something", "else@whoever"])
         end
       end
 
@@ -544,6 +556,22 @@ describe PragmaticTokenizer do
             clean: true
           )
           expect(pt.tokenize).to eq(["look", "the", "sky", "is", "blue"])
+        end
+
+        it 'keeps numbers at the end of mentions and hashtags' do
+          text = "#le1101 #artistQ21 @someone12 @someoneelse1 and @somebody1980"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["#le1101", "#artistq21", "@someone12", "@someoneelse1", "and", "@somebody1980"])
+        end
+
+        it 'cleans a prefixed weird hyphen' do
+          text = [104, 105, 103, 104, 32, 173, 116, 101, 109, 112, 101, 114, 97, 116, 117, 114, 101, 32, 97, 110, 100, 32, 173, 119, 105, 110, 100].pack("U*")
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["high", "temperature", "and", "wind"])
         end
       end
 

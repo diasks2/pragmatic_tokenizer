@@ -10,7 +10,10 @@ module PragmaticTokenizer
       shift_multiple_dash(text)
       shift_upsidedown_question_mark(text)
       shift_upsidedown_exclamation(text)
+      shift_exclamation(text)
       shift_ellipse(text)
+      shift_no_space_mention(text)
+      shift_not_equals(text)
       shift_special_quotes(text)
       shift_colon(text)
       shift_bracket(text)
@@ -45,10 +48,22 @@ module PragmaticTokenizer
       text.gsub!(/¡/, ' ¡ ') || text
     end
 
+    def shift_exclamation(text)
+      text.gsub!(/(?<=[a-zA-z])!(?=[a-zA-z])/, ' ! ') || text
+    end
+
     def shift_ellipse(text)
       text.gsub!(/(\.\.\.+)/o) { ' ' + $1 + ' ' } || text
       text.gsub!(/(\.\.+)/o) { ' ' + $1 + ' ' } || text
       text.gsub!(/(…+)/o) { ' ' + $1 + ' ' } || text
+    end
+
+    def shift_no_space_mention(text)
+      text.gsub!(/\.(?=(@|＠)[^\.]+(\s|\z))/, '. ') || text
+    end
+
+    def shift_not_equals(text)
+      text.gsub!(/≠/, ' ≠ ') || text
     end
 
     def shift_special_quotes(text)
