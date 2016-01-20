@@ -17,6 +17,7 @@ module PragmaticTokenizer
         .flat_map { |t| t.include?("?") && t !~ /(http|https|www)(\.|:)/ && t.length > 1 ? t.gsub(/\?/, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t.include?("+") ? t.gsub!(/\+/, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t =~ /\A\.[^\.]/ && t.length > 1 ? t.gsub(/\./, '\1 ').split(' ').flatten : t }
+        .flat_map { |t| t =~ /\A\:\S{2,}/ ? t.gsub(/\:/, ': ').split(' ').flatten : t }
         .flat_map { |t| t.include?(".") &&
           t !~ /(http|https|www)(\.|:)/ &&
           t !~ /\.(com|net|org|edu|gov|mil|int)/ &&
@@ -41,7 +42,7 @@ module PragmaticTokenizer
     private
 
     def convert_sym_to_punct(token)
-      symbol_matches = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘]/.match(token)
+      symbol_matches = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/.match(token)
       symbol_matches.nil? ? token : token.gsub!(symbol_matches[0], PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(symbol_matches[0]))
     end
   end

@@ -160,11 +160,17 @@ module PragmaticTokenizer
         .flat_map { |t| t =~ /\_+(?=\z)/ ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
         .flat_map { |t| t =~ /\*+/ ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
         .map { |t| t.gsub(/[[:cntrl:]]/, '') }
+        .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
+        .map { |t| t.gsub(/(?<=\A)!+(?=.+)/, '') }
+        .map { |t| t.gsub(/1+(?=\z)/, '') }
+        .map { |t| t.gsub(/!+(?=\z)/, '') }
+        .map { |t| t.gsub(/!+(1*!*)*(?=\z)/, '') }
         .delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||
         t.length > 50 ||
-        (t.length > 1 && t =~ /[&*+<=>^|~]/i)
+        (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
+        (t.length == 1 && t =~ /\:/)
       }
     end
 
@@ -211,7 +217,7 @@ module PragmaticTokenizer
     end
 
     def remove_emails!
-      @tokens.delete_if { |t| t =~ /\S+(＠|@)\S+/ }.map { |t| t.chomp('.') }
+      @tokens.delete_if { |t| t =~ /\S+(＠|@)\S+\.\S+/ }.map { |t| t.chomp('.') }
     end
 
     def mentions!
@@ -238,7 +244,7 @@ module PragmaticTokenizer
     end
 
     def remove_domains!
-      @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
+      @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
     end
 
     def split_long_words!

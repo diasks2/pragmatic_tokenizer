@@ -16,6 +16,7 @@ module PragmaticTokenizer
       shift_bracket(text)
       shift_semicolon(text)
       shift_caret(text)
+      shift_hashtag(text)
       shift_vertical_bar(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
@@ -29,6 +30,7 @@ module PragmaticTokenizer
     def shift_comma(text)
       # Shift commas off everything but numbers
       text.gsub!(/,(?!\d)/o, ' , ') || text
+      text.gsub!(/(?<=\D),(?=\S+)/, ' , ') || text
     end
 
     def shift_multiple_dash(text)
@@ -76,6 +78,10 @@ module PragmaticTokenizer
 
     def shift_caret(text)
       text.gsub!(/\^/, ' ^ ') || text
+    end
+
+    def shift_hashtag(text)
+      text.gsub!(/(?<=\S)(#|＃)(?=\S)/, ' \1\2') || text
     end
 
     def shift_vertical_bar(text)

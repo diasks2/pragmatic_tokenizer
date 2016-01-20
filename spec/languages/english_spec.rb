@@ -100,6 +100,36 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["hello", ",", "that", "will", "be", "$5", "dollars", ".", "you", "can", "pay", "at", "5:00", ",", "after", "it", "is", "500", "."])
         end
+
+        it 'splits at a comma' do
+          text = "16.1. day one,17.2. day two"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["16.1", ".", "day", "one", ",", "17.2", ".", "day", "two"])
+        end
+
+        it 'splits at hashtags' do
+          text = "some sentence#RT ... i like u2.#bono"
+          pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: :none)
+          expect(pt.tokenize).to eq(["some", "sentence", "#rt", "i", "like", "u2", "#bono"])
+        end
+
+        it 'identifies single quotes' do
+          text = "Sean Penn Sat for Secret Interview With ‘El Chapo,’ Mexican Drug"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["sean", "penn", "sat", "for", "secret", "interview", "with", "‘", "el", "chapo", ",", "’", "mexican", "drug"])
+        end
+
+        it 'identifies prefixed symbols' do
+          text = "look:the sky is blue"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["look", ":", "the", "sky", "is", "blue"])
+        end
+
+        it 'identifies hashtags with numbers too' do
+          text = "this is a sentence.#yay this too.#withnumbers123"
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(["this", "is", "a", "sentence", ".", "#yay", "this", "too", ".", "#withnumbers123"])
+        end
       end
 
       context 'user-supplied abbreviations' do
@@ -302,6 +332,14 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["here", "are", "some", "emails", "jon@hotmail.com", "ben123＠gmail.com", "."])
         end
+
+        it 'knows what is not an email address' do
+          text = "the great cook.@someone something else@whoever"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_emails: true
+          )
+          expect(pt.tokenize).to eq(["the", "great", "cook.@someone", "something", "else@whoever"])
+        end
       end
 
       context 'option (urls)' do
@@ -333,6 +371,31 @@ describe PragmaticTokenizer do
           text = "Here are some domains and urls google.com https://www.google.com www.google.com."
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["here", "are", "some", "domains", "and", "urls", "google.com", "https://www.google.com", "www.google.com", "."])
+        end
+
+        it 'knows what is not a domain 1' do
+          skip "NOT IMPLEMENTED"
+          text = "this is a sentence.and no domain."
+          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
+          expect(pt.tokenize).to eq(
+            ["this", "is", "a", "sentence", ".", "and", "no", "domain", "."]
+          )
+        end
+
+        it 'knows what is not a domain 2' do
+          text = "former president g.w.bush was..."
+          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
+          expect(pt.tokenize).to eq(
+            ["former", "president", "g.w.bush", "was", "..."]
+          )
+        end
+
+        it 'knows what is not a domain 3' do
+          text = "2.something-times"
+          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
+          expect(pt.tokenize).to eq(
+            ["2.something-times"]
+          )
         end
       end
 
@@ -409,6 +472,30 @@ describe PragmaticTokenizer do
             clean: true
           )
           expect(pt.tokenize).to eq(["this", "@sentence", "has", "a", "long", "string", "of", "dots"])
+        end
+
+        it 'cleans words with symbols 1' do
+          text = "something.com:article title !!wow look!!1"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["something.com", "article", "title", "wow", "look"])
+        end
+
+        it 'cleans words with symbols 2' do
+          text = "something.com:article title !!wow look!!1!1!11!"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["something.com", "article", "title", "wow", "look"])
+        end
+
+        it 'identifies prefixed symbols' do
+          text = "look:the sky is blue"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["look", "the", "sky", "is", "blue"])
         end
       end
 
@@ -745,24 +832,6 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["look", "a", "dog", "with", "shoes", "☺"])
         end
 
-        it 'handles hashtags 2' do
-          text = "This is the #upper-#limit"
-          pt = PragmaticTokenizer::Tokenizer.new(text,
-            punctuation: 'none',
-            hashtags: :keep_and_clean
-          )
-          expect(pt.tokenize).to eq(["this", "is", "the", "upper", "limit"])
-        end
-
-        it 'handles hashtags 3' do
-          text = "The #2016-fun has just begun."
-          pt = PragmaticTokenizer::Tokenizer.new(text,
-            punctuation: 'none',
-            hashtags: :keep_and_clean
-          )
-          expect(pt.tokenize).to eq(["the", "2016", "fun", "has", "just", "begun"])
-        end
-
         it 'handles emoji 1' do
           text = "How bad!😝"
           pt = PragmaticTokenizer::Tokenizer.new(text,
@@ -1006,6 +1075,24 @@ describe PragmaticTokenizer do
             long_word_split: 12
           )
           expect(pt.tokenize).to eq(["hi-hat", "and", "old-school", "but", "not", "really", "important", "long", "word"])
+        end
+
+        it 'handles hashtags 2' do
+          text = "This is the #upper-#limit"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: 'none',
+            hashtags: :keep_and_clean
+          )
+          expect(pt.tokenize).to eq(["this", "is", "the", "upper", "limit"])
+        end
+
+        it 'handles hashtags 3' do
+          text = "The #2016-fun has just begun."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: 'none',
+            hashtags: :keep_and_clean
+          )
+          expect(pt.tokenize).to eq(["the", "2016", "fun", "has", "just", "begun"])
         end
       end
     end
