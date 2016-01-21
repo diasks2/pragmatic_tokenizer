@@ -217,5 +217,13 @@ describe PragmaticTokenizer do
       )
       expect(pt.tokenize).to eq(["endlich", "regnet", "es", "ihm", "nicht", "mehr", "auf́s", "haupt"])
     end
+
+    it 'handles abrreviations for languages other than English' do
+      text = "Adj. Smith how are ü. today."
+      pt = PragmaticTokenizer::Tokenizer.new(text,
+        language: :de
+      )
+      expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
+    end
   end
 end

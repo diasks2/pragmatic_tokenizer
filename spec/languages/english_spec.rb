@@ -107,12 +107,6 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["16.1", ".", "day", "one", ",", "17.2", ".", "day", "two"])
         end
 
-        it 'splits at hashtags' do
-          text = "some sentence#RT ... i like u2.#bono"
-          pt = PragmaticTokenizer::Tokenizer.new(text, punctuation: :none)
-          expect(pt.tokenize).to eq(["some", "sentence", "#rt", "i", "like", "u2", "#bono"])
-        end
-
         it 'identifies single quotes' do
           text = "Sean Penn Sat for Secret Interview With ‘El Chapo,’ Mexican Drug"
           pt = PragmaticTokenizer::Tokenizer.new(text)
@@ -172,6 +166,14 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(text)
           expect(pt.tokenize).to eq(["there`s", "something"])
         end
+
+        it 'treats abbreviations always the same' do
+          text = "U.S.A. U.S.A. U.S.A."
+          pt = PragmaticTokenizer::Tokenizer.new(text)
+          expect(pt.tokenize).to eq(
+            ["u.s.a.", "u.s.a.", "u.s.a."]
+          )
+        end
       end
 
       context 'user-supplied abbreviations' do
@@ -184,40 +186,45 @@ describe PragmaticTokenizer do
         it 'fails to recognize an English abbreviation if the user supplies an abbreviations array without it' do
           text = "Mr. Smith, hello world."
           abbreviations = ['mrs']
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            abbreviations: abbreviations
+          )
           expect(pt.tokenize).to eq(["mr", ".", "smith", ",", "hello", "world", "."])
         end
 
         it 'recognizes a user-supplied abbreviation' do
           text = "thisisnotanormalabbreviation. hello world."
           abbreviations = ['thisisnotanormalabbreviation']
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            abbreviations: abbreviations
+          )
           expect(pt.tokenize).to eq(["thisisnotanormalabbreviation.", "hello", "world", "."])
         end
 
         it 'handles an empty user-supplied abbreviation array' do
           text = "thisisnotanormalabbreviation. hello world."
           abbreviations = []
-          pt = PragmaticTokenizer::Tokenizer.new(text, abbreviations: abbreviations)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            abbreviations: abbreviations
+          )
           expect(pt.tokenize).to eq(["thisisnotanormalabbreviation", ".", "hello", "world", "."])
         end
 
         it 'handles abrreviations across multiple languages' do
           text = "Mr. Smith how are ü. today."
-          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de])
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            filter_languages: [:en, :de]
+          )
           expect(pt.tokenize).to eq(["mr.", "smith", "how", "are", "ü.", "today", "."])
-        end
-
-        it 'handles abrreviations for languages other than English' do
-          text = "Adj. Smith how are ü. today."
-          pt = PragmaticTokenizer::Tokenizer.new(text, language: :de)
-          expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
         end
 
         it 'handles abrreviations across multiple languages and user-supplied abbreviations' do
           text = "Adj. Smith how are ü. today. thisisnotanormalabbreviation. is it?"
           abbreviations = ['thisisnotanormalabbreviation']
-          pt = PragmaticTokenizer::Tokenizer.new(text, filter_languages: [:en, :de], abbreviations: abbreviations)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            filter_languages: [:en, :de],
+            abbreviations: abbreviations
+          )
           expect(pt.tokenize).to eq(["adj.", "smith", "how", "are", "ü.", "today", ".", "thisisnotanormalabbreviation.", "is", "it", "?"])
         end
       end
@@ -233,27 +240,40 @@ describe PragmaticTokenizer do
         it 'expands user-supplied contractions' do
           text = "Hello supa'soo guy."
           contractions = { "supa'soo" => "super smooth" }
-          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: true)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            contractions: contractions,
+            expand_contractions: true
+          )
           expect(pt.tokenize).to eq(["hello", "super", "smooth", "guy", "."])
         end
 
         it 'does not expands user-supplied contractions' do
           text = "Hello supa'soo guy."
           contractions = { "supa'soo" => "super smooth" }
-          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: false)
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            contractions: contractions,
+            expand_contractions: false
+          )
           expect(pt.tokenize).to eq( ["hello", "supa'soo", "guy", "."])
         end
 
         it 'expands user-supplied contractions and language contractions' do
           text = "Hello supa'soo guy. auf's wasn't it?"
           contractions = { "supa'soo" => "super smooth" }
-          pt = PragmaticTokenizer::Tokenizer.new(text, contractions: contractions, expand_contractions: true, filter_languages: [:en, :de])
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            contractions: contractions,
+            expand_contractions: true,
+            filter_languages: [:en, :de]
+          )
           expect(pt.tokenize).to eq(["hello", "super", "smooth", "guy", ".", "auf", "das", "was", "not", "it", "?"])
         end
 
         it 'expands language contractions' do
           text = "Hello supa'soo guy. auf's wasn't it?"
-          pt = PragmaticTokenizer::Tokenizer.new(text, expand_contractions: true, filter_languages: [:en, :de])
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            expand_contractions: true,
+            filter_languages: [:en, :de]
+          )
           expect(pt.tokenize).to eq(["hello", "supa'soo", "guy", ".", "auf", "das", "was", "not", "it", "?"])
         end
 
@@ -442,26 +462,26 @@ describe PragmaticTokenizer do
         it 'knows what is not a domain 1' do
           skip "NOT IMPLEMENTED"
           text = "this is a sentence.and no domain."
-          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
-          expect(pt.tokenize).to eq(
-            ["this", "is", "a", "sentence", ".", "and", "no", "domain", "."]
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_domains: true
           )
+          expect(pt.tokenize).to eq(["this", "is", "a", "sentence", ".", "and", "no", "domain", "."])
         end
 
         it 'knows what is not a domain 2' do
           text = "former president g.w.bush was..."
-          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
-          expect(pt.tokenize).to eq(
-            ["former", "president", "g.w.bush", "was", "..."]
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_domains: true
           )
+          expect(pt.tokenize).to eq(["former", "president", "g.w.bush", "was", "..."])
         end
 
         it 'knows what is not a domain 3' do
           text = "2.something-times"
-          pt = PragmaticTokenizer::Tokenizer.new(text, remove_domains: true)
-          expect(pt.tokenize).to eq(
-            ["2.something-times"]
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            remove_domains: true
           )
+          expect(pt.tokenize).to eq(["2.something-times"])
         end
       end
 
@@ -579,6 +599,38 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["high", "temperature", "and", "wind"])
         end
+
+        it 'cleans (r) and (c) and (tm)' do
+          text = "the oscar® night ©companyname is a trademark™"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["the", "oscar", "night", "companyname", "is", "a", "trademark"])
+        end
+
+        it 'cleans letters in boxes 1' do
+          text = "making🇦🇹postcards"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["making", "postcards"])
+        end
+
+        it 'removes colons' do
+          text = "At 19:30 o'clock: Mad Max: Fury Road"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["at", "19:30", "o'clock", "mad", "max", "fury", "road"])
+        end
+
+        it 'removes a hyphen prefix 3' do
+          text = "women's clothes and –shoes needed"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["women's", "clothes", "and", "shoes", "needed"])
+        end
       end
 
       context 'option (classic_filter)' do
@@ -691,6 +743,14 @@ describe PragmaticTokenizer do
             numbers: :none
           )
           expect(pt.tokenize).to eq(["number"])
+        end
+
+        it 'tokenizes a string #006' do
+          text = "Remove III Roman Numerals and IX. with a period."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            numbers: :none
+          )
+          expect(pt.tokenize).to eq(["remove", "roman", "numerals", "and", ".", "with", "a", "period", "."])
         end
       end
 
@@ -954,6 +1014,14 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["looking", "forward", "to", "the", "new", "kodak", "super8", "camera", '\o/'])
         end
+
+        it 'splits at hashtags' do
+          text = "some sentence#RT ... i like u2.#bono"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: :none
+          )
+          expect(pt.tokenize).to eq(["some", "sentence", "#rt", "i", "like", "u2", "#bono"])
+        end
       end
 
       context 'option (remove_stop_words)' do
@@ -1039,14 +1107,6 @@ describe PragmaticTokenizer do
         end
 
         it 'tokenizes a string #005' do
-          text = "Remove III Roman Numerals and IX. with a period."
-          pt = PragmaticTokenizer::Tokenizer.new(text,
-            numbers: :none
-          )
-          expect(pt.tokenize).to eq(["remove", "roman", "numerals", "and", ".", "with", "a", "period", "."])
-        end
-
-        it 'tokenizes a string #006' do
           text = "Hello world with a stop word experiment."
           pt = PragmaticTokenizer::Tokenizer.new(text,
             language: 'en',
@@ -1060,7 +1120,7 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["experiment"])
         end
 
-        it 'tokenizes a string #007' do
+        it 'tokenizes a string #006' do
           text = "Hello; what is your: name @username **delete**"
           pt = PragmaticTokenizer::Tokenizer.new(text,
             clean: true,
@@ -1069,7 +1129,7 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["hello", "what", "is", "your", "name", "@username", "delete"])
         end
 
-        it 'tokenizes a string #008' do
+        it 'tokenizes a string #007' do
           text = 'His name is Mr. Smith.'
           pt = PragmaticTokenizer::Tokenizer.new(text,
             language: 'en',
@@ -1079,7 +1139,7 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(['His', 'name', 'is', 'Mr.', 'Smith'])
         end
 
-        it 'tokenizes a string #009' do
+        it 'tokenizes a string #008' do
           text = "Can't go tonight. Didn't finish."
           pt = PragmaticTokenizer::Tokenizer.new(text,
             downcase: false,
@@ -1088,7 +1148,7 @@ describe PragmaticTokenizer do
           expect(pt.tokenize).to eq(["Cannot", "go", "tonight", ".", "Did", "not", "finish", "."])
         end
 
-        it 'tokenizes a string #010' do
+        it 'tokenizes a string #009' do
           text = "Some *interesting stuff* is __happening here__"
           pt = PragmaticTokenizer::Tokenizer.new(text,
             punctuation: 'none',
@@ -1191,6 +1251,42 @@ describe PragmaticTokenizer do
             hashtags: :keep_and_clean
           )
           expect(pt.tokenize).to eq(["the", "2016", "fun", "has", "just", "begun"])
+        end
+
+        it 'does not clean mentions' do
+          text = "@_someone_ because @someone and @_someone was taken"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            mentions: :keep_original,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["@_someone_", "because", "@someone", "and", "@_someone", "was", "taken"])
+        end
+
+        it 'removes double single quotes' do
+          text = "Strong statement in ''The Day The Earth Caught Fire'' (1961)"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: :none,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["strong", "statement", "in", "the", "day", "the", "earth", "caught", "fire", "1961"])
+        end
+
+        it 'removes a hyphen prefix 1' do
+          text = "Geopol.-Strategy"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: :none,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["geopol", "strategy"])
+        end
+
+        it 'removes a hyphen prefix 2' do
+          text = "The language we use creates the reality we experience.-Michael Hyatt #quote"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            punctuation: :none,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["the", "language", "we", "use", "creates", "the", "reality", "we", "experience", "michael", "hyatt", "#quote"])
         end
       end
     end
@@ -1400,7 +1496,7 @@ describe PragmaticTokenizer do
 
       it 'handles abbreviations that occur at the end of a sentence' do
         text = 'He works at ABC Inc.'
-        expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["he", "works", "at", "abc", "inc", "."])
+        expect(PragmaticTokenizer::Tokenizer.new(text).tokenize).to eq(["he", "works", "at", "abc", "inc."])
       end
 
       it 'handles punctuation after an abbreviation' do

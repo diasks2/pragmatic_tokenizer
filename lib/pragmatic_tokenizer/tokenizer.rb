@@ -154,18 +154,22 @@ module PragmaticTokenizer
     end
 
     def clean!
-      @tokens = @tokens.flat_map { |t| t =~ /(?<=\s)\_+/ ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| t =~ /\_+(?=\s)/ ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| t =~ /(?<=\A)\_+/ ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
-        .flat_map { |t| t =~ /\_+(?=\z)/ ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| t =~ /\*+/ ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
+      @tokens = @tokens.flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\s)\_+/) ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\s)/) ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\A)\_+/) ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
+        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\z)/) ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
+        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\*+/) ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
         .map { |t| t.gsub(/[[:cntrl:]]/, '') }
         .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
+        .map { |t| t.gsub(/\:(?=\z)/, '') }
         .map { |t| t.gsub(/(?<=\A)!+(?=.+)/, '') }
         .map { |t| t !~ /[＠@#|＃]/ ? t.gsub(/(?<=\D)1+(?=\z)/, '') : t }
         .map { |t| t.gsub(/!+(?=\z)/, '') }
         .map { |t| t.gsub(/!+(1*!*)*(?=\z)/, '') }
         .map { |t| t.gsub(/\u{00AD}/, '') }
+        .map { |t| t.gsub(/\A(-|–)/, '') }
+        .map { |t| t.gsub(/[®©]/, '') }
+        .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
         .delete_if { |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||

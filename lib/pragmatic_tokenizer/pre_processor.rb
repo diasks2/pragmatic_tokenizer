@@ -106,10 +106,12 @@ module PragmaticTokenizer
 
     def convert_dbl_quotes(text)
       # Convert left double quotes to special character
+      text.gsub!(/''(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
       text.gsub!(/"(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
       text.gsub!(/“(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['“'] + ' ') || text
       # Convert remaining quotes to special character
       text.gsub!(/"/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
+      text.gsub!(/''/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ') || text
       text.gsub!(/”/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['”'] + ' ') || text
     end
 

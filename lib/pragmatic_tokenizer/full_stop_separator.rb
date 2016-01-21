@@ -28,7 +28,7 @@ module PragmaticTokenizer
         end
         cleaned_tokens << tokens[i]
       end
-      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/
+      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviations.include?(Unicode::downcase(cleaned_tokens[-1]).chomp("."))
         cleaned_tokens[-1] = $1
         cleaned_tokens.push '.'
       end
