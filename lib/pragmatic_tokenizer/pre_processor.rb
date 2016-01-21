@@ -20,6 +20,7 @@ module PragmaticTokenizer
       shift_semicolon(text)
       shift_caret(text)
       shift_hashtag(text)
+      shift_ampersand(text)
       shift_vertical_bar(text)
       convert_dbl_quotes(text)
       convert_sgl_quotes(text)
@@ -98,6 +99,10 @@ module PragmaticTokenizer
 
     def shift_hashtag(text)
       text.gsub!(/(?<=\S)(#|＃)(?=\S)/, ' \1\2') || text
+    end
+
+    def shift_ampersand(text)
+      text.gsub!(/\&/, ' & ') || text
     end
 
     def shift_vertical_bar(text)

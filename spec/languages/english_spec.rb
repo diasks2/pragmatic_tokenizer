@@ -631,6 +631,14 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["women's", "clothes", "and", "shoes", "needed"])
         end
+
+        it 'does not remove tokens with ampersands' do
+          text = "you&amp;me"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true
+          )
+          expect(pt.tokenize).to eq(["you", "&", "me"])
+        end
       end
 
       context 'option (classic_filter)' do
@@ -1287,6 +1295,15 @@ describe PragmaticTokenizer do
             clean: true
           )
           expect(pt.tokenize).to eq(["the", "language", "we", "use", "creates", "the", "reality", "we", "experience", "michael", "hyatt", "#quote"])
+        end
+
+        it 'does not remove tokens with ampersands' do
+          text = "you&amp;me"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true,
+            punctuation: :none
+          )
+          expect(pt.tokenize).to eq(["you", "me"])
         end
       end
     end
