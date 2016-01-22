@@ -8,17 +8,16 @@ Pragmatic Tokenizer is a multilingual tokenizer to split a string into tokens.
 
 Add this line to your application's Gemfile:
 
-```ruby
-gem 'pragmatic_tokenizer'
+**Ruby**  
+```
+gem install pragmatic_tokenizer
 ```
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install pragmatic_tokenizer
+**Ruby on Rails**  
+Add this line to your application’s Gemfile:  
+```ruby 
+gem 'pragmatic_tokenizer'
+```
 
 ## Usage
 
