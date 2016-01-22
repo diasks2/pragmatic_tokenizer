@@ -1305,6 +1305,16 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["you", "me"])
         end
+
+        it 'cleans percent signs not related to numbers' do
+          text = "TudoW%1 provides company users a way to offer each other, and guests, and interpreters%6 free assistance. To date, there have been %2 questions asked."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            clean: true,
+            numbers: :none,
+            punctuation: :none
+          )
+          expect(pt.tokenize).to eq(["tudow", "provides", "company", "users", "a", "way", "to", "offer", "each", "other", "and", "guests", "and", "interpreters", "free", "assistance", "to", "date", "there", "have", "been", "questions", "asked"])
+        end
       end
     end
 

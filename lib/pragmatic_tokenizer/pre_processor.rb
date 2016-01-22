@@ -18,6 +18,7 @@ module PragmaticTokenizer
       shift_colon(text)
       shift_bracket(text)
       shift_semicolon(text)
+      shift_percent(text)
       shift_caret(text)
       shift_hashtag(text)
       shift_ampersand(text)
@@ -91,6 +92,10 @@ module PragmaticTokenizer
 
     def shift_semicolon(text)
       text.gsub!(/([;])/o) { ' ' + $1 + ' ' } || text
+    end
+
+    def shift_percent(text)
+      text.gsub!(/(?<=\D)%(?=\d+)/, ' %') || text
     end
 
     def shift_caret(text)
