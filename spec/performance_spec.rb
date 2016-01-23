@@ -54,7 +54,7 @@ describe PragmaticTokenizer do
   # end
 end
 
-def benchmark(&block)
+def benchmark
   yield
   time = Benchmark.realtime { yield }
   puts "RUNTIME: #{time}"
