@@ -148,13 +148,13 @@ module PragmaticTokenizer
       end
 
       def convert_sgl_quotes!(language)
-        self.replace(if defined?(language::SingleQuotes)
-                       language::SingleQuotes.new
-                           .handle_single_quotes(self)
-                     else
-                       PragmaticTokenizer::Languages::Common::SingleQuotes.new
-                           .handle_single_quotes(self)
-                     end)
+        replace(if defined?(language::SingleQuotes)
+                  language::SingleQuotes.new
+                      .handle_single_quotes(self)
+                else
+                  PragmaticTokenizer::Languages::Common::SingleQuotes.new
+                      .handle_single_quotes(self)
+                end)
       end
 
       def convert_apostrophe_s!
