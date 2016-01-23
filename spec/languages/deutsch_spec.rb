@@ -197,7 +197,7 @@ describe PragmaticTokenizer do
       expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "english", "."])
     end
 
-     it 'removes English and German stopwords' do
+    it 'removes English and German stopwords' do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
@@ -206,7 +206,7 @@ describe PragmaticTokenizer do
                                              language:          'de'
                                             )
       expect(pt.tokenize).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
-     end
+    end
 
     it 'does not remove English stopwords' do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
