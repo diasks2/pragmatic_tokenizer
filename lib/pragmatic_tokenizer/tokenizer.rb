@@ -142,14 +142,14 @@ module PragmaticTokenizer
     end
 
     def downcase!
-      @tokens.map! { |t| Unicode::downcase(t) }
+      @tokens.map! { |t| Unicode.downcase(t) }
     end
 
     def expand_contractions!(contractions)
       if downcase
-        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
+        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
       else
-        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
+        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode.capitalize(t) : t }.flatten : t }
       end
     end
 
@@ -188,7 +188,7 @@ module PragmaticTokenizer
       when 'semi'
         @tokens.delete_if { |t| t =~ /\A\d+\z/ }
       when 'none'
-        @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode::downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode::downcase(t)}.") }
+        @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
       when 'only'
         @tokens.delete_if { |t| t =~ /\A\D+\z/ }
       end
@@ -213,7 +213,7 @@ module PragmaticTokenizer
       if downcase
         @tokens = @tokens - stop_words
       else
-        @tokens.delete_if { |t| stop_words.include?(Unicode::downcase(t)) }
+        @tokens.delete_if { |t| stop_words.include?(Unicode.downcase(t)) }
       end
     end
 

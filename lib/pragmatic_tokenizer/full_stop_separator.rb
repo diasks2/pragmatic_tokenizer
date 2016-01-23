@@ -19,7 +19,7 @@ module PragmaticTokenizer
       tokens.each_with_index do |_t, i|
         if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
           w = $1
-          unless abbr[Unicode::downcase(w)] || w =~ /\A[a-z]\z/i ||
+          unless abbr[Unicode.downcase(w)] || w =~ /\A[a-z]\z/i ||
             w =~ /[a-z](?:\.[a-z])+\z/i
             cleaned_tokens <<  w
             cleaned_tokens << '.'
@@ -28,7 +28,7 @@ module PragmaticTokenizer
         end
         cleaned_tokens << tokens[i]
       end
-      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviations.include?(Unicode::downcase(cleaned_tokens[-1]).chomp("."))
+      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviations.include?(Unicode.downcase(cleaned_tokens[-1]).chomp("."))
         cleaned_tokens[-1] = $1
         cleaned_tokens.push '.'
       end
