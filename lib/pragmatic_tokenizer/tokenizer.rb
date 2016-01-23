@@ -170,13 +170,13 @@ module PragmaticTokenizer
         .map { |t| t.gsub(/\A(-|–)/, '') }
         .map { |t| t.gsub(/[®©]/, '') }
         .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
-        .delete_if { |t| t =~ /\A-+\z/ ||
+        .delete_if do |t| t =~ /\A-+\z/ ||
         PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
         t =~ /\A\.{2,}\z/ || t.include?("\\") ||
         t.length > 50 ||
         (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
         (t.length == 1 && t =~ /\:/)
-      }
+      end
     end
 
     def classic_filter!
@@ -218,11 +218,11 @@ module PragmaticTokenizer
     end
 
     def remove_emoji!
-      @tokens.delete_if { |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
+      @tokens.delete_if do |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
         t =~ /\u{2744}\u{FE0F}/ ||
         t =~ /\u{2744}\u{FE0E}/ ||
         t =~ /\u{2744}/
-      }
+      end
     end
 
     def remove_emails!
