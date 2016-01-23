@@ -7,7 +7,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
           language: 'fr'
-                                            )
+      )
       expect(pt.tokenize).to eq(["l'", "art", "de", "l'", "univers", ",", "c'est", "un", "art"])
     end
   end

@@ -7,7 +7,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
           language: 'bg'
-                                            )
+      )
       expect(pt.tokenize).to eq(["стойностни", ",", "вкл.", "български", "и", "руски"])
     end
 
@@ -17,7 +17,7 @@ describe PragmaticTokenizer do
           text,
           language:          'bg',
           remove_stop_words: true
-                                            )
+      )
       expect(pt.tokenize).to eq(["поставя", "началото", "могъща", "династия", ",", "управлява", "продължение", "150", "саргон", "надделява", "двубой", "владетеля", "град", "ур", "разширява", "териториите", "държавата", "долното", "течение", "тигър", "ефрат", "."])
     end
 
@@ -27,7 +27,7 @@ describe PragmaticTokenizer do
           text,
           language:          'bg',
           remove_stop_words: true
-                                            )
+      )
       expect(pt.tokenize).to eq(["български", "жертви", "париж", "."])
     end
 
@@ -38,7 +38,7 @@ describe PragmaticTokenizer do
           language:          'bg',
           remove_stop_words: true,
           downcase:          false
-                                            )
+      )
       expect(pt.tokenize).to eq(["български", "жертви", "Париж", "."])
     end
   end
