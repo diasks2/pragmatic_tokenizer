@@ -88,7 +88,8 @@ module PragmaticTokenizer
       def shift_colon!
         return unless may_shift_colon?
         # Ignore web addresses
-        @text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[':'.freeze])
+        replacement = replacement_for_key(':'.freeze)
+        @text.gsub!(/(?<=[http|https]):(?=\/\/)/, replacement)
         @text.gsub!(/:/o, ' :'.freeze)
         @text.gsub!(/(?<=\s):(?=\#)/, ': '.freeze)
       end
@@ -133,27 +134,38 @@ module PragmaticTokenizer
       end
 
       def replace_left_double_quotes!
-        @text.gsub!(/''(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
-        @text.gsub!(/"(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
-        @text.gsub!(/“(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['“'.freeze] + ' '.freeze)
+        replace_left_quotes!("''", '"'.freeze)
+        replace_left_quotes!('"', '"'.freeze)
+        replace_left_quotes!('“', '“'.freeze)
+      end
+
+      def replace_left_quotes!(style, replacement_key)
+        replacement = replacement_for_key(replacement_key)
+        @text.gsub!(/#{style}(?=.*\w)/o, ' '.freeze + replacement + ' '.freeze)
       end
 
       def replace_remaining_double_quotes!
-        @text.gsub!(/"/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
-        @text.gsub!(/''/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
-        @text.gsub!(/”/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['”'.freeze] + ' '.freeze)
+        replace_remaining_quotes!('"', '"'.freeze)
+        replace_remaining_quotes!("''", '"'.freeze)
+        replace_remaining_quotes!('”', '”'.freeze)
+      end
+
+      def replace_remaining_quotes!(style, replacement_key)
+        replacement = replacement_for_key(replacement_key)
+        @text.gsub!(/#{style}/, ' '.freeze + replacement + ' '.freeze)
       end
 
       def convert_sgl_quotes!
-        if defined? @language::SingleQuotes
-          @language::SingleQuotes.new.handle_single_quotes(@text)
-        else
-          PragmaticTokenizer::Languages::Common::SingleQuotes.new.handle_single_quotes(@text)
-        end
+        @text = if defined?(@language::SingleQuotes)
+                  @language::SingleQuotes.new.handle_single_quotes(@text)
+                else
+                  PragmaticTokenizer::Languages::Common::SingleQuotes.new.handle_single_quotes(@text)
+                end
       end
 
       def convert_apostrophe_s!
-        @text.gsub!(/\s\u{0301}(?=s(\s|\z))/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['`'.freeze])
+        replacement = replacement_for_key('`'.freeze)
+        @text.gsub!(/\s\u{0301}(?=s(\s|\z))/, replacement)
       end
 
       def shift_beginning_hyphen!
@@ -163,5 +175,10 @@ module PragmaticTokenizer
       def shift_ending_hyphen!
         @text.gsub!(/-\s+/, ' - '.freeze)
       end
+
+      def replacement_for_key(replacement_key)
+        PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[replacement_key]
+      end
+
   end
 end
