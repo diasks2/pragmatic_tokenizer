@@ -6,7 +6,7 @@ describe PragmaticTokenizer do
       text = "L'art de l'univers, c'est un art"
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
-                                             language: 'fr'
+          language: 'fr'
                                             )
       expect(pt.tokenize).to eq(["l'", "art", "de", "l'", "univers", ",", "c'est", "un", "art"])
     end

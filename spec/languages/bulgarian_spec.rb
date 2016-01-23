@@ -6,7 +6,7 @@ describe PragmaticTokenizer do
       text = 'Стойностни, вкл. български и руски'
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
-                                             language: 'bg'
+          language: 'bg'
                                             )
       expect(pt.tokenize).to eq(["стойностни", ",", "вкл.", "български", "и", "руски"])
     end
@@ -15,8 +15,8 @@ describe PragmaticTokenizer do
       text = 'Той поставя началото на могъща династия, която управлява в продължение на 150 г. Саргон надделява в двубой с владетеля на град Ур и разширява териториите на държавата си по долното течение на Тигър и Ефрат.'
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
-                                             language:          'bg',
-                                             remove_stop_words: true
+          language:          'bg',
+          remove_stop_words: true
                                             )
       expect(pt.tokenize).to eq(["поставя", "началото", "могъща", "династия", ",", "управлява", "продължение", "150", "саргон", "надделява", "двубой", "владетеля", "град", "ур", "разширява", "териториите", "държавата", "долното", "течение", "тигър", "ефрат", "."])
     end
@@ -25,8 +25,8 @@ describe PragmaticTokenizer do
       text = 'Без български жертви в Париж.'
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
-                                             language:          'bg',
-                                             remove_stop_words: true
+          language:          'bg',
+          remove_stop_words: true
                                             )
       expect(pt.tokenize).to eq(["български", "жертви", "париж", "."])
     end
@@ -35,9 +35,9 @@ describe PragmaticTokenizer do
       text = 'Без български жертви в Париж.'
       pt = PragmaticTokenizer::Tokenizer.new(
           text,
-                                             language:          'bg',
-                                             remove_stop_words: true,
-                                             downcase:          false
+          language:          'bg',
+          remove_stop_words: true,
+          downcase:          false
                                             )
       expect(pt.tokenize).to eq(["български", "жертви", "Париж", "."])
     end
