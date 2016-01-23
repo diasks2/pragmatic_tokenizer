@@ -16,7 +16,7 @@ describe PragmaticTokenizer do
                                                remove_stop_words: true,
                                                punctuation:       'none',
                                                numbers:           :none
-                                              ).tokenize).to eq(["größte", "Ausdehnung", "Landes", "Westen", "Osten", "beträgt", "Nord", "Süd", "europäischen", "Staaten", "Weißrussland", "flächenmäßig"])
+                                              ).tokenize).to eq(%w(größte Ausdehnung Landes Westen Osten beträgt Nord Süd europäischen Staaten Weißrussland flächenmäßig))
     end
 
     it 'tokenizes a string #003' do
@@ -62,7 +62,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["ich", "frage", "mich", "wieso", "er", "nicht", "herr", "der", "lage", "war", "ist"])
+      expect(pt.tokenize).to eq(%w(ich frage mich wieso er nicht herr der lage war ist))
     end
 
     it 'handles words with a slash 3' do
@@ -72,7 +72,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["poison", "gas", "attack", "in", "ghuta", "syria"])
+      expect(pt.tokenize).to eq(%w(poison gas attack in ghuta syria))
     end
 
     it 'handles words with a question mark' do
@@ -82,7 +82,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["essen", "á", "la", "carte", "man", "ist", "versucht"])
+      expect(pt.tokenize).to eq(%w(essen á la carte man ist versucht))
     end
 
     it 'handles apostrophes and quotes 3' do
@@ -92,7 +92,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["die", "mitte", "der", "gesellschaft", "interessiert", "sich", "jetzt", "für", "feminismus"])
+      expect(pt.tokenize).to eq(%w(die mitte der gesellschaft interessiert sich jetzt für feminismus))
     end
 
     it 'handles mentions 1' do
@@ -133,7 +133,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["hier", "ist", "ein", "whirlpool", "versteckt"])
+      expect(pt.tokenize).to eq(%w(hier ist ein whirlpool versteckt))
     end
 
     it 'handles hashtags 1' do
@@ -163,7 +163,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen"])
+      expect(pt.tokenize).to eq(%w(der die lehrer_in und seine ihre schüler_innen))
     end
 
     it 'handles contractions 1' do
@@ -173,7 +173,7 @@ describe PragmaticTokenizer do
                                              expand_contractions: true,
                                              language:            'de'
                                             )
-      expect(pt.tokenize).to eq(["gibt", "es"])
+      expect(pt.tokenize).to eq(%w(gibt es))
     end
 
     it 'handles contractions 2' do
@@ -183,7 +183,7 @@ describe PragmaticTokenizer do
                                              expand_contractions: true,
                                              language:            'de'
                                             )
-      expect(pt.tokenize).to eq(["gibt", "es", "schaut", "es", "wenn", "es", "gespür", "finde", "es"])
+      expect(pt.tokenize).to eq(%w(gibt es schaut es wenn es gespür finde es))
     end
 
     it 'removes English stopwords' do
@@ -238,7 +238,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              language:    'de'
                                             )
-      expect(pt.tokenize).to eq(["endlich", "regnet", "es", "ihm", "nicht", "mehr", "auf́s", "haupt"])
+      expect(pt.tokenize).to eq(%w(endlich regnet es ihm nicht mehr auf́s haupt))
     end
 
     it 'handles abrreviations for languages other than English' do

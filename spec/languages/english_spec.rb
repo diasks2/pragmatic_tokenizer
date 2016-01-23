@@ -559,7 +559,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["abc", "company", "1994"])
+          expect(pt.tokenize).to eq(%w(abc company 1994))
         end
 
         it 'tokenizes a string #004' do
@@ -568,7 +568,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["this", "sentence", "has", "a", "long", "string", "of", "dots"])
+          expect(pt.tokenize).to eq(%w(this sentence has a long string of dots))
         end
 
         it 'tokenizes a string #005' do
@@ -622,7 +622,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["look", "the", "sky", "is", "blue"])
+          expect(pt.tokenize).to eq(%w(look the sky is blue))
         end
 
         it 'keeps numbers at the end of mentions and hashtags' do
@@ -640,7 +640,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["high", "temperature", "and", "wind"])
+          expect(pt.tokenize).to eq(%w(high temperature and wind))
         end
 
         it 'cleans (r) and (c) and (tm)' do
@@ -649,7 +649,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["the", "oscar", "night", "companyname", "is", "a", "trademark"])
+          expect(pt.tokenize).to eq(%w(the oscar night companyname is a trademark))
         end
 
         it 'cleans letters in boxes 1' do
@@ -658,7 +658,7 @@ describe PragmaticTokenizer do
               text,
                                                  clean: true
                                                 )
-          expect(pt.tokenize).to eq(["making", "postcards"])
+          expect(pt.tokenize).to eq(%w(making postcards))
         end
 
         it 'removes colons' do
@@ -716,7 +716,7 @@ describe PragmaticTokenizer do
               text,
                                                  classic_filter: true
                                                 )
-          expect(pt.tokenize).to eq(["there", "something"])
+          expect(pt.tokenize).to eq(%w(there something))
         end
 
         it 'optimizes the classic filter' do
@@ -725,7 +725,7 @@ describe PragmaticTokenizer do
               text,
                                                  classic_filter: true
                                                 )
-          expect(pt.tokenize).to eq(["there", "something"])
+          expect(pt.tokenize).to eq(%w(there something))
         end
       end
 
@@ -841,7 +841,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["kath", "evang"])
+          expect(pt.tokenize).to eq(%w(kath evang))
         end
 
         it 'tokenizes a string #002' do
@@ -877,7 +877,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["a", "sentence", "one", "with", "two", "dots", "and", "with", "three", "or", "horizontal", "ellipsis", "which", "are", "three", "dots", "too"])
+          expect(pt.tokenize).to eq(%w(a sentence one with two dots and with three or horizontal ellipsis which are three dots too))
         end
 
         it 'tokenizes a string #006' do
@@ -886,7 +886,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["breaking", "something", "happened", "is", "it", "interesting"])
+          expect(pt.tokenize).to eq(%w(breaking something happened is it interesting))
         end
 
         it 'tokenizes a string #007' do
@@ -913,7 +913,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: :none
                                                 )
-          expect(pt.tokenize).to eq(["hello", "yes"])
+          expect(pt.tokenize).to eq(%w(hello yes))
         end
 
         it 'tokenizes a string #010' do
@@ -940,7 +940,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["they", "were", "being", "helped", "this", "is", "solidarity"])
+          expect(pt.tokenize).to eq(%w(they were being helped this is solidarity))
         end
 
         it 'handles non-domain words with a dot 2' do
@@ -1048,7 +1048,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["i", "suggest", "to", "buy", "stocks", "that", "are", "low", "value", "have", "momentum"])
+          expect(pt.tokenize).to eq(%w(i suggest to buy stocks that are low value have momentum))
         end
 
         it 'handles apostrophes and quotes 1' do
@@ -1075,7 +1075,7 @@ describe PragmaticTokenizer do
               text,
                                                  punctuation: 'none'
                                                 )
-          expect(pt.tokenize).to eq(["4", "things", "marketers", "must", "do", "better", "in", "2016", "blah"])
+          expect(pt.tokenize).to eq(%w(4 things marketers must do better in 2016 blah))
         end
 
         it 'handles words with a emoticon suffix' do
@@ -1143,7 +1143,7 @@ describe PragmaticTokenizer do
               text,
                                                  language:          'en',
                                                  remove_stop_words: true,
-                                                 stop_words:        ["and", "a"]
+                                                 stop_words:        %w(and a)
                                                 )
           expect(pt.tokenize).to eq(["this", "is", "short", "sentence", "with", "explanations", "stop", "words", "."])
         end
@@ -1213,7 +1213,7 @@ describe PragmaticTokenizer do
                                                  remove_stop_words:   true,
                                                  punctuation:         'none'
                                                 )
-          expect(pt.tokenize).to eq(["crazy", "sandowsky", "afford"])
+          expect(pt.tokenize).to eq(%w(crazy sandowsky afford))
         end
 
         it 'tokenizes a string #005' do
@@ -1269,7 +1269,7 @@ describe PragmaticTokenizer do
                                                  punctuation: 'none',
                                                  clean:       true
                                                 )
-          expect(pt.tokenize).to eq(["some", "interesting", "stuff", "is", "happening", "here"])
+          expect(pt.tokenize).to eq(%w(some interesting stuff is happening here))
         end
 
         it 'also allows symbols for options' do
@@ -1319,7 +1319,7 @@ describe PragmaticTokenizer do
                                                  punctuation: 'none',
                                                  clean:       true
                                                 )
-          expect(pt.tokenize).to eq(["this", "is", "bold", "and", "this", "is", "italic"])
+          expect(pt.tokenize).to eq(%w(this is bold and this is italic))
         end
 
         it 'handles single quotes' do
@@ -1334,7 +1334,7 @@ describe PragmaticTokenizer do
                                                  remove_stop_words:   true,
                                                  punctuation:         :none,
                                                  downcase:            true)
-          expect(pt.tokenize).to eq(["recognised", "good", "games"])
+          expect(pt.tokenize).to eq(%w(recognised good games))
         end
 
         it 'removes control characters' do
@@ -1364,7 +1364,7 @@ describe PragmaticTokenizer do
                                                  punctuation: 'none',
                                                  hashtags:    :keep_and_clean
                                                 )
-          expect(pt.tokenize).to eq(["this", "is", "the", "upper", "limit"])
+          expect(pt.tokenize).to eq(%w(this is the upper limit))
         end
 
         it 'handles hashtags 3' do
@@ -1374,7 +1374,7 @@ describe PragmaticTokenizer do
                                                  punctuation: 'none',
                                                  hashtags:    :keep_and_clean
                                                 )
-          expect(pt.tokenize).to eq(["the", "2016", "fun", "has", "just", "begun"])
+          expect(pt.tokenize).to eq(%w(the 2016 fun has just begun))
         end
 
         it 'does not clean mentions' do
@@ -1394,7 +1394,7 @@ describe PragmaticTokenizer do
                                                  punctuation: :none,
                                                  clean:       true
                                                 )
-          expect(pt.tokenize).to eq(["strong", "statement", "in", "the", "day", "the", "earth", "caught", "fire", "1961"])
+          expect(pt.tokenize).to eq(%w(strong statement in the day the earth caught fire 1961))
         end
 
         it 'removes a hyphen prefix 1' do
@@ -1404,7 +1404,7 @@ describe PragmaticTokenizer do
                                                  punctuation: :none,
                                                  clean:       true
                                                 )
-          expect(pt.tokenize).to eq(["geopol", "strategy"])
+          expect(pt.tokenize).to eq(%w(geopol strategy))
         end
 
         it 'removes a hyphen prefix 2' do
@@ -1424,7 +1424,7 @@ describe PragmaticTokenizer do
                                                  clean:       true,
                                                  punctuation: :none
                                                 )
-          expect(pt.tokenize).to eq(["you", "me"])
+          expect(pt.tokenize).to eq(%w(you me))
         end
 
         it 'cleans percent signs not related to numbers' do
@@ -1435,7 +1435,7 @@ describe PragmaticTokenizer do
                                                  numbers:     :none,
                                                  punctuation: :none
                                                 )
-          expect(pt.tokenize).to eq(["tudow", "provides", "company", "users", "a", "way", "to", "offer", "each", "other", "and", "guests", "and", "interpreters", "free", "assistance", "to", "date", "there", "have", "been", "questions", "asked"])
+          expect(pt.tokenize).to eq(%w(tudow provides company users a way to offer each other and guests and interpreters free assistance to date there have been questions asked))
         end
       end
     end
