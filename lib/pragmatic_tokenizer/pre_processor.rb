@@ -7,77 +7,77 @@ module PragmaticTokenizer
 
     def pre_process(text:)
       @text = text
-      shift_comma
-      shift_multiple_dash
-      shift_upsidedown_question_mark
-      shift_upsidedown_exclamation
-      shift_exclamation
-      shift_ellipse
-      shift_no_space_mention
-      shift_not_equals
-      shift_special_quotes
-      shift_colon
-      shift_bracket
-      shift_semicolon
-      shift_percent
-      shift_caret
-      shift_hashtag
-      shift_ampersand
-      shift_vertical_bar
-      convert_dbl_quotes
-      convert_sgl_quotes
-      convert_apostrophe_s
-      shift_beginning_hyphen
-      shift_ending_hyphen
+      shift_comma!
+      shift_multiple_dash!
+      shift_inverted_question_mark!
+      shift_inverted_exclamation!
+      shift_exclamation!
+      shift_ellipse!
+      shift_no_space_mention!
+      shift_not_equals!
+      shift_special_quotes!
+      shift_colon!
+      shift_bracket!
+      shift_semicolon!
+      shift_percent!
+      shift_caret!
+      shift_hashtag!
+      shift_ampersand!
+      shift_vertical_bar!
+      convert_dbl_quotes!
+      convert_sgl_quotes!
+      convert_apostrophe_s!
+      shift_beginning_hyphen!
+      shift_ending_hyphen!
       @text.squeeze(' ')
     end
 
     private
 
       # Shift commas off everything but numbers
-      def shift_comma
+      def shift_comma!
         @text.gsub!(/,(?!\d)/o, ' , ')
         @text.gsub!(/(?<=\D),(?=\S+)/, ' , ')
       end
 
-      def shift_multiple_dash
+      def shift_multiple_dash!
         @text.gsub!(/--+/o, ' - ')
       end
 
-      def shift_upsidedown_question_mark
+      def shift_inverted_question_mark!
         @text.gsub!(/¿/, ' ¿ ')
       end
 
-      def shift_upsidedown_exclamation
+      def shift_inverted_exclamation!
         @text.gsub!(/¡/, ' ¡ ')
       end
 
-      def shift_exclamation
+      def shift_exclamation!
         @text.gsub!(/(?<=[a-zA-z])!(?=[a-zA-z])/, ' ! ')
       end
 
-      def shift_ellipse
+      def shift_ellipse!
         @text.gsub!(/(\.\.\.+)/o) { ' ' + Regexp.last_match(1) + ' ' }
         @text.gsub!(/(\.\.+)/o) { ' ' + Regexp.last_match(1) + ' ' }
         @text.gsub!(/(…+)/o) { ' ' + Regexp.last_match(1) + ' ' }
       end
 
-      def shift_no_space_mention
+      def shift_no_space_mention!
         @text.gsub!(/\.(?=(@|＠)[^\.]+(\s|\z))/, '. ')
       end
 
-      def shift_not_equals
+      def shift_not_equals!
         @text.gsub!(/≠/, ' ≠ ')
       end
 
-      def shift_special_quotes
+      def shift_special_quotes!
         @text.gsub!(/«/, ' « ')
         @text.gsub!(/»/, ' » ')
         @text.gsub!(/„/, ' „ ')
         @text.gsub!(/“/, ' “ ')
       end
 
-      def shift_colon
+      def shift_colon!
         return unless may_shift_colon?
         # Ignore web addresses
         @text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[":"])
@@ -91,35 +91,35 @@ module PragmaticTokenizer
         partitions.last[0] !~ /\A\d+/ || partitions.first[-1] !~ /\A\d+/
       end
 
-      def shift_bracket
+      def shift_bracket!
         @text.gsub!(/([\(\[\{\}\]\)])/o) { ' ' + Regexp.last_match(1) + ' ' }
       end
 
-      def shift_semicolon
+      def shift_semicolon!
         @text.gsub!(/([;])/o) { ' ' + Regexp.last_match(1) + ' ' }
       end
 
-      def shift_percent
+      def shift_percent!
         @text.gsub!(/(?<=\D)%(?=\d+)/, ' %')
       end
 
-      def shift_caret
+      def shift_caret!
         @text.gsub!(/\^/, ' ^ ')
       end
 
-      def shift_hashtag
+      def shift_hashtag!
         @text.gsub!(/(?<=\S)(#|＃)(?=\S)/, ' \1\2')
       end
 
-      def shift_ampersand
+      def shift_ampersand!
         @text.gsub!(/\&/, ' & ')
       end
 
-      def shift_vertical_bar
+      def shift_vertical_bar!
         @text.gsub!(/\|/, ' | ')
       end
 
-      def convert_dbl_quotes
+      def convert_dbl_quotes!
         # Convert left double quotes to special character
         @text.gsub!(/''(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ')
         @text.gsub!(/"(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'] + ' ')
@@ -130,7 +130,7 @@ module PragmaticTokenizer
         @text.gsub!(/”/, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['”'] + ' ')
       end
 
-      def convert_sgl_quotes
+      def convert_sgl_quotes!
         if defined? @language::SingleQuotes
           @language::SingleQuotes.new.handle_single_quotes(@text)
         else
@@ -138,15 +138,15 @@ module PragmaticTokenizer
         end
       end
 
-      def convert_apostrophe_s
+      def convert_apostrophe_s!
         @text.gsub!(/\s\u{0301}(?=s(\s|\z))/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['`'])
       end
 
-      def shift_beginning_hyphen
+      def shift_beginning_hyphen!
         @text.gsub!(/\s+-/, ' - ')
       end
 
-      def shift_ending_hyphen
+      def shift_ending_hyphen!
         @text.gsub!(/-\s+/, ' - ')
       end
   end
