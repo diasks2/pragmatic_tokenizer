@@ -2,7 +2,8 @@ module PragmaticTokenizer
   module Languages
     module Deutsch
       include Languages::Common
-      ABBREVIATIONS = ['a', 'a.d', 'a.k.a', 'a.s.a.p', 'abg', 'alt', 'apr', 'art', 'aug', 'b',
+      ABBREVIATIONS = [
+'a', 'a.d', 'a.k.a', 'a.s.a.p', 'abg', 'alt', 'apr', 'art', 'aug', 'b',
                        'b.a', 'b.s', 'best', 'bgm', 'bldg', 'btw', 'buchst', 'bzgl', 'bzw', 'c',
                        'ca', 'co', 'd', 'd.d', 'd.h', 'd.r', 'dergl', 'dez', 'dgl', 'dr', 'dr ',
                        'dt', 'dzt', 'e', 'e.l', 'e.u', 'e.v', 'ehem', 'eig', 'etc', 'etc.p.p',
