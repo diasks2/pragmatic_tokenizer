@@ -79,10 +79,7 @@ module PragmaticTokenizer
       end
 
       def shift_special_quotes!
-        @text.gsub!(/«/, ' « '.freeze)
-        @text.gsub!(/»/, ' » '.freeze)
-        @text.gsub!(/„/, ' „ '.freeze)
-        @text.gsub!(/“/, ' “ '.freeze)
+        @text.gsub!(/([«»„“])/, ' \1 ')
       end
 
       def shift_colon!
