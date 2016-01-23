@@ -114,7 +114,10 @@ module PragmaticTokenizer
       return [] unless text
       tokens = []
       text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
-        tokens << post_process(PreProcessor.new(language: language_module).pre_process(text: segment))
+        pre_processed = segment
+                            .extend(PragmaticTokenizer::PreProcessor)
+                            .pre_process(language: language_module)
+        tokens << post_process(pre_processed)
       end
       tokens.flatten
     end
