@@ -28,7 +28,7 @@ require 'pragmatic_tokenizer/languages/turkish'
 module PragmaticTokenizer
   module Languages
     LANGUAGE_CODES = {
-      'en' => English,
+        'en' => English,
       'ar' => Arabic,
       'bg' => Bulgarian,
       'ca' => Catalan,

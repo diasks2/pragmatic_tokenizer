@@ -8,7 +8,7 @@ module PragmaticTokenizer
       # Pragmatic Tokenizer will return the most frequently appearing expanded contraction. Regardless, this should
       # be rather insignificant as in most cases one is probably removing stop words.
       CONTRACTIONS = {
-        "i'm"               => "i am",
+          "i'm"               => "i am",
         "i'll"              => "i will",
         "i'd"               => "i would",
         "i've"              => "i have",
