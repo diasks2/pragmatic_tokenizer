@@ -47,7 +47,7 @@ module PragmaticTokenizer
     # @option opts [Boolean] :remove_urls - (default: false)
     # @option opts [Boolean] :remove_domains - (default: false)
 
-    def initialize(text, opts = {})
+    def initialize(text, opts={})
       @text                     = CGI.unescapeHTML(text)
       @filter_languages         = opts[:filter_languages] || []
       @language                 = opts[:language] || 'en'
@@ -62,17 +62,17 @@ module PragmaticTokenizer
         merged_abbreviations = []
         @filter_languages.map { |l| merged_abbreviations << Languages.get_language_by_code(l.to_s)::ABBREVIATIONS.flatten }
         merged_abbreviations << opts[:abbreviations].flatten unless opts[:abbreviations].nil?
-        @abbreviations          =  merged_abbreviations.flatten
+        @abbreviations = merged_abbreviations.flatten
 
         merged_contractions = {}
         @filter_languages.map { |l| merged_contractions = merged_contractions.merge(Languages.get_language_by_code(l.to_s)::CONTRACTIONS) }
         merged_contractions = merged_contractions.merge(opts[:contractions]) unless opts[:contractions].nil?
-        @contractions           =  merged_contractions
+        @contractions = merged_contractions
 
         merged_stop_words = []
         @filter_languages.map { |l| merged_stop_words << Languages.get_language_by_code(l.to_s)::STOP_WORDS.flatten }
         merged_stop_words << opts[:stop_words].flatten unless opts[:stop_words].nil?
-        @stop_words             =  merged_stop_words.flatten
+        @stop_words = merged_stop_words.flatten
       end
       @punctuation              = opts[:punctuation] || 'all'
       @numbers                  = opts[:numbers] || 'all'
@@ -89,20 +89,20 @@ module PragmaticTokenizer
       @remove_domains           = opts[:remove_domains] || false
 
       unless punctuation.to_s.eql?('all') ||
-        punctuation.to_s.eql?('semi') ||
-        punctuation.to_s.eql?('none') ||
-        punctuation.to_s.eql?('only')
+             punctuation.to_s.eql?('semi') ||
+             punctuation.to_s.eql?('none') ||
+             punctuation.to_s.eql?('only')
         raise "Punctuation argument can be only be nil, 'all', 'semi', 'none', or 'only'"
       end
       unless numbers.to_s.eql?('all') ||
-        numbers.to_s.eql?('semi') ||
-        numbers.to_s.eql?('none') ||
-        numbers.to_s.eql?('only')
+             numbers.to_s.eql?('semi') ||
+             numbers.to_s.eql?('none') ||
+             numbers.to_s.eql?('only')
         raise "Numbers argument can be only be nil, 'all', 'semi', 'none', or 'only'"
       end
       unless mentions.to_s.eql?('keep_original') ||
-        mentions.to_s.eql?('keep_and_clean') ||
-        mentions.to_s.eql?('remove')
+             mentions.to_s.eql?('keep_and_clean') ||
+             mentions.to_s.eql?('remove')
         raise "Mentions argument can be only be nil, 'keep_original', 'keep_and_clean', or 'remove'"
       end
       raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
@@ -121,144 +121,164 @@ module PragmaticTokenizer
 
     private
 
-    def post_process(text)
-      @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
-      downcase! if downcase
-      expand_contractions!(contractions) if expand_contractions
-      clean! if clean
-      classic_filter! if classic_filter
-      process_numbers!
-      remove_short_tokens! if minimum_length > 0
-      process_punctuation!
-      remove_stop_words!(stop_words) if remove_stop_words
-      remove_emoji! if remove_emoji
-      remove_emails! if remove_emails
-      mentions! if mentions
-      hashtags! if hashtags
-      remove_urls! if remove_urls
-      remove_domains! if remove_domains
-      split_long_words! if long_word_split
-      @tokens.reject { |t| t.empty? }
-    end
-
-    def downcase!
-      @tokens.map! { |t| Unicode::downcase(t) }
-    end
-
-    def expand_contractions!(contractions)
-      if downcase
-        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
-      else
-        @tokens = @tokens.flat_map { |t| contractions.has_key?(Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode::downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode::capitalize(t) : t }.flatten : t }
+      def post_process(text)
+        @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
+        downcase! if downcase
+        expand_contractions!(contractions) if expand_contractions
+        clean! if clean
+        classic_filter! if classic_filter
+        process_numbers!
+        remove_short_tokens! if minimum_length > 0
+        process_punctuation!
+        remove_stop_words!(stop_words) if remove_stop_words
+        remove_emoji! if remove_emoji
+        remove_emails! if remove_emails
+        mentions! if mentions
+        hashtags! if hashtags
+        remove_urls! if remove_urls
+        remove_domains! if remove_domains
+        split_long_words! if long_word_split
+        @tokens.reject(&:empty?)
       end
-    end
 
-    def clean!
-      @tokens = @tokens.flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\s)\_+/) ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\s)/) ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\A)\_+/) ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
-        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\z)/) ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
-        .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\*+/) ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
-        .map { |t| t.gsub(/[[:cntrl:]]/, '') }
-        .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
-        .map { |t| t.gsub(/\:(?=\z)/, '') }
-        .map { |t| t.gsub(/(?<=\A)!+(?=.+)/, '') }
-        .map { |t| t !~ /[＠@#|＃]/ ? t.gsub(/(?<=\D)1+(?=\z)/, '') : t }
-        .map { |t| t.gsub(/!+(?=\z)/, '') }
-        .map { |t| t.gsub(/!+(1*!*)*(?=\z)/, '') }
-        .map { |t| t.gsub(/\u{00AD}/, '') }
-        .map { |t| t.gsub(/\A(-|–)/, '') }
-        .map { |t| t.gsub(/[®©]/, '') }
-        .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
-        .delete_if { |t| t =~ /\A-+\z/ ||
-        PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
-        t =~ /\A\.{2,}\z/ || t.include?("\\") ||
-        t.length > 50 ||
-        (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
-        (t.length == 1 && t =~ /\:/)
-      }
-    end
-
-    def classic_filter!
-      @tokens.map! { |t| abbreviations.include?(t.chomp(".")) ? t.gsub('.', '').chomp("'s").chomp("’s").chomp("`s").chomp("́s") : t.chomp("'s").chomp("’s").chomp("`s").chomp("́s") }
-    end
-
-    def process_numbers!
-      case numbers.to_s
-      when 'semi'
-        @tokens.delete_if { |t| t =~ /\A\d+\z/ }
-      when 'none'
-        @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode::downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode::downcase(t)}.") }
-      when 'only'
-        @tokens.delete_if { |t| t =~ /\A\D+\z/ }
+      def downcase!
+        @tokens.map! { |t| Unicode.downcase(t) }
       end
-    end
 
-    def remove_short_tokens!
-      @tokens.delete_if { |t| t.length < minimum_length }
-    end
-
-    def process_punctuation!
-      case punctuation.to_s
-      when 'semi'
-        @tokens = @tokens - PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
-      when 'none'
-        @tokens =  @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
-      when 'only'
-        @tokens.delete_if { |t| !PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
+      def expand_contractions!(contractions)
+        @tokens = if downcase
+                    @tokens.flat_map do |t|
+                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
+                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                            .split(' ')
+                            .flatten
+                      else
+                        t
+                      end
+                    end
+                  else
+                    @tokens.flat_map do |t|
+                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
+                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                            .split(' ')
+                            .each_with_index
+                            .map { |token, i| i.eql?(0) ? Unicode.capitalize(token) : token }
+                            .flatten
+                      else
+                        t
+                      end
+                    end
+                  end
       end
-    end
 
-    def remove_stop_words!(stop_words)
-      if downcase
-        @tokens = @tokens - stop_words
-      else
-        @tokens.delete_if { |t| stop_words.include?(Unicode::downcase(t)) }
+      def clean!
+        @tokens = @tokens.flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\s)\_+/) ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\s)/) ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\A)\_+/) ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\z)/) ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\*+/) ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
+            .map { |t| t.gsub(/[[:cntrl:]]/, '') }
+            .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
+            .map { |t| t.gsub(/\:(?=\z)/, '') }
+            .map { |t| t.gsub(/(?<=\A)!+(?=.+)/, '') }
+            .map { |t| t !~ /[＠@#|＃]/ ? t.gsub(/(?<=\D)1+(?=\z)/, '') : t }
+            .map { |t| t.gsub(/!+(?=\z)/, '') }
+            .map { |t| t.gsub(/!+(1*!*)*(?=\z)/, '') }
+            .map { |t| t.gsub(/\u{00AD}/, '') }
+            .map { |t| t.gsub(/\A(-|–)/, '') }
+            .map { |t| t.gsub(/[®©]/, '') }
+            .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
+            .delete_if do |t|
+          t =~ /\A-+\z/ ||
+            PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
+            t =~ /\A\.{2,}\z/ || t.include?("\\") ||
+            t.length > 50 ||
+            (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
+            (t.length == 1 && t =~ /\:/)
+        end
       end
-    end
 
-    def remove_emoji!
-      @tokens.delete_if { |t| t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
-        t =~ /\u{2744}\u{FE0F}/ ||
-        t =~ /\u{2744}\u{FE0E}/ ||
-        t =~ /\u{2744}/
-      }
-    end
-
-    def remove_emails!
-      @tokens.delete_if { |t| t =~ /\S+(＠|@)\S+\.\S+/ }.map { |t| t.chomp('.') }
-    end
-
-    def mentions!
-      case mentions.to_s
-      when 'remove'
-        @tokens.delete_if { |t| t =~ /\A(@|＠)/ }
-      when 'keep_and_clean'
-        @tokens.map! { |t| t =~ /\A(@|＠)/ ? t.gsub!(/(?<=\A)(@|＠)/, '') : t }
+      def classic_filter!
+        @tokens.map! { |t| abbreviations.include?(t.chomp(".")) ? t.delete('.').chomp("'s").chomp("’s").chomp("`s").chomp("́s") : t.chomp("'s").chomp("’s").chomp("`s").chomp("́s") }
       end
-    end
 
-    def hashtags!
-      case hashtags.to_s
-      when 'remove'
-        @tokens.delete_if { |t| t =~ /\A(#|＃)/ }
-      when 'keep_and_clean'
-        @tokens = @tokens.flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
-        @tokens.map! { |t| t =~ /\A(#|＃)/ ? t.gsub!(/(?<=\A)(#|＃)/, '') : t }
+      def process_numbers!
+        case numbers.to_s
+        when 'semi'
+          @tokens.delete_if { |t| t =~ /\A\d+\z/ }
+        when 'none'
+          @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
+        when 'only'
+          @tokens.delete_if { |t| t =~ /\A\D+\z/ }
+        end
       end
-    end
 
-    def remove_urls!
-      @tokens.delete_if { |t| t =~ /(http|https)(\.|:)/ }
-    end
+      def remove_short_tokens!
+        @tokens.delete_if { |t| t.length < minimum_length }
+      end
 
-    def remove_domains!
-      @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
-    end
+      def process_punctuation!
+        case punctuation.to_s
+        when 'semi'
+          @tokens -= PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
+        when 'none'
+          @tokens = @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
+        when 'only'
+          @tokens.delete_if { |t| !PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
+        end
+      end
 
-    def split_long_words!
-      @tokens.map! { |t| t.length > long_word_split ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
-        .map! { |t| t.length > long_word_split ? t.gsub(/\_/, '\1 \2').split(' ').flatten : t }
-    end
+      def remove_stop_words!(stop_words)
+        if downcase
+          @tokens -= stop_words
+        else
+          @tokens.delete_if { |t| stop_words.include?(Unicode.downcase(t)) }
+        end
+      end
+
+      def remove_emoji!
+        @tokens.delete_if do |t|
+          t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
+            t =~ /\u{2744}\u{FE0F}/ ||
+            t =~ /\u{2744}\u{FE0E}/ ||
+            t =~ /\u{2744}/
+        end
+      end
+
+      def remove_emails!
+        @tokens.delete_if { |t| t =~ /\S+(＠|@)\S+\.\S+/ }.map { |t| t.chomp('.') }
+      end
+
+      def mentions!
+        case mentions.to_s
+        when 'remove'
+          @tokens.delete_if { |t| t =~ /\A(@|＠)/ }
+        when 'keep_and_clean'
+          @tokens.map! { |t| t =~ /\A(@|＠)/ ? t.gsub!(/(?<=\A)(@|＠)/, '') : t }
+        end
+      end
+
+      def hashtags!
+        case hashtags.to_s
+        when 'remove'
+          @tokens.delete_if { |t| t =~ /\A(#|＃)/ }
+        when 'keep_and_clean'
+          @tokens = @tokens.flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
+          @tokens.map! { |t| t =~ /\A(#|＃)/ ? t.gsub!(/(?<=\A)(#|＃)/, '') : t }
+        end
+      end
+
+      def remove_urls!
+        @tokens.delete_if { |t| t =~ /(http|https)(\.|:)/ }
+      end
+
+      def remove_domains!
+        @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
+      end
+
+      def split_long_words!
+        @tokens.map! { |t| t.length > long_word_split ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
+            .map! { |t| t.length > long_word_split ? t.gsub(/\_/, '\1 \2').split(' ').flatten : t }
+      end
   end
 end

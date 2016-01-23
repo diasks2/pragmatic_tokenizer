@@ -4,7 +4,6 @@ require 'spec_helper'
 require 'stackprof'
 
 describe PragmaticTokenizer do
-
   # Speed benchmarks tests
 
   # it 'is fast?' do
@@ -55,8 +54,8 @@ describe PragmaticTokenizer do
   # end
 end
 
-def benchmark(&block)
-  block.call
-  time = Benchmark.realtime { block.call }
+def benchmark
+  yield
+  time = Benchmark.realtime { yield }
   puts "RUNTIME: #{time}"
 end
