@@ -138,7 +138,7 @@ module PragmaticTokenizer
         remove_urls! if remove_urls
         remove_domains! if remove_domains
         split_long_words! if long_word_split
-        @tokens.reject { |t| t.empty? }
+        @tokens.reject(&:empty?)
       end
 
       def downcase!
