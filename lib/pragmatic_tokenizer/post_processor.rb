@@ -9,9 +9,9 @@ module PragmaticTokenizer
 
     def post_process
       tokens = text.split
-        .flat_map { |t| (t[0] == '‚' || t[0] == ',') && t.length > 1 ? t.split(/(,|‚)/).flatten : t }
-        .flat_map { |t| (t[-1] == '’' || t[-1] == "'" || t[-1] == '‘' || t[-1] == '`') && t.length > 1 ? t.split(/(’|'|‘|`)/).flatten : t }
-        .map { |t| convert_sym_to_punct(t) }
+          .flat_map { |t| (t[0] == '‚' || t[0] == ',') && t.length > 1 ? t.split(/(,|‚)/).flatten : t }
+          .flat_map { |t| (t[-1] == '’' || t[-1] == "'" || t[-1] == '‘' || t[-1] == '`') && t.length > 1 ? t.split(/(’|'|‘|`)/).flatten : t }
+          .map { |t| convert_sym_to_punct(t) }
       full_stop_separated_tokens = FullStopSeparator.new(tokens: tokens, abbreviations: abbreviations).separate
       EndingPunctuationSeparator.new(tokens: EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate.flat_map { |t| t.include?("/") && t !~ /(http|https|www)(\.|:)/ ? t.gsub!(/\//, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t.include?("?") && t !~ /(http|https|www)(\.|:)/ && t.length > 1 ? t.gsub(/\?/, '\1 \2').split(' ').flatten : t }
