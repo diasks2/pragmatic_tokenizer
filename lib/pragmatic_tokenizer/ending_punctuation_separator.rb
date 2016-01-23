@@ -15,7 +15,7 @@ module PragmaticTokenizer
         if split_punctuation[0].nil?
           cleaned_tokens << a
         else
-          cleaned_tokens << a.tr(split_punctuation[0],'')
+          cleaned_tokens << a.tr(split_punctuation[0], '')
           if split_punctuation[0].length.eql?(1)
             cleaned_tokens << split_punctuation[0]
           else
