@@ -149,7 +149,7 @@ module PragmaticTokenizer
         @tokens = if downcase
                     @tokens.flat_map { |t| contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
                   else
-                    @tokens.flat_map { |t| contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |t, i| i.eql?(0) ? Unicode.capitalize(t) : t }.flatten : t }
+                    @tokens.flat_map { |t| contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |token, i| i.eql?(0) ? Unicode.capitalize(token) : token }.flatten : t }
                   end
       end
 
