@@ -31,7 +31,7 @@ module PragmaticTokenizer
       convert_apostrophe_s!
       shift_beginning_hyphen!
       shift_ending_hyphen!
-      @text.squeeze(' ')
+      @text.squeeze(' '.freeze)
     end
 
     private
