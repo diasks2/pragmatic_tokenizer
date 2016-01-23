@@ -62,17 +62,17 @@ module PragmaticTokenizer
         merged_abbreviations = []
         @filter_languages.map { |l| merged_abbreviations << Languages.get_language_by_code(l.to_s)::ABBREVIATIONS.flatten }
         merged_abbreviations << opts[:abbreviations].flatten unless opts[:abbreviations].nil?
-        @abbreviations          =  merged_abbreviations.flatten
+        @abbreviations          = merged_abbreviations.flatten
 
         merged_contractions = {}
         @filter_languages.map { |l| merged_contractions = merged_contractions.merge(Languages.get_language_by_code(l.to_s)::CONTRACTIONS) }
         merged_contractions = merged_contractions.merge(opts[:contractions]) unless opts[:contractions].nil?
-        @contractions           =  merged_contractions
+        @contractions = merged_contractions
 
         merged_stop_words = []
         @filter_languages.map { |l| merged_stop_words << Languages.get_language_by_code(l.to_s)::STOP_WORDS.flatten }
         merged_stop_words << opts[:stop_words].flatten unless opts[:stop_words].nil?
-        @stop_words             =  merged_stop_words.flatten
+        @stop_words = merged_stop_words.flatten
       end
       @punctuation              = opts[:punctuation] || 'all'
       @numbers                  = opts[:numbers] || 'all'
@@ -203,7 +203,7 @@ module PragmaticTokenizer
       when 'semi'
         @tokens = @tokens - PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
       when 'none'
-        @tokens =  @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
+        @tokens = @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
       when 'only'
         @tokens.delete_if { |t| !PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
       end

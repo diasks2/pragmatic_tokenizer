@@ -21,7 +21,7 @@ module PragmaticTokenizer
           w = $1
           unless abbr[Unicode.downcase(w)] || w =~ /\A[a-z]\z/i ||
             w =~ /[a-z](?:\.[a-z])+\z/i
-            cleaned_tokens <<  w
+            cleaned_tokens << w
             cleaned_tokens << '.'
             next
           end
