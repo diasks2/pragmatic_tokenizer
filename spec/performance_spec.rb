@@ -4,7 +4,6 @@ require 'spec_helper'
 require 'stackprof'
 
 describe PragmaticTokenizer do
-
   # Speed benchmarks tests
 
   # it 'is fast?' do

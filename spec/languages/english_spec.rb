@@ -3,7 +3,6 @@ require 'spec_helper'
 describe PragmaticTokenizer do
   context 'Language: English (en)' do
     context '#tokenize (example strings)' do
-
       context 'no options selected' do
         it 'tokenizes a string #001' do
           text = "Hello world."
