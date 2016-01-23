@@ -46,9 +46,9 @@ module PragmaticTokenizer
 
     private
 
-    def convert_sym_to_punct(token)
-      symbol_matches = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/.match(token)
-      symbol_matches.nil? ? token : token.gsub!(symbol_matches[0], PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(symbol_matches[0]))
-    end
+      def convert_sym_to_punct(token)
+        symbol_matches = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/.match(token)
+        symbol_matches.nil? ? token : token.gsub!(symbol_matches[0], PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(symbol_matches[0]))
+      end
   end
 end
