@@ -979,7 +979,7 @@ describe PragmaticTokenizer do
             punctuation: 'none'
           )
           expect(pt.tokenize).to eq(["watch", "the", "video", "of", "@amandapalmer`s", "song", "killing", "type", "here"])
-        end
+         end
 
         it 'handles numbers suffixed with a symbol' do
           text = "4 Things Marketers Must Do Better in 2016: blah"

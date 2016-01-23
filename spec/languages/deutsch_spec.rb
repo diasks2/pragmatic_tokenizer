@@ -186,7 +186,7 @@ describe PragmaticTokenizer do
         language: 'de'
       )
       expect(pt.tokenize).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
-    end
+     end
 
     it 'does not remove English stopwords' do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
