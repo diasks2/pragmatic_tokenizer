@@ -27,13 +27,15 @@ module PragmaticTokenizer
           t.count(".") == 1 &&
           t !~ /\d+/ &&
           !abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) &&
-          t !~ /\S+(＠|@)\S+/ ? t.gsub(/\./, '\1 . \2').split(' ').flatten : t end
+          t !~ /\S+(＠|@)\S+/ ? t.gsub(/\./, '\1 . \2').split(' ').flatten : t 
+        end
         .flat_map do |t| t.include?(".") &&
           t !~ /(http|https|www)(\.|:)/ &&
           t.length > 1 &&
           t !~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix &&
           t !~ /\S+(＠|@)\S+/ &&
-          abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub(/\./, '\1. \2').split(' ').flatten : t end
+          abbreviations.include?(Unicode::downcase(t.split(".")[0] == nil ? '' : t.split(".")[0])) ? t.gsub(/\./, '\1. \2').split(' ').flatten : t 
+        end
         .flat_map { |t| t =~ /\u{2744}\u{FE0F}/ ? t.gsub(/\u{2744}\u{FE0F}/, " \u{2744}\u{FE0F} ").split(' ').flatten : t }
         .flat_map { |t| t =~ /\u{2744}\u{FE0E}/ ? t.gsub(/\u{2744}\u{FE0E}/, " \u{2744}\u{FE0E} ").split(' ').flatten : t }
         .flat_map { |t| t =~ /(\A|\S)\u{2744}[^\u{FE0E}|\u{FE0F}]/ ? t.gsub(/\u{2744}/, " \u{2744} ").split(' ').flatten : t }
