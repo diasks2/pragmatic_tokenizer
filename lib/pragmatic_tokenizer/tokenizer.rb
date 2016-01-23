@@ -147,9 +147,27 @@ module PragmaticTokenizer
 
       def expand_contractions!(contractions)
         @tokens = if downcase
-                    @tokens.flat_map { |t| contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').flatten : t }
+                    @tokens.flat_map do |t|
+                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
+                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                            .split(' ')
+                            .flatten
+                      else
+                        t
+                      end
+                    end
                   else
-                    @tokens.flat_map { |t| contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))) ? contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))].split(' ').each_with_index.map { |token, i| i.eql?(0) ? Unicode.capitalize(token) : token }.flatten : t }
+                    @tokens.flat_map do |t|
+                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
+                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                            .split(' ')
+                            .each_with_index
+                            .map { |token, i| i.eql?(0) ? Unicode.capitalize(token) : token }
+                            .flatten
+                      else
+                        t
+                      end
+                    end
                   end
       end
 
