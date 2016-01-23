@@ -12,7 +12,9 @@ module PragmaticTokenizer
       shift_inverted_question_mark!
       shift_inverted_exclamation!
       shift_exclamation!
-      shift_ellipse!
+      shift_ellipse_three_dots!
+      shift_ellipse_two_dots!
+      shift_horizontal_ellipsis!
       shift_no_space_mention!
       shift_not_equals!
       shift_special_quotes!
@@ -56,10 +58,16 @@ module PragmaticTokenizer
         @text.gsub!(/(?<=[a-zA-z])!(?=[a-zA-z])/, ' ! '.freeze)
       end
 
-      def shift_ellipse!
-        @text.gsub!(/(\.\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
-        @text.gsub!(/(\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+      def shift_horizontal_ellipsis!
         @text.gsub!(/(…+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+      end
+
+      def shift_ellipse_two_dots!
+        @text.gsub!(/(\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+      end
+
+      def shift_ellipse_three_dots!
+        @text.gsub!(/(\.\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
       end
 
       def shift_no_space_mention!
@@ -120,11 +128,17 @@ module PragmaticTokenizer
       end
 
       def convert_dbl_quotes!
-        # Convert left double quotes to special character
+        replace_left_double_quotes!
+        replace_remaining_double_quotes!
+      end
+
+      def replace_left_double_quotes!
         @text.gsub!(/''(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
         @text.gsub!(/"(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
         @text.gsub!(/“(?=.*\w)/o, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['“'.freeze] + ' '.freeze)
-        # Convert remaining quotes to special character
+      end
+
+      def replace_remaining_double_quotes!
         @text.gsub!(/"/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
         @text.gsub!(/''/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['"'.freeze] + ' '.freeze)
         @text.gsub!(/”/, ' '.freeze + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP['”'.freeze] + ' '.freeze)
