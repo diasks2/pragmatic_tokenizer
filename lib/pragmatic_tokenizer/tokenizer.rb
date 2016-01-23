@@ -202,7 +202,7 @@ module PragmaticTokenizer
       def process_punctuation!
         case punctuation.to_s
         when 'semi'
-          @tokens = @tokens - PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
+          @tokens -= PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
         when 'none'
           @tokens = @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
         when 'only'
@@ -212,7 +212,7 @@ module PragmaticTokenizer
 
       def remove_stop_words!(stop_words)
         if downcase
-          @tokens = @tokens - stop_words
+          @tokens -= stop_words
         else
           @tokens.delete_if { |t| stop_words.include?(Unicode.downcase(t)) }
         end
