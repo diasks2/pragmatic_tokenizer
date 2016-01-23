@@ -54,7 +54,7 @@ module PragmaticTokenizer
       'sk' => Slovak,
       'sv' => Swedish,
       'tr' => Turkish
-    }
+    }.freeze
 
     def self.get_language_by_code(code)
       LANGUAGE_CODES[code] || Common

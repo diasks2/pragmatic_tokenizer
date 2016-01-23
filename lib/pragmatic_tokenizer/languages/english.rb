@@ -94,7 +94,7 @@ module PragmaticTokenizer
         "jack-o'-lantern"   => "jack-of-the-lantern",
         "will-o'-the-wisp"  => "will-of-the-wisp",
         "'twas"             => "it was"
-      }
+      }.freeze
       class SingleQuotes
         def handle_single_quotes(text)
           # Convert left quotes to special character except for 'Twas or 'twas

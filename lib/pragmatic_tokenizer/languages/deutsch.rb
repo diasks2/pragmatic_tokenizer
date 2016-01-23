@@ -64,7 +64,7 @@ module PragmaticTokenizer
           "wird's"            => "wird es",
           "wär's"             => "wäre es",
           "ö's"               => "österreichs"
-      }
+      }.freeze
     end
   end
 end
