@@ -41,7 +41,7 @@ module PragmaticTokenizer
         .flat_map { |t| t =~ /(\A|\S)\u{2744}[^\u{FE0E}|\u{FE0F}]/ ? t.gsub(/\u{2744}/, " \u{2744} ").split(' ').flatten : t }
         .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
         .flat_map { |t| t =~ PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX ? t.gsub(PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX, '\1 \2').split(' ').flatten : t }
-      ).separate
+                                    ).separate
     end
 
     private

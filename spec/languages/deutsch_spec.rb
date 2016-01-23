@@ -15,7 +15,7 @@ describe PragmaticTokenizer do
                                                remove_stop_words: true,
                                                punctuation:       'none',
                                                numbers:           :none
-      ).tokenize).to eq(["größte", "Ausdehnung", "Landes", "Westen", "Osten", "beträgt", "Nord", "Süd", "europäischen", "Staaten", "Weißrussland", "flächenmäßig"])
+                                              ).tokenize).to eq(["größte", "Ausdehnung", "Landes", "Westen", "Osten", "beträgt", "Nord", "Süd", "europäischen", "Staaten", "Weißrussland", "flächenmäßig"])
     end
 
     it 'tokenizes a string #003' do
@@ -23,7 +23,7 @@ describe PragmaticTokenizer do
       expect(PragmaticTokenizer::Tokenizer.new(text,
                                                language: 'de',
                                                downcase: false
-      ).tokenize).to eq(["Die", "weißrussischen", "offiziellen", "Stellen", "wie", "auch", "die", "deutsche", "Diplomatie", "verwenden", "in", "offiziellen", "deutschsprachigen", "Texten", "den", "Namen", "Belarus", ",", "um", "die", "Unterscheidung", "von", "Russland", "zu", "verdeutlichen", "."])
+                                              ).tokenize).to eq(["Die", "weißrussischen", "offiziellen", "Stellen", "wie", "auch", "die", "deutsche", "Diplomatie", "verwenden", "in", "offiziellen", "deutschsprachigen", "Texten", "den", "Namen", "Belarus", ",", "um", "die", "Unterscheidung", "von", "Russland", "zu", "verdeutlichen", "."])
     end
 
     it 'tokenizes a string #004' do
@@ -31,14 +31,14 @@ describe PragmaticTokenizer do
       expect(PragmaticTokenizer::Tokenizer.new(text,
                                                language: 'de',
                                                downcase: false
-      ).tokenize).to eq(['der', 'Kaffee-Ersatz'])
+                                              ).tokenize).to eq(['der', 'Kaffee-Ersatz'])
     end
 
     it 'tokenizes a string #005' do
       text = "Charlie Hebdo backlash over 'racist' Alan Kurdi cartoon - https://t.co/J8N2ylVV3w"
       expect(PragmaticTokenizer::Tokenizer.new(text,
                                                language: 'de',
-      ).tokenize).to eq(["charlie", "hebdo", "backlash", "over", "'", "racist", "'", "alan", "kurdi", "cartoon", "-", "https://t.co/j8n2ylvv3w"])
+                                              ).tokenize).to eq(["charlie", "hebdo", "backlash", "over", "'", "racist", "'", "alan", "kurdi", "cartoon", "-", "https://t.co/j8n2ylvv3w"])
     end
 
     it 'handles words with a slash 1' do
@@ -46,7 +46,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["we", "pay", "3000", "€", "month"])
     end
 
@@ -55,7 +55,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["ich", "frage", "mich", "wieso", "er", "nicht", "herr", "der", "lage", "war", "ist"])
     end
 
@@ -64,7 +64,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["poison", "gas", "attack", "in", "ghuta", "syria"])
     end
 
@@ -73,7 +73,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["essen", "á", "la", "carte", "man", "ist", "versucht"])
     end
 
@@ -82,7 +82,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["die", "mitte", "der", "gesellschaft", "interessiert", "sich", "jetzt", "für", "feminismus"])
     end
 
@@ -91,7 +91,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["@rainersteinke", "@_sternchen_2015", "1:0", "für", "dich"])
     end
 
@@ -100,7 +100,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["@landaudaniel", "@anthzeto", "@julianfranz", "@s_beck19", "yep"])
     end
 
@@ -110,7 +110,7 @@ describe PragmaticTokenizer do
                                              punctuation: 'none',
                                              downcase:    false,
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["du", "übertreibst", "maßlos", ":D"])
     end
 
@@ -119,7 +119,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["hier", "ist", "ein", "whirlpool", "versteckt"])
     end
 
@@ -128,7 +128,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["was", "wir", "tun", "wird", "in", "diesem", "land", "leben", "retten", "#obama"])
     end
 
@@ -137,7 +137,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["air", "force", "once", "ist", "18.270-mal", "abgehoben"])
     end
 
@@ -146,7 +146,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen"])
     end
 
@@ -155,7 +155,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              expand_contractions: true,
                                              language:            'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["gibt", "es"])
     end
 
@@ -164,7 +164,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              expand_contractions: true,
                                              language:            'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["gibt", "es", "schaut", "es", "wenn", "es", "gespür", "finde", "es"])
     end
 
@@ -174,7 +174,7 @@ describe PragmaticTokenizer do
                                              filter_languages:  [:en],
                                              remove_stop_words: true,
                                              language:          'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "english", "."])
     end
 
@@ -184,7 +184,7 @@ describe PragmaticTokenizer do
                                              filter_languages:  [:en, :de],
                                              remove_stop_words: true,
                                              language:          'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
      end
 
@@ -192,7 +192,7 @@ describe PragmaticTokenizer do
       text = "der/die Lehrer_in und seine/ihre Schüler_innen. This has some English."
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              language: 'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "this", "has", "some", "english", "."])
     end
 
@@ -204,7 +204,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["wir", "brauchen", "eine/n", "erfahrene/n", "informatiker/in"])
     end
 
@@ -214,7 +214,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              punctuation: 'none',
                                              language:    'de'
-      )
+                                            )
       expect(pt.tokenize).to eq(["endlich", "regnet", "es", "ihm", "nicht", "mehr", "auf́s", "haupt"])
     end
 
@@ -222,7 +222,7 @@ describe PragmaticTokenizer do
       text = "Adj. Smith how are ü. today."
       pt = PragmaticTokenizer::Tokenizer.new(text,
                                              language: :de
-      )
+                                            )
       expect(pt.tokenize).to eq(["adj", ".", "smith", "how", "are", "ü.", "today", "."])
     end
   end
