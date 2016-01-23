@@ -41,7 +41,7 @@ describe PragmaticTokenizer do
       text = "Charlie Hebdo backlash over 'racist' Alan Kurdi cartoon - https://t.co/J8N2ylVV3w"
       expect(PragmaticTokenizer::Tokenizer.new(
           text,
-                                               language: 'de',
+                                               language: 'de'
                                               ).tokenize).to eq(["charlie", "hebdo", "backlash", "over", "'", "racist", "'", "alan", "kurdi", "cartoon", "-", "https://t.co/j8n2ylvv3w"])
     end
 
