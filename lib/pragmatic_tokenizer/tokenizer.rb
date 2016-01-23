@@ -62,7 +62,7 @@ module PragmaticTokenizer
         merged_abbreviations = []
         @filter_languages.map { |l| merged_abbreviations << Languages.get_language_by_code(l.to_s)::ABBREVIATIONS.flatten }
         merged_abbreviations << opts[:abbreviations].flatten unless opts[:abbreviations].nil?
-        @abbreviations          = merged_abbreviations.flatten
+        @abbreviations = merged_abbreviations.flatten
 
         merged_contractions = {}
         @filter_languages.map { |l| merged_contractions = merged_contractions.merge(Languages.get_language_by_code(l.to_s)::CONTRACTIONS) }
