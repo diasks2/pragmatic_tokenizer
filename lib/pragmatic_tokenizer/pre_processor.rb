@@ -89,7 +89,7 @@ module PragmaticTokenizer
         return unless may_shift_colon?
         # Ignore web addresses
         replacement = replacement_for_key(':'.freeze)
-        @text.gsub!(%r{(?<=[http|https]):(?=//)}, replacement)
+        @text.gsub!(%r{(?<=[(https?|ftp)]):(?=//)}, replacement)
         @text.gsub!(/:/o, ' :'.freeze)
         @text.gsub!(/(?<=\s):(?=\#)/, ': '.freeze)
       end
