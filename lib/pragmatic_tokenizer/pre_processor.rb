@@ -78,8 +78,8 @@ module PragmaticTokenizer
 
       def shift_colon(text)
         return text unless text.include?(':') &&
-          (text.partition(':').last[0] !~ /\A\d+/ ||
-          text.partition(':').first[-1] !~ /\A\d+/)
+                           (text.partition(':').last[0] !~ /\A\d+/ ||
+                           text.partition(':').first[-1] !~ /\A\d+/)
         # Ignore web addresses
         text.gsub!(/(?<=[http|https]):(?=\/\/)/, PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP[":"]) || text
         text.gsub!(/:/o, ' :') || text

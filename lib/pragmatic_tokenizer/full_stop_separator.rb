@@ -20,7 +20,7 @@ module PragmaticTokenizer
         if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
           w = $1
           unless abbr[Unicode.downcase(w)] || w =~ /\A[a-z]\z/i ||
-            w =~ /[a-z](?:\.[a-z])+\z/i
+                 w =~ /[a-z](?:\.[a-z])+\z/i
             cleaned_tokens << w
             cleaned_tokens << '.'
             next

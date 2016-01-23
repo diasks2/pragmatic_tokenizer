@@ -89,20 +89,20 @@ module PragmaticTokenizer
       @remove_domains           = opts[:remove_domains] || false
 
       unless punctuation.to_s.eql?('all') ||
-        punctuation.to_s.eql?('semi') ||
-        punctuation.to_s.eql?('none') ||
-        punctuation.to_s.eql?('only')
+             punctuation.to_s.eql?('semi') ||
+             punctuation.to_s.eql?('none') ||
+             punctuation.to_s.eql?('only')
         raise "Punctuation argument can be only be nil, 'all', 'semi', 'none', or 'only'"
       end
       unless numbers.to_s.eql?('all') ||
-        numbers.to_s.eql?('semi') ||
-        numbers.to_s.eql?('none') ||
-        numbers.to_s.eql?('only')
+             numbers.to_s.eql?('semi') ||
+             numbers.to_s.eql?('none') ||
+             numbers.to_s.eql?('only')
         raise "Numbers argument can be only be nil, 'all', 'semi', 'none', or 'only'"
       end
       unless mentions.to_s.eql?('keep_original') ||
-        mentions.to_s.eql?('keep_and_clean') ||
-        mentions.to_s.eql?('remove')
+             mentions.to_s.eql?('keep_and_clean') ||
+             mentions.to_s.eql?('remove')
         raise "Mentions argument can be only be nil, 'keep_original', 'keep_and_clean', or 'remove'"
       end
       raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
@@ -172,11 +172,11 @@ module PragmaticTokenizer
             .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
             .delete_if do |t| 
                     t =~ /\A-+\z/ ||
-          PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
-          t =~ /\A\.{2,}\z/ || t.include?("\\") ||
-          t.length > 50 ||
-          (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
-          (t.length == 1 && t =~ /\:/)
+                      PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(t) ||
+                      t =~ /\A\.{2,}\z/ || t.include?("\\") ||
+                      t.length > 50 ||
+                      (t.length > 1 && t =~ /[&*+<=>^|~]/i) ||
+                      (t.length == 1 && t =~ /\:/)
         end
       end
 
@@ -221,9 +221,9 @@ module PragmaticTokenizer
       def remove_emoji!
         @tokens.delete_if do |t| 
           t =~ PragmaticTokenizer::Languages::Common::EMOJI_REGEX ||
-          t =~ /\u{2744}\u{FE0F}/ ||
-          t =~ /\u{2744}\u{FE0E}/ ||
-          t =~ /\u{2744}/
+            t =~ /\u{2744}\u{FE0F}/ ||
+            t =~ /\u{2744}\u{FE0E}/ ||
+            t =~ /\u{2744}/
         end
       end
 
