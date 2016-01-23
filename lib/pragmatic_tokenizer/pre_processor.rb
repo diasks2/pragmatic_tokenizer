@@ -56,9 +56,9 @@ module PragmaticTokenizer
       end
 
       def shift_ellipse(text)
-        text.gsub!(/(\.\.\.+)/o) { ' ' + $1 + ' ' } || text
-        text.gsub!(/(\.\.+)/o) { ' ' + $1 + ' ' } || text
-        text.gsub!(/(…+)/o) { ' ' + $1 + ' ' } || text
+        text.gsub!(/(\.\.\.+)/o) { ' ' + Regexp.last_match(1) + ' ' } || text
+        text.gsub!(/(\.\.+)/o) { ' ' + Regexp.last_match(1) + ' ' } || text
+        text.gsub!(/(…+)/o) { ' ' + Regexp.last_match(1) + ' ' } || text
       end
 
       def shift_no_space_mention(text)
@@ -87,11 +87,11 @@ module PragmaticTokenizer
       end
 
       def shift_bracket(text)
-        text.gsub!(/([\(\[\{\}\]\)])/o) { ' ' + $1 + ' ' } || text
+        text.gsub!(/([\(\[\{\}\]\)])/o) { ' ' + Regexp.last_match(1) + ' ' } || text
       end
 
       def shift_semicolon(text)
-        text.gsub!(/([;])/o) { ' ' + $1 + ' ' } || text
+        text.gsub!(/([;])/o) { ' ' + Regexp.last_match(1) + ' ' } || text
       end
 
       def shift_percent(text)
