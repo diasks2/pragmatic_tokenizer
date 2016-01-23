@@ -47,7 +47,7 @@ module PragmaticTokenizer
     # @option opts [Boolean] :remove_urls - (default: false)
     # @option opts [Boolean] :remove_domains - (default: false)
 
-    def initialize(text, opts = {})
+    def initialize(text, opts={})
       @text                     = CGI.unescapeHTML(text)
       @filter_languages         = opts[:filter_languages] || []
       @language                 = opts[:language] || 'en'
