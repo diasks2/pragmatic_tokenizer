@@ -260,7 +260,7 @@ describe PragmaticTokenizer do
                                                  contractions:        contractions,
                                                  expand_contractions: false
                                                 )
-          expect(pt.tokenize).to eq( ["hello", "supa'soo", "guy", "."])
+          expect(pt.tokenize).to eq(["hello", "supa'soo", "guy", "."])
         end
 
         it 'expands user-supplied contractions and language contractions' do
