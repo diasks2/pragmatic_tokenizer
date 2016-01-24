@@ -18,10 +18,12 @@ module PragmaticTokenizer
 
       def method_name3
         separated = EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate
-        [split_slashes_unless_domain, split_question_marks_unless_domain, split_plus_signs,
-         method_name7, method_name8, method_name9,
-         method_name10, method_name11, method_name12, method_name13, method_name14, method_name15]
-            .reduce(separated) { |a, fn| a.flat_map &fn }
+        procs     = [
+            split_slashes_unless_domain, split_question_marks_unless_domain,
+            split_plus_signs, method_name7, method_name8, method_name9, method_name10,
+            method_name11, method_name12, method_name13, method_name14, method_name15
+        ]
+        procs.reduce(separated) { |a, e| a.flat_map(&e) }
       end
 
       def full_stop_separated_tokens
@@ -29,8 +31,8 @@ module PragmaticTokenizer
       end
 
       def method_name16
-        [split_prefixed_commas, split_suffixed_single_quotes, convert_sym_to_punct]
-            .reduce(text.split) { |a, fn| a.flat_map &fn }
+        procs = [split_prefixed_commas, split_suffixed_single_quotes, convert_sym_to_punct]
+        procs.reduce(text.split) { |a, e| a.flat_map(&e) }
       end
 
       def method_name15
