@@ -49,9 +49,9 @@ Style/MultilineMethodCallIndentation:
   EnforcedStyle: indented
   IndentationWidth: 4
 
-# unsure how we'd want it
-#Style/MultilineOperationIndentation:
-#  IndentationWidth: 4
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+  IndentationWidth: 4
 
 # these are not continued (e.g. 'private'), so we keep them at 2 chars
 Style/AccessModifierIndentation:
