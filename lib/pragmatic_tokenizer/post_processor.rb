@@ -7,16 +7,14 @@ module PragmaticTokenizer
     REGEXP_SLASH         = /^(?!(https?:|www\.))(.*)\/(.*)/.freeze
     REGEXP_QUESTION_MARK = /^(?!(https?:|www\.))(.*)(\?)(.*)/.freeze
     REGEXP_PLUS_SIGN     = /(.+)\+(.+)/.freeze
-    REGEXP_UNKNOWN7      = /^(\.{1,})/.freeze
-    REGEXP_UNKNOWN8      = /^(\:)(\S{2,})/.freeze
-    REGEXP_UNKNOWN11     = /(\u{2744}[\u{FE0E}|\u{FE0F}])/.freeze
+    REGEXP_COLON         = /^(\:)(\S{2,})/.freeze
+    REGEXP_EMOJI         = /(\u{2744}[\u{FE0E}|\u{FE0F}])/.freeze
 
     REGEX_UNIFIED1       = Regexp.union(REGEXP_SLASH,
                                         REGEXP_QUESTION_MARK,
                                         REGEXP_PLUS_SIGN,
-                                        REGEXP_UNKNOWN7,
-                                        REGEXP_UNKNOWN8,
-                                        REGEXP_UNKNOWN11,
+                                        REGEXP_COLON,
+                                        REGEXP_EMOJI,
                                         PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX,
                                         PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX
     ).freeze
@@ -40,7 +38,7 @@ module PragmaticTokenizer
 
       def method_name3
         separated = EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate
-        procs     = [unified1, method_name9, method_name10, method_name13]
+        procs     = [unified1, split_unknown_period1, split_unknown_period2, split_emoji]
         procs.reduce(separated) { |a, e| a.flat_map(&e) }
       end
 
@@ -49,38 +47,38 @@ module PragmaticTokenizer
       end
 
       def full_stop_separated_tokens
-        FullStopSeparator.new(tokens: method_name16, abbreviations: abbreviations).separate
+        FullStopSeparator.new(tokens: split_and_convert_commas_and_quotes, abbreviations: abbreviations).separate
       end
 
-      def method_name16
+      def split_and_convert_commas_and_quotes
         text
             .split
             .flat_map { |token| token.split(REGEX_UNIFIED2) }
             .flat_map { |token| convert_sym_to_punct(token) }
       end
 
-      def method_name13
+      def split_emoji
         proc { |token| (token =~ /(\A|\S)\u{2744}[^\u{FE0E}|\u{FE0F}]/) ? token.split(/(\u{2744})/) : token }
       end
 
-      def method_name10
-        proc { |token| method_name19(token) ? token.split(/(.*\.)/) : token }
+      def split_unknown_period1
+        proc { |token| unknown_period1?(token) ? token.split(/(.*\.)/) : token }
       end
 
-      def method_name19(token)
+      def split_unknown_period2
+        proc { |token| unknown_period2?(token) ? token.split(/(\.)/) : token }
+      end
+
+      def unknown_period1?(token)
         token.include?(".") &&
             token !~ /(http|https|www)(\.|:)/ &&
             token.length > 1 &&
             token !~ /(\s+|\A)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix &&
             token !~ /\S+(＠|@)\S+/ &&
-            abbreviations.include?(method_name17(token))
+            abbreviations.include?(extract_abbreviation(token))
       end
 
-      def method_name9
-        proc { |token| method_name18(token) ? token.split(/(\.)/) : token }
-      end
-
-      def method_name18(token)
+      def unknown_period2?(token)
         token.include?(".") &&
             token !~ /(http|https|www)(\.|:)/ &&
             token !~ /\.(com|net|org|edu|gov|mil|int)/ &&
@@ -89,11 +87,11 @@ module PragmaticTokenizer
             token !~ /\A[a-zA-Z]{1}\./ &&
             token.count(".") == 1 &&
             token !~ /\d+/ &&
-            !abbreviations.include?(method_name17(token)) &&
+            !abbreviations.include?(extract_abbreviation(token)) &&
             token !~ /\S+(＠|@)\S+/
       end
 
-      def method_name17(token)
+      def extract_abbreviation(token)
         abbreviation = token.split(/(\.)/)[0]
         Unicode.downcase(abbreviation)
       end
