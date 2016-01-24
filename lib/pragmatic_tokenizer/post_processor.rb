@@ -1,7 +1,29 @@
 module PragmaticTokenizer
   class PostProcessor
 
-    SYMBOL_REGEX = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/
+    REGEX_SYMBOL         = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/.freeze
+    REGEXP_COMMAS        = /^(,|‚)+/.freeze
+    REGEXP_SINGLE_QUOTES = /(.+)(’|'|‘|`)$/.freeze
+    REGEXP_SLASH         = /^(?!(https?:|www\.))(.*)\/(.*)/.freeze
+    REGEXP_QUESTION_MARK = /^(?!(https?:|www\.))(.*)(\?)(.*)/.freeze
+    REGEXP_PLUS_SIGN     = /(.+)\+(.+)/.freeze
+    REGEXP_UNKNOWN7      = /^(\.{1,})/.freeze
+    REGEXP_UNKNOWN8      = /^(\:)(\S{2,})/.freeze
+    REGEXP_UNKNOWN11     = /(\u{2744}[\u{FE0E}|\u{FE0F}])/.freeze
+
+    REGEX_UNIFIED1       = Regexp.union(REGEXP_SLASH,
+                                        REGEXP_QUESTION_MARK,
+                                        REGEXP_PLUS_SIGN,
+                                        REGEXP_UNKNOWN7,
+                                        REGEXP_UNKNOWN8,
+                                        REGEXP_UNKNOWN11,
+                                        PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX,
+                                        PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX
+    ).freeze
+
+    REGEX_UNIFIED2       = Regexp.union(REGEXP_SINGLE_QUOTES,
+                                        REGEXP_COMMAS
+    ).freeze
 
     attr_reader :text, :abbreviations
 
@@ -18,12 +40,12 @@ module PragmaticTokenizer
 
       def method_name3
         separated = EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate
-        procs     = [
-            split_slashes_unless_domain, split_question_marks_unless_domain,
-            split_plus_signs, method_name7, method_name8, method_name9, method_name10,
-            method_name11, method_name12, method_name13, method_name14, method_name15
-        ]
+        procs     = [unified1, method_name9, method_name10, method_name13]
         procs.reduce(separated) { |a, e| a.flat_map(&e) }
+      end
+
+      def unified1
+        proc { |token| token.split(REGEX_UNIFIED1) }
       end
 
       def full_stop_separated_tokens
@@ -31,28 +53,14 @@ module PragmaticTokenizer
       end
 
       def method_name16
-        procs = [split_prefixed_commas, split_suffixed_single_quotes, convert_sym_to_punct]
-        procs.reduce(text.split) { |a, e| a.flat_map(&e) }
-      end
-
-      def method_name15
-        proc { |token| token.split(PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX) }
-      end
-
-      def method_name14
-        proc { |token| token.split(PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX) }
+        text
+            .split
+            .flat_map { |token| token.split(REGEX_UNIFIED2) }
+            .flat_map { |token| convert_sym_to_punct(token) }
       end
 
       def method_name13
         proc { |token| (token =~ /(\A|\S)\u{2744}[^\u{FE0E}|\u{FE0F}]/) ? token.split(/(\u{2744})/) : token }
-      end
-
-      def method_name12
-        proc { |token| token.split(/(\u{2744}\u{FE0E})/) }
-      end
-
-      def method_name11
-        proc { |token| token.split(/(\u{2744}\u{FE0F})/) }
       end
 
       def method_name10
@@ -90,44 +98,14 @@ module PragmaticTokenizer
         Unicode.downcase(abbreviation)
       end
 
-      def method_name8
-        proc { |token| token.split(/\A(\:)(\S{2,})/) }
-      end
-
-      def method_name7
-        proc { |token| token.split(/\A\.[^\.].+/) }
-      end
-
-      def split_plus_signs
-        proc { |token| token.split(/\+/) }
-      end
-
-      def split_question_marks_unless_domain
-        proc { |token| token.split(/^(?!(http|https|www)[\.|:])(.*)(\?)(.*)/) }
-      end
-
-      def split_slashes_unless_domain
-        proc { |token| token.split(/^(?!(http|https|www)[\.|:])(.*)\/(.*)/) }
-      end
-
-      def split_suffixed_single_quotes
-        proc { |token| token.split(/(.+)(’|'|‘|`)$/) }
-      end
-
-      def split_prefixed_commas
-        proc { |token| token.split(/^(,|‚)+/) }
-      end
-
-      def convert_sym_to_punct
-        proc do |token|
-          symbol_matches = SYMBOL_REGEX.match(token)
-          if symbol_matches.nil?
-            token
-          else
-            pattern     = symbol_matches[0]
-            replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(pattern)
-            token.gsub!(pattern, replacement)
-          end
+      def convert_sym_to_punct(token)
+        symbol_matches = REGEX_SYMBOL.match(token)
+        if symbol_matches.nil?
+          token
+        else
+          pattern     = symbol_matches[0]
+          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP.key(pattern)
+          token.gsub!(pattern, replacement)
         end
       end
 
