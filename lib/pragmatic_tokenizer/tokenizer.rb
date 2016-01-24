@@ -112,14 +112,19 @@ module PragmaticTokenizer
 
     def tokenize
       return [] unless text
-      tokens = []
-      text.scan(/.{,10000}(?=\s|\z)/m).each do |segment|
-        tokens << post_process(PreProcessor.new(language: language_module).pre_process(text: segment))
-      end
-      tokens.flatten
+      text
+          .scan(/.{,10000}(?=\s|\z)/m)
+          .map { |segment| post_process(pre_process(segment)) }
+          .flatten
     end
 
     private
+
+      def pre_process(text)
+        text
+            .extend(PragmaticTokenizer::PreProcessor)
+            .pre_process(language: language_module)
+      end
 
       def post_process(text)
         @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
