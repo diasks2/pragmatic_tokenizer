@@ -1458,29 +1458,6 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(["user", "john", "pt-br", "wordfast"])
         end
-
-        it 'removes hyphens' do
-          text = "princípio da legalidade;&tA;  EN-US Therefore, ANEEL - though still"
-          pt = PragmaticTokenizer::Tokenizer.new(text,
-            language: :en,
-            filter_languages: [:en],
-            clean: true,
-            numbers: :none,
-            minimum_length: 3,
-            expand_contractions: true,
-            remove_stop_words: true,
-            punctuation: :none,
-            remove_emails: true,
-            remove_domains: true,
-            remove_urls: true,
-            hashtags: :remove,
-            mentions: :remove,
-            downcase: true
-          )
-          expect(pt.tokenize).to eq(["princípio", "legalidade", "en-us", "aneel"])
-        end
-
-
       end
     end
 
