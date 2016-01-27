@@ -127,8 +127,11 @@ module PragmaticTokenizer
       end
 
       def post_process(text)
-        @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
-        downcase! if downcase
+        if downcase
+          @tokens = PostProcessor.new(text: Unicode.downcase(text), abbreviations: abbreviations, downcase: downcase).post_process
+        else
+          @tokens = PostProcessor.new(text: text, abbreviations: abbreviations, downcase: downcase).post_process
+        end
         expand_contractions!(contractions) if expand_contractions
         clean! if clean
         classic_filter! if classic_filter
@@ -146,15 +149,11 @@ module PragmaticTokenizer
         @tokens.reject(&:empty?)
       end
 
-      def downcase!
-        @tokens.map! { |t| Unicode.downcase(t) }
-      end
-
       def expand_contractions!(contractions)
         @tokens = if downcase
                     @tokens.flat_map do |t|
-                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
-                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                      if contractions.key?(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))
+                        contractions[t.gsub(/[‘’‚‛‹›＇´`]/, "'")]
                             .split(' ')
                             .flatten
                       else
@@ -212,7 +211,11 @@ module PragmaticTokenizer
         when 'semi'
           @tokens.delete_if { |t| t =~ /\A\d+\z/ }
         when 'none'
-          @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
+          if downcase
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
+          else
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
+          end
         when 'only'
           @tokens.delete_if { |t| t =~ /\A\D+\z/ }
         end

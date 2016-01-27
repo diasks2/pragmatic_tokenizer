@@ -4,10 +4,11 @@ module PragmaticTokenizer
   # This class separates true full stops while ignoring
   # periods that are part of an abbreviation
   class FullStopSeparator
-    attr_reader :tokens, :abbreviations
-    def initialize(tokens:, abbreviations:)
+    attr_reader :tokens, :abbreviations, :downcase
+    def initialize(tokens:, abbreviations:, downcase:)
       @tokens = tokens
       @abbreviations = abbreviations
+      @downcase = downcase
     end
 
     def separate
@@ -19,7 +20,12 @@ module PragmaticTokenizer
       tokens.each_with_index do |_t, i|
         if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
           w = Regexp.last_match(1)
-          unless abbr[Unicode.downcase(w)] || w =~ /\A[a-z]\z/i ||
+          if downcase
+            abbreviation = abbr[w]
+          else
+            abbreviation = abbr[Unicode.downcase(w)]
+          end
+          unless abbreviation || w =~ /\A[a-z]\z/i ||
                  w =~ /[a-z](?:\.[a-z])+\z/i
             cleaned_tokens << w
             cleaned_tokens << '.'
@@ -28,7 +34,12 @@ module PragmaticTokenizer
         end
         cleaned_tokens << tokens[i]
       end
-      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviations.include?(Unicode.downcase(cleaned_tokens[-1]).chomp("."))
+      if downcase
+        abbreviation = abbreviations.include?(cleaned_tokens[-1].chomp(".")) unless cleaned_tokens[-1].nil?
+      else
+        abbreviation = abbreviations.include?(Unicode.downcase(cleaned_tokens[-1]).chomp(".")) unless cleaned_tokens[-1].nil?
+      end
+      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviation
         cleaned_tokens[-1] = Regexp.last_match(1)
         cleaned_tokens.push '.'
       end

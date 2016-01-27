@@ -23,11 +23,12 @@ module PragmaticTokenizer
                                         REGEXP_COMMAS
     ).freeze
 
-    attr_reader :text, :abbreviations
+    attr_reader :text, :abbreviations, :downcase
 
-    def initialize(text:, abbreviations:)
+    def initialize(text:, abbreviations:, downcase:)
       @text          = text
       @abbreviations = abbreviations
+      @downcase      = downcase
     end
 
     def post_process
@@ -47,7 +48,7 @@ module PragmaticTokenizer
       end
 
       def full_stop_separated_tokens
-        FullStopSeparator.new(tokens: split_and_convert_commas_and_quotes, abbreviations: abbreviations).separate
+        FullStopSeparator.new(tokens: split_and_convert_commas_and_quotes, abbreviations: abbreviations, downcase: downcase).separate
       end
 
       def split_and_convert_commas_and_quotes
@@ -82,7 +83,7 @@ module PragmaticTokenizer
         token.include?(".") &&
             token !~ /(http|https|www)(\.|:)/ &&
             token !~ /\.(com|net|org|edu|gov|mil|int)/ &&
-            token !~ /\.[a-z]{2}/ &&
+            token !~ /\.[a-zA-Z]{2}(\s|\z)/ &&
             token.length > 2 &&
             token !~ /\A[a-zA-Z]{1}\./ &&
             token.count(".") == 1 &&
@@ -92,8 +93,11 @@ module PragmaticTokenizer
       end
 
       def extract_abbreviation(token)
-        abbreviation = token.split(/(\.)/)[0]
-        Unicode.downcase(abbreviation)
+        if downcase
+          token.split(/(\.)/)[0]
+        else
+          Unicode.downcase(token.split(/(\.)/)[0])
+        end
       end
 
       def convert_sym_to_punct(token)
