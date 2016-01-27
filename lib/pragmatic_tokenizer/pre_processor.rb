@@ -2,6 +2,7 @@ module PragmaticTokenizer
   module PreProcessor
 
     def pre_process(language: Languages::Common)
+      remove_non_breaking_space!
       shift_comma!
       shift_multiple_dash!
       shift_inverted_question_mark!
@@ -30,6 +31,10 @@ module PragmaticTokenizer
     end
 
     private
+
+      def remove_non_breaking_space!
+        gsub!(/\u{00A0}/, ''.freeze)
+      end
 
       # Shift commas off everything but numbers
       def shift_comma!

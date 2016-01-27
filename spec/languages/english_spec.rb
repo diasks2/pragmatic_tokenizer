@@ -1437,6 +1437,50 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize).to eq(%w(tudow provides company users a way to offer each other and guests and interpreters free assistance to date there have been questions asked))
         end
+
+        it 'removes non-breaking spaces' do
+          text = "%20141201~221624  %User ID,JU,JU John %TU=00000362  %PT-BR  %Wordfast    da hello."
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: :en,
+            filter_languages: [:en],
+            clean: true,
+            numbers: :none,
+            minimum_length: 3,
+            expand_contractions: true,
+            remove_stop_words: true,
+            punctuation: :none,
+            remove_emails: true,
+            remove_domains: true,
+            remove_urls: true,
+            hashtags: :remove,
+            mentions: :remove,
+            downcase: true
+          )
+          expect(pt.tokenize).to eq(["user", "john", "pt-br", "wordfast"])
+        end
+
+        it 'removes hyphens' do
+          text = "princípio da legalidade;&tA;  EN-US Therefore, ANEEL - though still"
+          pt = PragmaticTokenizer::Tokenizer.new(text,
+            language: :en,
+            filter_languages: [:en],
+            clean: true,
+            numbers: :none,
+            minimum_length: 3,
+            expand_contractions: true,
+            remove_stop_words: true,
+            punctuation: :none,
+            remove_emails: true,
+            remove_domains: true,
+            remove_urls: true,
+            hashtags: :remove,
+            mentions: :remove,
+            downcase: true
+          )
+          expect(pt.tokenize).to eq(["princípio", "legalidade", "en-us", "aneel"])
+        end
+
+
       end
     end
 

@@ -132,7 +132,6 @@ module PragmaticTokenizer
         else
           @tokens = PostProcessor.new(text: text, abbreviations: abbreviations, downcase: downcase).post_process
         end
-        # downcase! if downcase
         expand_contractions!(contractions) if expand_contractions
         clean! if clean
         classic_filter! if classic_filter
@@ -148,10 +147,6 @@ module PragmaticTokenizer
         remove_domains! if remove_domains
         split_long_words! if long_word_split
         @tokens.reject(&:empty?)
-      end
-
-      def downcase!
-        @tokens.map! { |t| UnicodeCaseConverter::Converter.new(t).downcase }
       end
 
       def expand_contractions!(contractions)
@@ -196,6 +191,7 @@ module PragmaticTokenizer
             .map { |t| t.gsub(/\u{00AD}/, '') }
             .map { |t| t.gsub(/\A(-|–)/, '') }
             .map { |t| t.gsub(/[®©]/, '') }
+            .map { |t| t.gsub(/\A\%/, '') }
             .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
             .delete_if do |t|
           t =~ /\A-+\z/ ||
