@@ -4,7 +4,7 @@ require 'pragmatic_tokenizer/pre_processor'
 require 'pragmatic_tokenizer/post_processor'
 require 'pragmatic_tokenizer/full_stop_separator'
 require 'pragmatic_tokenizer/ending_punctuation_separator'
-require 'unicode'
+require 'unicode_case_converter'
 
 module PragmaticTokenizer
   class Tokenizer
@@ -127,8 +127,12 @@ module PragmaticTokenizer
       end
 
       def post_process(text)
-        @tokens = PostProcessor.new(text: text, abbreviations: abbreviations).post_process
-        downcase! if downcase
+        if downcase
+          @tokens = PostProcessor.new(text: UnicodeCaseConverter::Converter.new(text).downcase, abbreviations: abbreviations, downcase: downcase).post_process
+        else
+          @tokens = PostProcessor.new(text: text, abbreviations: abbreviations, downcase: downcase).post_process
+        end
+        # downcase! if downcase
         expand_contractions!(contractions) if expand_contractions
         clean! if clean
         classic_filter! if classic_filter
@@ -147,14 +151,14 @@ module PragmaticTokenizer
       end
 
       def downcase!
-        @tokens.map! { |t| Unicode.downcase(t) }
+        @tokens.map! { |t| UnicodeCaseConverter::Converter.new(t).downcase }
       end
 
       def expand_contractions!(contractions)
         @tokens = if downcase
                     @tokens.flat_map do |t|
-                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
-                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                      if contractions.key?(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))
+                        contractions[t.gsub(/[‘’‚‛‹›＇´`]/, "'")]
                             .split(' ')
                             .flatten
                       else
@@ -163,11 +167,11 @@ module PragmaticTokenizer
                     end
                   else
                     @tokens.flat_map do |t|
-                      if contractions.key?(Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'")))
-                        contractions[Unicode.downcase(t.gsub(/[‘’‚‛‹›＇´`]/, "'"))]
+                      if contractions.key?(UnicodeCaseConverter::Converter.new(t.gsub(/[‘’‚‛‹›＇´`]/, "'")).downcase)
+                        contractions[UnicodeCaseConverter::Converter.new(t.gsub(/[‘’‚‛‹›＇´`]/, "'")).downcase]
                             .split(' ')
                             .each_with_index
-                            .map { |token, i| i.eql?(0) ? Unicode.capitalize(token) : token }
+                            .map { |token, i| i.eql?(0) ? UnicodeCaseConverter::Converter.new(token).capitalize : token }
                             .flatten
                       else
                         t
@@ -212,7 +216,11 @@ module PragmaticTokenizer
         when 'semi'
           @tokens.delete_if { |t| t =~ /\A\d+\z/ }
         when 'none'
-          @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
+          if downcase
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
+          else
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(UnicodeCaseConverter::Converter.new(t).downcase) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{UnicodeCaseConverter::Converter.new(t).downcase}.") }
+          end
         when 'only'
           @tokens.delete_if { |t| t =~ /\A\D+\z/ }
         end
@@ -237,7 +245,7 @@ module PragmaticTokenizer
         if downcase
           @tokens -= stop_words
         else
-          @tokens.delete_if { |t| stop_words.include?(Unicode.downcase(t)) }
+          @tokens.delete_if { |t| stop_words.include?(UnicodeCaseConverter::Converter.new(t).downcase) }
         end
       end
 
