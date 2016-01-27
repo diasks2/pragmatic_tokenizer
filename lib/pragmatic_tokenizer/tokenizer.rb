@@ -191,6 +191,7 @@ module PragmaticTokenizer
             .map { |t| t.gsub(/\u{00AD}/, '') }
             .map { |t| t.gsub(/\A(-|–)/, '') }
             .map { |t| t.gsub(/[®©]/, '') }
+            .map { |t| t.gsub(/\A\%/, '') }
             .map { |t| t.gsub(/[\u{1F100}-\u{1F1FF}]/, '') }
             .delete_if do |t|
           t =~ /\A-+\z/ ||
