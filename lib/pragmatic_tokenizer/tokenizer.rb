@@ -138,7 +138,7 @@ module PragmaticTokenizer
         process_numbers!
         remove_short_tokens! if minimum_length > 0
         process_punctuation!
-        remove_stop_words!(stop_words) if remove_stop_words
+        remove_stop_words! if remove_stop_words
         remove_emoji! if remove_emoji
         remove_emails! if remove_emails
         mentions! if mentions
@@ -237,11 +237,11 @@ module PragmaticTokenizer
         end
       end
 
-      def remove_stop_words!(stop_words)
+      def remove_stop_words!
         if downcase
-          @tokens -= stop_words
+          @tokens -= @stop_words
         else
-          @tokens.delete_if { |t| stop_words.include?(Unicode.downcase(t)) }
+          @tokens.delete_if { |t| @stop_words.include?(Unicode.downcase(t)) }
         end
       end
 
