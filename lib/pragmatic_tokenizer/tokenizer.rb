@@ -114,8 +114,7 @@ module PragmaticTokenizer
       return [] unless text
       text
           .scan(/.{,10000}(?=\s|\z)/m)
-          .map { |segment| post_process(pre_process(segment)) }
-          .flatten
+          .flat_map { |segment| post_process(pre_process(segment)) }
     end
 
     private
@@ -176,11 +175,12 @@ module PragmaticTokenizer
       end
 
       def clean!
-        @tokens = @tokens.flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\s)\_+/) ? t.gsub!(/(?<=\s)\_+/, ' \1').split(' ').flatten : t }
-            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\s)/) ? t.gsub!(/\_+(?=\s)/, ' \1').split(' ').flatten : t }
-            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\A)\_+/) ? t.gsub!(/(?<=\A)\_+/, '\1 ').split(' ').flatten : t }
-            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\z)/) ? t.gsub!(/\_+(?=\z)/, ' \1').split(' ').flatten : t }
-            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\*+/) ? t.gsub!(/\*+/, '\1 ').split(' ').flatten : t }
+        @tokens = @tokens
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\s)\_+/) ? t.split(/(?<=\s)\_+/) : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\s)/) ? t.split(/\_+(?=\s)/) : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /(?<=\A)\_+/) ? t.split(/(?<=\A)\_+/) : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\_+(?=\z)/) ? t.split(/\_+(?=\z)/) : t }
+            .flat_map { |t| (t !~ /[＠@#|＃]/ && t =~ /\*+/) ? t.split(/\*+/) : t }
             .map { |t| t.gsub(/[[:cntrl:]]/, '') }
             .map { |t| t.gsub(/(?<=\A)\:(?=.+)/, '') }
             .map { |t| t.gsub(/\:(?=\z)/, '') }
@@ -272,7 +272,7 @@ module PragmaticTokenizer
         when 'remove'
           @tokens.delete_if { |t| t =~ /\A(#|＃)/ }
         when 'keep_and_clean'
-          @tokens = @tokens.flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
+          @tokens = @tokens.flat_map { |t| t =~ /\A(#|＃)\S+-/ ? t.split(/\-/) : t }
           @tokens.map! { |t| t =~ /\A(#|＃)/ ? t.gsub!(/(?<=\A)(#|＃)/, '') : t }
         end
       end
@@ -285,9 +285,10 @@ module PragmaticTokenizer
         @tokens.delete_if { |t| t =~ /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix }
       end
 
-      def split_long_words!
-        @tokens.map! { |t| t.length > long_word_split ? t.gsub(/\-/, '\1 \2').split(' ').flatten : t }
-            .map! { |t| t.length > long_word_split ? t.gsub(/\_/, '\1 \2').split(' ').flatten : t }
+    def split_long_words!
+      @tokens = @tokens
+                    .flat_map { |t| t.length > long_word_split ? t.split(/\-/) : t }
+                    .flat_map { |t| t.length > long_word_split ? t.split(/\_/) : t }
       end
   end
 end
