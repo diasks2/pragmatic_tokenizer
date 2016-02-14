@@ -50,31 +50,19 @@ module PragmaticTokenizer
                                                    REGEXP_SPECIAL_SYMBOL,
                                                    REGEXP_PERCENT_AT_START,
                                                    REGEXP_ALPHANUMERIC_SUPPLEMENT)
-    REGEXP_UNKNOWN17         = /(?<=\D)1+(?=\z)/
-    REGEXP_HASHTAG_AT_START  = /\A(#|＃)/
-    REGEXP_AT_SIGN_AT_START  = /\A(@|＠)/
-    REGEXP_UNKNOWN18         = /(?<=\A)(#|＃)/
-    REGEXP_UNKNOWN19         = /(?<=\A)(@|＠)/
-    REGEXP_UNKNOWN20         = /\A(#|＃)\S+-/
-    REGEXP_UNKNOWN21         = /\u{2744}[\u{FE0F}|\u{FE0E}]?/
-    REGEX_UNIFIED3           = Regexp.union(REGEXP_UNKNOWN21,
+    REGEXP_ONE_AS_EXCLAMATION  = /(?<=\D)1+(?=\z)/
+    REGEXP_HASHTAG_AT_START    = /(?<=\A)(#|＃)/
+    REGEXP_AT_SIGN_AT_START    = /(?<=\A)(@|＠)/
+    REGEXP_HYPHEN_HASTAG       = /\A(#|＃)\S+-/
+    REGEXP_EMOJI_SNOWFLAKE     = /\u{2744}[\u{FE0F}|\u{FE0E}]?/
+    REGEX_EMOJI_UNIFIED        = Regexp.union(REGEXP_EMOJI_SNOWFLAKE,
                                             PragmaticTokenizer::Languages::Common::EMOJI_REGEX)
-    REGEXP_UNKNOWN22         = /\A[[:punct:]]+\z/
-    REGEXP_UNKNOWN23         = /\A(‹+|\^+|›+|\++)\z/
-    REGEX_UNIFIED4           = Regexp.union(REGEXP_UNKNOWN22,
-                                            REGEXP_UNKNOWN23)
-    REGEXP_UNKNOWN24         = /\A\d+\z/
-    REGEXP_UNKNOWN25         = /\A\D+\z/
-    REGEXP_UNKNOWN26         = /\D*\d+\d*/
-    REGEXP_UNKNOWN27         = /\A-+\z/
-    REGEXP_UNKNOWN28         = /\A\.{2,}\z/
-    REGEXP_UNKNOWN29         = /[&*+<=>^|~]/i
-    REGEX_UNIFIED5           = Regexp.union(REGEXP_UNKNOWN27,
-                                            REGEXP_UNKNOWN28,
-                                            REGEXP_UNKNOWN29)
-    REGEXP_UNKNOWN30         = /\:/
-    REGEXP_UNKNOWN31         = /.{,10000}(?=\s|\z)/m
-
+    REGEXP_PUNCTUATION_ONLY    = /\A[[:punct:]]+\z/
+    REGEXP_NUMBER_ONLY         = /\A\d+\z/
+    REGEXP_NO_NUMBERS          = /\A\D+\z/
+    REGEXP_NUMBER              = /\D*\d+\d*/
+    REGEXP_CONSECUTIVE_DOTS    = /\A\.{2,}\z/
+    REGEXP_CHUNK_STRING        = /.{,10000}(?=\s|\z)/m
 
     # @param [Hash] opts optional arguments
 
@@ -159,7 +147,7 @@ module PragmaticTokenizer
       return [] unless text
       raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
       CGI.unescapeHTML(text)
-          .scan(REGEXP_UNKNOWN31)
+          .scan(REGEXP_CHUNK_STRING)
           .flat_map { |segment| post_process(pre_process(segment)) }
     end
 
@@ -210,16 +198,16 @@ module PragmaticTokenizer
       def clean!
         @tokens = @tokens
             .flat_map { |t| t !~ REGEX_HASHTAG_OR_MENTION ? t.split(REGEX_UNIFIED1) : t }
-            .map! { |t| t !~ REGEX_HASHTAG_OR_MENTION ? t.gsub(REGEXP_UNKNOWN17, EMPTY_STRING) : t }
+            .map! { |t| t !~ REGEX_HASHTAG_OR_MENTION ? t.gsub(REGEXP_ONE_AS_EXCLAMATION, EMPTY_STRING) : t }
             .map! { |t| t.gsub(REGEX_UNIFIED2, EMPTY_STRING) }
-            .delete_if { |t| unknown_method1(t) }
+            .delete_if { |t| unclean_token?(t) }
       end
 
-      def unknown_method1(token)
+      def unclean_token?(token)
         return true if PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(token)
         return true if token.length > MAX_TOKEN_LENGTH
         return true if token.include?('\\'.freeze)
-        token =~ ((token.length == 1) ? REGEXP_UNKNOWN30 : REGEX_UNIFIED5)
+        token =~ REGEXP_CONSECUTIVE_DOTS
       end
 
       def classic_filter!
@@ -233,11 +221,11 @@ module PragmaticTokenizer
       def process_numbers!
         case @numbers
         when :semi
-          @tokens.delete_if { |t| t =~ REGEXP_UNKNOWN24 }
+          @tokens.delete_if { |t| t =~ REGEXP_NUMBER_ONLY }
         when :none
-          @tokens.delete_if { |t| t =~ REGEXP_UNKNOWN26 || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(inverse_case(t)) }
+          @tokens.delete_if { |t| t =~ REGEXP_NUMBER || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(inverse_case(t)) }
         when :only
-          @tokens.delete_if { |t| t =~ REGEXP_UNKNOWN25 }
+          @tokens.delete_if { |t| t =~ REGEXP_NO_NUMBERS }
         end
       end
 
@@ -250,7 +238,7 @@ module PragmaticTokenizer
         when :semi
           @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION.include?(t) }
         when :none
-          @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) || t =~ REGEX_UNIFIED4 }
+          @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) || t =~ REGEXP_PUNCTUATION_ONLY }
         when :only
           @tokens.keep_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
         end
@@ -265,7 +253,7 @@ module PragmaticTokenizer
         when :remove
           @tokens.delete_if { |t| t =~ REGEXP_AT_SIGN_AT_START }
         when :keep_and_clean
-          @tokens.map! { |t| t =~ REGEXP_AT_SIGN_AT_START ? t.gsub!(REGEXP_UNKNOWN19, EMPTY_STRING) : t }
+          @tokens.map! { |t| t =~ REGEXP_AT_SIGN_AT_START ? t.gsub!(REGEXP_AT_SIGN_AT_START, EMPTY_STRING) : t }
         end
       end
 
@@ -275,8 +263,8 @@ module PragmaticTokenizer
           @tokens.delete_if { |t| t =~ REGEXP_HASHTAG_AT_START }
         when :keep_and_clean
           @tokens = @tokens
-                        .flat_map { |t| t =~ REGEXP_UNKNOWN20 ? t.split(REGEX_HYPHEN) : t }
-                        .map { |t| t =~ REGEXP_HASHTAG_AT_START ? t.gsub!(REGEXP_UNKNOWN18, EMPTY_STRING) : t }
+                        .flat_map { |t| t =~ REGEXP_HYPHEN_HASTAG ? t.split(REGEX_HYPHEN) : t }
+                        .map { |t| t =~ REGEXP_HASHTAG_AT_START ? t.gsub!(REGEXP_HASHTAG_AT_START, EMPTY_STRING) : t }
         end
       end
 
@@ -287,10 +275,10 @@ module PragmaticTokenizer
       def regex_various
         @regex_various ||= begin
           regex_array = []
-          regex_array << REGEX_UNIFIED3 if @remove_emoji
-          regex_array << REGEX_EMAIL    if @remove_emails
-          regex_array << REGEX_URL      if @remove_urls
-          regex_array << REGEX_DOMAIN   if @remove_domains
+          regex_array << REGEX_EMOJI_UNIFIED if @remove_emoji
+          regex_array << REGEX_EMAIL         if @remove_emails
+          regex_array << REGEX_URL           if @remove_urls
+          regex_array << REGEX_DOMAIN        if @remove_domains
           Regexp.union(regex_array)
         end
       end
