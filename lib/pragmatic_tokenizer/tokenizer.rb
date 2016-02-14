@@ -34,28 +34,26 @@ module PragmaticTokenizer
                                             REGEX_UNKNOWN3,
                                             REGEX_UNKNOWN4,
                                             REGEX_UNKNOWN5)
-    REGEXP_UNKNOWN6          = /[[:cntrl:]]/
-    REGEXP_UNKNOWN7          = /(?<=\A)\:(?=.+)/
-    REGEXP_UNKNOWN8          = /\:(?=\z)/
-    REGEXP_UNKNOWN9          = /(?<=\A)!+(?=.+)/
-    REGEXP_UNKNOWN10         = /!+(?=\z)/
-    REGEXP_UNKNOWN11         = /!+(1*!*)*(?=\z)/
-    REGEXP_UNKNOWN12         = /\u{00AD}/
-    REGEXP_UNKNOWN13         = /\A(-|–)/
-    REGEXP_UNKNOWN14         = /[®©]/
-    REGEXP_UNKNOWN15         = /\A\%/
-    REGEXP_UNKNOWN16         = /[\u{1F100}-\u{1F1FF}]/
-    REGEX_UNIFIED2           = Regexp.union(REGEXP_UNKNOWN6,
-                                            REGEXP_UNKNOWN7,
-                                            REGEXP_UNKNOWN8,
-                                            REGEXP_UNKNOWN9,
-                                            REGEXP_UNKNOWN10,
-                                            REGEXP_UNKNOWN11,
-                                            REGEXP_UNKNOWN12,
-                                            REGEXP_UNKNOWN13,
-                                            REGEXP_UNKNOWN14,
-                                            REGEXP_UNKNOWN15,
-                                            REGEXP_UNKNOWN16)
+    # https://en.wikipedia.org/wiki/Control_character
+    # matches any character with hexadecimal value 00 through 1F or 7F.
+    # Rubular: http://rubular.com/r/E83fpBoDjI
+    REGEXP_CONTROL                  = /[[:cntrl:]]/
+    REGEXP_ENDING_COLON             = /\:(?=\z)/
+    REGEXP_EXCLAMATION_AT_START     = /(?<=\A)!+(?=.+)/
+    REGEXP_EXCLAMATION_AT_END       = /!+(1*!*)*(?=\z)/
+    REGEXP_HYPHEN_AT_START          = /\A(-|–|\u{00AD})/
+    REGEXP_SPECIAL_SYMBOL           = /[®©]/
+    REGEXP_PERCENT_AT_START         = /\A\%/
+    # https://codepoints.net/enclosed_alphanumeric_supplement
+    REGEXP_ALPHANUMERIC_SUPPLEMENT  = /[\u{1F100}-\u{1F1FF}]/
+    REGEX_UNIFIED2                  = Regexp.union(REGEXP_CONTROL,
+                                                   REGEXP_ENDING_COLON,
+                                                   REGEXP_EXCLAMATION_AT_START,
+                                                   REGEXP_EXCLAMATION_AT_END,
+                                                   REGEXP_HYPHEN_AT_START,
+                                                   REGEXP_SPECIAL_SYMBOL,
+                                                   REGEXP_PERCENT_AT_START,
+                                                   REGEXP_ALPHANUMERIC_SUPPLEMENT)
     REGEXP_UNKNOWN17         = /(?<=\D)1+(?=\z)/
     REGEXP_HASHTAG_AT_START  = /\A(#|＃)/
     REGEXP_AT_SIGN_AT_START  = /\A(@|＠)/
