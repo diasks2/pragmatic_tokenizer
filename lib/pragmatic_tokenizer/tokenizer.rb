@@ -213,10 +213,11 @@ module PragmaticTokenizer
         when 'semi'
           @tokens.delete_if { |t| t =~ /\A\d+\z/ }
         when 'none'
+          lookup = PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS
           if downcase
-            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || lookup.include?(t) || lookup.include?("#{t}.") }
           else
-            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || lookup.include?(Unicode.downcase(t)) || lookup.include?("#{Unicode.downcase(t)}.") }
           end
         when 'only'
           @tokens.delete_if { |t| t =~ /\A\D+\z/ }
