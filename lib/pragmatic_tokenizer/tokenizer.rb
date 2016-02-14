@@ -9,31 +9,27 @@ require 'unicode'
 module PragmaticTokenizer
   class Tokenizer
 
-    PUNCTIATION_OPTIONS      = Set.new([:all, :semi, :none, :only]).freeze
-    NUMBERS_OPTIONS          = Set.new([:all, :semi, :none, :only]).freeze
-    MENTIONS_OPTIONS         = Set.new([:keep_original, :keep_and_clean, :remove]).freeze
-    MAX_TOKEN_LENGTH         = 50
-    EMPTY_STRING             = ''.freeze
-    DOT_STRING               = '.'.freeze
-    SPACE_STRING             = ' '.freeze
-    REGEX_DOMAIN             = /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix
-    REGEX_URL                = /(http|https)(\.|:)/
-    REGEX_HYPHEN             = /\-/
-    REGEX_UNDERSCORE         = /\_/
-    REGEX_CONTRACTIONS       = /[‘’‚‛‹›＇´`]/
-    REGEX_APOSTROPHE_S       = /['’`́]s$/
-    REGEX_EMAIL              = /\S+(＠|@)\S+\.\S+/
-    REGEX_HASHTAG_OR_MENTION = /[＠@#|＃]/
-    REGEX_UNKNOWN1           = /(?<=\s)\_+/
-    REGEX_UNKNOWN2           = /\_+(?=\s)/
-    REGEX_UNKNOWN3           = /(?<=\A)\_+/
-    REGEX_UNKNOWN4           = /\_+(?=\z)/
-    REGEX_UNKNOWN5           = /\*+/
-    REGEX_UNIFIED1           = Regexp.union(REGEX_UNKNOWN1,
-                                            REGEX_UNKNOWN2,
-                                            REGEX_UNKNOWN3,
-                                            REGEX_UNKNOWN4,
-                                            REGEX_UNKNOWN5)
+    PUNCTIATION_OPTIONS       = Set.new([:all, :semi, :none, :only]).freeze
+    NUMBERS_OPTIONS           = Set.new([:all, :semi, :none, :only]).freeze
+    MENTIONS_OPTIONS          = Set.new([:keep_original, :keep_and_clean, :remove]).freeze
+    MAX_TOKEN_LENGTH          = 50
+    EMPTY_STRING              = ''.freeze
+    DOT_STRING                = '.'.freeze
+    SPACE_STRING              = ' '.freeze
+    REGEX_DOMAIN              = /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix
+    REGEX_URL                 = /(http|https)(\.|:)/
+    REGEX_HYPHEN              = /\-/
+    REGEX_UNDERSCORE          = /\_/
+    REGEX_CONTRACTIONS        = /[‘’‚‛‹›＇´`]/
+    REGEX_APOSTROPHE_S        = /['’`́]s$/
+    REGEX_EMAIL               = /\S+(＠|@)\S+\.\S+/
+    REGEX_HASHTAG_OR_MENTION  = /[＠@#|＃]/
+    REGEX_UNDERSCORE_AT_START = /(?<=\A)\_+/
+    REGEX_UNDERSCORE_AT_END   = /\_+(?=\z)/
+    REGEX_ASTERISK            = /\*+/
+    REGEX_UNIFIED1            = Regexp.union(REGEX_UNDERSCORE_AT_START,
+                                             REGEX_UNDERSCORE_AT_END,
+                                             REGEX_ASTERISK)
     # https://en.wikipedia.org/wiki/Control_character
     # matches any character with hexadecimal value 00 through 1F or 7F.
     # Rubular: http://rubular.com/r/E83fpBoDjI
