@@ -9,9 +9,8 @@ require 'unicode'
 module PragmaticTokenizer
   class Tokenizer
 
-    attr_reader :text, :punctuation, :language_module, :expand_contractions, :numbers, :minimum_length, :downcase, :classic_filter, :filter_languages, :abbreviations, :contractions, :clean, :remove_stop_words, :stop_words, :remove_emoji, :remove_emails, :mentions, :hashtags, :remove_urls, :remove_domains, :long_word_split
+    attr_reader :punctuation, :language_module, :expand_contractions, :numbers, :minimum_length, :downcase, :classic_filter, :filter_languages, :abbreviations, :contractions, :clean, :remove_stop_words, :stop_words, :remove_emoji, :remove_emails, :mentions, :hashtags, :remove_urls, :remove_domains, :long_word_split
 
-    # @param [String] text to be tokenized
     # @param [Hash] opts optional arguments
 
     # @option opts [Array] :filter_languages - user-supplied array of languages from which that language's stop words, abbreviations and contractions should be used when calculating the resulting tokens - array elements should be of the String class or can be symbols
@@ -47,8 +46,7 @@ module PragmaticTokenizer
     # @option opts [Boolean] :remove_urls - (default: false)
     # @option opts [Boolean] :remove_domains - (default: false)
 
-    def initialize(text, opts={})
-      @text                     = CGI.unescapeHTML(text)
+    def initialize(opts={})
       @filter_languages         = opts[:filter_languages] || []
       @language                 = opts[:language] || 'en'
       @language_module          = Languages.get_language_by_code(@language.to_s)
@@ -105,14 +103,17 @@ module PragmaticTokenizer
              mentions.to_s.eql?('remove')
         raise "Mentions argument can be only be nil, 'keep_original', 'keep_and_clean', or 'remove'"
       end
-      raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
       raise "In Pragmatic Tokenizer minimum_length must be an Integer" unless minimum_length.class == Fixnum || minimum_length.nil?
       raise "In Pragmatic Tokenizer long_word_split must be an Integer" unless long_word_split.class == Fixnum || long_word_split.nil?
     end
 
-    def tokenize
+    # @param [String] text to be tokenized
+
+    def tokenize(text)
       return [] unless text
-      text
+      raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
+      @text = CGI.unescapeHTML(text)
+      @text
           .scan(/.{,10000}(?=\s|\z)/m)
           .flat_map { |segment| post_process(pre_process(segment)) }
     end
