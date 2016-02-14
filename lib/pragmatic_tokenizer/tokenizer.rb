@@ -213,11 +213,10 @@ module PragmaticTokenizer
         when 'semi'
           @tokens.delete_if { |t| t =~ /\A\d+\z/ }
         when 'none'
-          lookup = PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS
           if downcase
-            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || lookup.include?(t) || lookup.include?("#{t}.") }
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(t) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{t}.") }
           else
-            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || lookup.include?(Unicode.downcase(t)) || lookup.include?("#{Unicode.downcase(t)}.") }
+            @tokens.delete_if { |t| t =~ /\D*\d+\d*/ || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(Unicode.downcase(t)) || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?("#{Unicode.downcase(t)}.") }
           end
         when 'only'
           @tokens.delete_if { |t| t =~ /\A\D+\z/ }
@@ -231,11 +230,11 @@ module PragmaticTokenizer
       def process_punctuation!
         case punctuation.to_s
         when 'semi'
-          @tokens -= PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION
+          @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION.include?(t) }
         when 'none'
-          @tokens = @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ } - PragmaticTokenizer::Languages::Common::PUNCTUATION
+          @tokens = @tokens.delete_if { |t| t =~ /\A[[:punct:]]+\z/ || t =~ /\A(‹+|\^+|›+|\++)\z/ || PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
         when 'only'
-          @tokens.delete_if { |t| !PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
+          @tokens.keep_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
         end
       end
 
