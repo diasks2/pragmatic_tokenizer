@@ -2,7 +2,7 @@ module PragmaticTokenizer
   module Languages
     module Deutsch
       include Languages::Common
-      ABBREVIATIONS = [
+      ABBREVIATIONS = Set.new([
           'a', 'a.d', 'a.k.a', 'a.s.a.p', 'abg', 'alt', 'apr', 'art', 'aug', 'b',
           'b.a', 'b.s', 'best', 'bgm', 'bldg', 'btw', 'buchst', 'bzgl', 'bzw', 'c',
           'ca', 'co', 'd', 'd.d', 'd.h', 'd.r', 'dergl', 'dez', 'dgl', 'dr', 'dr ',
@@ -22,8 +22,8 @@ module PragmaticTokenizer
           'v.m', 'vgl', 'vi', 'vii', 'viii', 'vs', 'w', 'wg', 'wr', 'x', 'xi',
           'xii', 'xiii', 'xiv', 'xix', 'xv', 'xvi', 'xvii', 'xviii', 'xx', 'y',
           'z', 'z.b', 'z.t', 'z.z', 'z.zt', 'zb', 'zt', 'zw', 'zzt', 'ä', 'ö',
-          'öffentl', 'öst', 'österr', 'ü'].freeze
-      STOP_WORDS = [
+          'öffentl', 'öst', 'österr', 'ü']).freeze
+      STOP_WORDS = Set.new([
           "a", "ab", "aber", "ach", "acht", "achte", "achten", "achter", "achtes",
           "ag", "alle", "allein", "allem", "allen", "aller", "allerdings", "alles",
           "allgemeinen", "als", "also", "am", "an", "andere", "anderen", "andern",
@@ -93,7 +93,7 @@ module PragmaticTokenizer
           "zehnten", "zehnter", "zehntes", "zeit", "zu", "zuerst", "zugleich", "zum",
           "zunächst", "zur", "zurück", "zusammen", "zwanzig", "zwar", "zwei", "zweite",
           "zweiten", "zweiter", "zweites", "zwischen", "zwölf", "über", "überhaupt",
-          "übrigens"].freeze
+          "übrigens"]).freeze
       CONTRACTIONS = {
           "auf's"             => "auf das",
           "can't"             => "cannot",

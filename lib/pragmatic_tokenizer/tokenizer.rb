@@ -53,24 +53,24 @@ module PragmaticTokenizer
       @expand_contractions      = opts[:expand_contractions] || false
       @remove_stop_words        = opts[:remove_stop_words] || false
       if @filter_languages.empty?
-        @abbreviations          = opts[:abbreviations] || @language_module::ABBREVIATIONS
+        @abbreviations          = opts[:abbreviations] ? Set.new(opts[:abbreviations]) : @language_module::ABBREVIATIONS
         @contractions           = opts[:contractions] || @language_module::CONTRACTIONS
-        @stop_words             = opts[:stop_words] || @language_module::STOP_WORDS
+        @stop_words             = opts[:stop_words] ? Set.new(opts[:stop_words]) : @language_module::STOP_WORDS
       else
-        merged_abbreviations = []
-        @filter_languages.map { |l| merged_abbreviations << Languages.get_language_by_code(l.to_s)::ABBREVIATIONS.flatten }
-        merged_abbreviations << opts[:abbreviations].flatten unless opts[:abbreviations].nil?
-        @abbreviations = merged_abbreviations.flatten
+        merged_abbreviations = Set.new
+        @filter_languages.each { |l| merged_abbreviations += Languages.get_language_by_code(l.to_s)::ABBREVIATIONS }
+        merged_abbreviations += opts[:abbreviations] if opts[:abbreviations]
+        @abbreviations       = merged_abbreviations
 
         merged_contractions = {}
         @filter_languages.map { |l| merged_contractions = merged_contractions.merge(Languages.get_language_by_code(l.to_s)::CONTRACTIONS) }
         merged_contractions = merged_contractions.merge(opts[:contractions]) unless opts[:contractions].nil?
         @contractions = merged_contractions
 
-        merged_stop_words = []
-        @filter_languages.map { |l| merged_stop_words << Languages.get_language_by_code(l.to_s)::STOP_WORDS.flatten }
-        merged_stop_words << opts[:stop_words].flatten unless opts[:stop_words].nil?
-        @stop_words = merged_stop_words.flatten
+        merged_stop_words = Set.new
+        @filter_languages.each { |l| merged_stop_words += Languages.get_language_by_code(l.to_s)::STOP_WORDS }
+        merged_stop_words += opts[:stop_words] if opts[:stop_words]
+        @stop_words       = merged_stop_words
       end
       @punctuation              = opts[:punctuation] || 'all'
       @numbers                  = opts[:numbers] || 'all'
@@ -240,9 +240,9 @@ module PragmaticTokenizer
 
       def remove_stop_words!
         if downcase
-          @tokens -= @stop_words
+          @tokens.delete_if { |token| @stop_words.include?(token) }
         else
-          @tokens.delete_if { |t| @stop_words.include?(Unicode.downcase(t)) }
+          @tokens.delete_if { |token| @stop_words.include?(Unicode.downcase(token)) }
         end
       end
 
