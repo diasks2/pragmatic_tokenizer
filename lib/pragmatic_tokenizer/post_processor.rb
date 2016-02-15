@@ -20,6 +20,7 @@ module PragmaticTokenizer
 
     REGEX_UNIFIED2       = Regexp.union(REGEXP_SINGLE_QUOTES,
                                         REGEXP_COMMAS)
+    REGEXP_UNKNOWN1      = /(?<=\S)([。．！!?？]+)$/
 
     attr_reader :text, :abbreviations, :downcase
 
@@ -30,15 +31,19 @@ module PragmaticTokenizer
     end
 
     def post_process
-      EndingPunctuationSeparator.new(tokens: method_name3).separate
+      separate_ending_punctuation(method_name3)
     end
 
     private
 
       def method_name3
-        separated = EndingPunctuationSeparator.new(tokens: full_stop_separated_tokens).separate
+        separated = separate_ending_punctuation(full_stop_separated_tokens)
         procs     = [unified1, split_unknown_period1, split_unknown_period2, split_emoji]
         procs.reduce(separated) { |a, e| a.flat_map(&e) }
+      end
+
+      def separate_ending_punctuation(tokens)
+        tokens.flat_map { |token| token.split(REGEXP_UNKNOWN1) }
       end
 
       def unified1
