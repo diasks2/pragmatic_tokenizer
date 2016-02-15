@@ -4,46 +4,60 @@ module PragmaticTokenizer
   # This class separates true full stops while ignoring
   # periods that are part of an abbreviation
   class FullStopSeparator
-    attr_reader :tokens, :abbreviations, :downcase
+
+    REGEXP_ENDS_WITH_DOT = /\A(.+)\.\z/
+    REGEXP_ONLY_LETTERS  = /\A[a-z]\z/i
+    REGEXP_UNKNOWN1      = /[a-z](?:\.[a-z])+\z/i
+    REGEXP_UNKNOWN2      = /\A(.*\w)\.\z/
+    DOT                  = '.'.freeze
+
     def initialize(tokens:, abbreviations:, downcase:)
-      @tokens = tokens
+      @tokens        = tokens
       @abbreviations = abbreviations
-      @downcase = downcase
+      @downcase      = downcase
     end
 
     def separate
-      abbr = {}
-      abbreviations.each do |i|
-        abbr[i] = true
-      end
-      cleaned_tokens = []
-      tokens.each_with_index do |_t, i|
-        if tokens[i + 1] && tokens[i] =~ /\A(.+)\.\z/
-          w = Regexp.last_match(1)
-          if downcase
-            abbreviation = abbr[w]
-          else
-            abbreviation = abbr[Unicode.downcase(w)]
-          end
-          unless abbreviation || w =~ /\A[a-z]\z/i ||
-                 w =~ /[a-z](?:\.[a-z])+\z/i
-            cleaned_tokens << w
-            cleaned_tokens << '.'
-            next
-          end
-        end
-        cleaned_tokens << tokens[i]
-      end
-      if downcase
-        abbreviation = abbreviations.include?(cleaned_tokens[-1].chomp(".")) unless cleaned_tokens[-1].nil?
-      else
-        abbreviation = abbreviations.include?(Unicode.downcase(cleaned_tokens[-1]).chomp(".")) unless cleaned_tokens[-1].nil?
-      end
-      if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbreviation
-        cleaned_tokens[-1] = Regexp.last_match(1)
-        cleaned_tokens.push '.'
-      end
-      cleaned_tokens
+      create_cleaned_tokens
+      replace_last_token unless @cleaned_tokens.empty?
+      @cleaned_tokens
     end
+
+    private
+
+      def create_cleaned_tokens
+        @cleaned_tokens = []
+        @tokens.each_with_index do |token, position|
+          if @tokens[position + 1] && token =~ REGEXP_ENDS_WITH_DOT
+            match = Regexp.last_match(1)
+            if unknown_method1(match)
+              @cleaned_tokens += [match, DOT]
+              next
+            end
+          end
+          @cleaned_tokens << token
+        end
+      end
+
+      def unknown_method1(token)
+        !abbreviation?(token) && token !~ REGEXP_ONLY_LETTERS && token !~ REGEXP_UNKNOWN1
+      end
+
+      def abbreviation?(token)
+        @abbreviations.include?(inverse_case(token))
+      end
+
+      def inverse_case(token)
+        @downcase ? token : Unicode.downcase(token)
+      end
+
+      def replace_last_token
+        last_token = @cleaned_tokens[-1]
+        return if abbreviation?(last_token.chomp(DOT)) || last_token !~ REGEXP_UNKNOWN2
+        @cleaned_tokens[-1] = Regexp.last_match(1)
+        @cleaned_tokens << DOT
+      end
+
   end
+
 end
