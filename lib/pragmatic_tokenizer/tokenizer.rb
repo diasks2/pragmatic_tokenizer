@@ -3,7 +3,6 @@ require 'pragmatic_tokenizer/languages'
 require 'pragmatic_tokenizer/pre_processor'
 require 'pragmatic_tokenizer/post_processor'
 require 'pragmatic_tokenizer/full_stop_separator'
-require 'pragmatic_tokenizer/ending_punctuation_separator'
 require 'unicode'
 
 module PragmaticTokenizer
