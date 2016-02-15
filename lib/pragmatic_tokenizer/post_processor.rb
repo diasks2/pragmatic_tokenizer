@@ -1,14 +1,14 @@
 module PragmaticTokenizer
   class PostProcessor
 
-    REGEX_SYMBOL         = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/.freeze
-    REGEXP_COMMAS        = /^(,|‚)+/.freeze
-    REGEXP_SINGLE_QUOTES = /(.+)(’|'|‘|`)$/.freeze
-    REGEXP_SLASH         = /^(?!(https?:|www\.))(.*)\/(.*)/.freeze
-    REGEXP_QUESTION_MARK = /^(?!(https?:|www\.))(.*)(\?)(.*)/.freeze
-    REGEXP_PLUS_SIGN     = /(.+)\+(.+)/.freeze
-    REGEXP_COLON         = /^(\:)(\S{2,})/.freeze
-    REGEXP_EMOJI         = /(\u{2744}[\u{FE0E}|\u{FE0F}])/.freeze
+    REGEX_SYMBOL         = /[♳ ♴ ♵ ♶ ♷ ♸ ♹ ♺ ⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ☇ ☈ ☉ ☊ ☋ ☌ ☍ ☠ ☢ ☣ ☤ ☥ ☦ ☧ ☀ ☁ ☂ ☃ ☄ ☮ ♔ ♕ ♖ ♗ ♘ ♙ ♚ ⚘ ⚭]/
+    REGEXP_COMMAS        = /^(,|‚)+/
+    REGEXP_SINGLE_QUOTES = /(.+)(’|'|‘|`)$/
+    REGEXP_SLASH         = /^(?!(https?:|www\.))(.*)\/(.*)/
+    REGEXP_QUESTION_MARK = /^(?!(https?:|www\.))(.*)(\?)(.*)/
+    REGEXP_PLUS_SIGN     = /(.+)\+(.+)/
+    REGEXP_COLON         = /^(\:)(\S{2,})/
+    REGEXP_EMOJI         = /(\u{2744}[\u{FE0E}|\u{FE0F}])/
 
     REGEX_UNIFIED1       = Regexp.union(REGEXP_SLASH,
                                         REGEXP_QUESTION_MARK,
@@ -16,12 +16,10 @@ module PragmaticTokenizer
                                         REGEXP_COLON,
                                         REGEXP_EMOJI,
                                         PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX,
-                                        PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX
-    ).freeze
+                                        PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX)
 
     REGEX_UNIFIED2       = Regexp.union(REGEXP_SINGLE_QUOTES,
-                                        REGEXP_COMMAS
-    ).freeze
+                                        REGEXP_COMMAS)
 
     attr_reader :text, :abbreviations, :downcase
 
@@ -96,7 +94,7 @@ module PragmaticTokenizer
         if downcase
           token.split(/(\.)/)[0]
         else
-          UnicodeCaseConverter::Converter.new(token.split(/(\.)/)[0]).downcase
+          UnicodeCaseConverter::downcase(token.split(/(\.)/)[0])
         end
       end
 

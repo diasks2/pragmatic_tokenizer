@@ -28,35 +28,36 @@ require 'pragmatic_tokenizer/languages/turkish'
 module PragmaticTokenizer
   module Languages
     LANGUAGE_CODES = {
-        'en' => English,
-        'ar' => Arabic,
-        'bg' => Bulgarian,
-        'ca' => Catalan,
-        'cs' => Czech,
-        'da' => Danish,
-        'de' => Deutsch,
-        'el' => Greek,
-        'es' => Spanish,
-        'fa' => Persian,
-        'fi' => Finnish,
-        'fr' => French,
-        'id' => Indonesian,
-        'it' => Italian,
-        'lv' => Latvian,
-        'nl' => Dutch,
-        'nn' => Norwegian,
-        'nb' => Norwegian,
-        'no' => Norwegian,
-        'pl' => Polish,
-        'pt' => Portuguese,
-        'ro' => Romanian,
-        'ru' => Russian,
-        'sk' => Slovak,
-        'sv' => Swedish,
-        'tr' => Turkish
+        :en => English,
+        :ar => Arabic,
+        :bg => Bulgarian,
+        :ca => Catalan,
+        :cs => Czech,
+        :da => Danish,
+        :de => Deutsch,
+        :el => Greek,
+        :es => Spanish,
+        :fa => Persian,
+        :fi => Finnish,
+        :fr => French,
+        :id => Indonesian,
+        :it => Italian,
+        :lv => Latvian,
+        :nl => Dutch,
+        :nn => Norwegian,
+        :nb => Norwegian,
+        :no => Norwegian,
+        :pl => Polish,
+        :pt => Portuguese,
+        :ro => Romanian,
+        :ru => Russian,
+        :sk => Slovak,
+        :sv => Swedish,
+        :tr => Turkish
     }.freeze
 
     def self.get_language_by_code(code)
+      code = code ? code.to_sym : :en
       LANGUAGE_CODES[code] || Common
     end
   end

@@ -29,10 +29,10 @@ gem 'pragmatic_tokenizer'
 ```ruby
 text = "\"I said, 'what're you? Crazy?'\" said Sandowsky. \"I can't afford to do that.\""
 
-PragmaticTokenizer::Tokenizer.new(text).tokenize
+PragmaticTokenizer::Tokenizer.new.tokenize(text)
 # => ["\"", "i", "said", ",", "'", "what're", "you", "?", "crazy", "?", "'", "\"", "said", "sandowsky", ".", "\"", "i", "can't", "afford", "to", "do", "that", ".", "\""]
 
-# You can pass many different options:
+# You can pass many different options to #initialize:
 options = {
   language:            :en, # the language of the string you are tokenizing
   abbreviations:       ['a.b', 'a'], # a user-supplied array of abbreviations (downcased with ending period removed)

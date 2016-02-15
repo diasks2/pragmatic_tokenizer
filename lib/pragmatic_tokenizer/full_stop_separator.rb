@@ -23,7 +23,7 @@ module PragmaticTokenizer
           if downcase
             abbreviation = abbr[w]
           else
-            abbreviation = abbr[UnicodeCaseConverter::Converter.new(w).downcase]
+            abbreviation = abbr[UnicodeCaseConverter::downcase(w)]
           end
           unless abbreviation || w =~ /\A[a-z]\z/i ||
                  w =~ /[a-z](?:\.[a-z])+\z/i
@@ -37,7 +37,7 @@ module PragmaticTokenizer
       if downcase
         abbr_included = abbreviations.include?(cleaned_tokens[-1].chomp(".")) unless cleaned_tokens[-1].nil?
       else
-        abbr_included = abbreviations.include?(UnicodeCaseConverter::Converter.new(cleaned_tokens[-1]).downcase.chomp(".")) unless cleaned_tokens[-1].nil?
+        abbr_included = abbreviations.include?(UnicodeCaseConverter::downcase(cleaned_tokens[-1]).chomp(".")) unless cleaned_tokens[-1].nil?
       end
       if cleaned_tokens[-1] && cleaned_tokens[-1] =~ /\A(.*\w)\.\z/ && !abbr_included
         cleaned_tokens[-1] = Regexp.last_match(1)
