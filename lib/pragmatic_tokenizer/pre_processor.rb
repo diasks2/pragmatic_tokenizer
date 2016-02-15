@@ -59,15 +59,15 @@ module PragmaticTokenizer
       end
 
       def shift_horizontal_ellipsis!
-        gsub!(/(…+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+        gsub!(/(…+)/o, ' \1 ')
       end
 
       def shift_ellipse_two_dots!
-        gsub!(/(\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+        gsub!(/(\.\.+)/o, ' \1 ')
       end
 
       def shift_ellipse_three_dots!
-        gsub!(/(\.\.\.+)/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+        gsub!(/(\.\.\.+)/o, ' \1 ')
       end
 
       def shift_no_space_mention!
@@ -98,11 +98,11 @@ module PragmaticTokenizer
       end
 
       def shift_bracket!
-        gsub!(/([\(\[\{\}\]\)])/o) { ' ' + Regexp.last_match(1) + ' '.freeze }
+        gsub!(/([\(\[\{\}\]\)])/o, ' \1 ')
       end
 
       def shift_semicolon!
-        gsub!(/([;])/o) { ' '.freeze + Regexp.last_match(1) + ' '.freeze }
+        gsub!(/([;])/o, ' \1 ')
       end
 
       def shift_percent!
@@ -138,7 +138,7 @@ module PragmaticTokenizer
 
       def replace_left_quotes!(style, replacement_key)
         replacement = replacement_for_key(replacement_key)
-        gsub!(/#{style}(?=.*\w)/o, ' '.freeze + replacement + ' '.freeze)
+        gsub!(/#{style}(?=.*\w)/o, ' ' << replacement << ' ')
       end
 
       def replace_remaining_double_quotes!
@@ -149,7 +149,7 @@ module PragmaticTokenizer
 
       def replace_remaining_quotes!(style, replacement_key)
         replacement = replacement_for_key(replacement_key)
-        gsub!(/#{style}/, ' '.freeze + replacement + ' '.freeze)
+        gsub!(/#{style}/, ' ' << replacement << ' ')
       end
 
       def convert_sgl_quotes!(language)
