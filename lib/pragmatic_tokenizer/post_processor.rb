@@ -96,11 +96,8 @@ module PragmaticTokenizer
       end
 
       def extract_abbreviation(token)
-        if downcase
-          token.split(/(\.)/)[0]
-        else
-          Unicode.downcase(token.split(/(\.)/)[0])
-        end
+        before_first_dot = token[0, token.index('.'.freeze)]
+        downcase ? before_first_dot : Unicode.downcase(before_first_dot)
       end
 
       def convert_sym_to_punct(token)
