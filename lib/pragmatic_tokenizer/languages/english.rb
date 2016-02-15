@@ -95,16 +95,29 @@ module PragmaticTokenizer
           "will-o'-the-wisp"  => "will-of-the-wisp",
           "'twas"             => "it was"
       }.freeze
+
       class SingleQuotes
+
+        REGEXP_LEFT_QUOTES1      = /(\W|^)'(?=.*\w)(?!twas)(?!Twas)/o
+        REGEXP_LEFT_QUOTES2      = /(\W|^)‘(?=.*\w)(?!twas)(?!Twas)/o
+        REGEXP_LEFT_QUOTES3      = /(\W|^)'(?=.*\w)/o
+        REGEXP_RIGHT_SIDE_QUOTES = /(\w|\D)'(?!')(?=\W|$)/o
+
         def handle_single_quotes(text)
           # Convert left quotes to special character except for 'Twas or 'twas
-          text.gsub!(/(\W|^)'(?=.*\w)(?!twas)(?!Twas)/o) { Regexp.last_match(1) ? Regexp.last_match(1) + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' : ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
-          text.gsub!(/(\W|^)‘(?=.*\w)(?!twas)(?!Twas)/o) { Regexp.last_match(1) ? Regexp.last_match(1) + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["‘"] + ' ' : ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["‘"] + ' ' } || text
-          text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"]) || text
-          # Separate right single quotes
-          text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { Regexp.last_match(1) + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
+          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze]
+          text.gsub!(REGEXP_LEFT_QUOTES1, "\\1 #{replacement} ")
+          text.gsub!(REGEXP_LEFT_QUOTES3, ' ' << replacement)
+          text.gsub!(REGEXP_RIGHT_SIDE_QUOTES, "\\1 #{replacement} ")
+
+          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["‘".freeze]
+          text.gsub!(REGEXP_LEFT_QUOTES2, "\\1 #{replacement} ")
+
+          text
         end
+
       end
+
     end
   end
 end

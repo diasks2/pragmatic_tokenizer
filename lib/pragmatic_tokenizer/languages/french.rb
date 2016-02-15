@@ -7,11 +7,17 @@ module PragmaticTokenizer
       CONTRACTIONS = {}.freeze
 
       class SingleQuotes
+
+        REGEXP_UNKNOWN1 = /(\w|\D)'(?!')(?=\W|$)/o
+        REGEXP_UNKNOWN2 = /(\W|^)'(?=.*\w)/o
+
         def handle_single_quotes(text)
-          text.gsub!(/(\w|\D)'(?!')(?=\W|$)/o) { Regexp.last_match(1) + ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"] + ' ' } || text
-          text.gsub!(/(\W|^)'(?=.*\w)/o, ' ' + PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'"]) || text
-          text.gsub!(/l\'/, '\1 l☮ \2') || text
-          text.gsub!(/L\'/, '\1 L☮ \2') || text
+          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze]
+          text.gsub!(REGEXP_UNKNOWN1, "\\1 #{replacement} ")
+          text.gsub!(REGEXP_UNKNOWN2, ' ' << replacement)
+          text.gsub!(/l\'/, '\1 l☮ \2')
+          text.gsub!(/L\'/, '\1 L☮ \2')
+          text
         end
       end
     end
