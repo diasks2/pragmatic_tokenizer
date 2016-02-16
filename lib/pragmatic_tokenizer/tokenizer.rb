@@ -1,4 +1,6 @@
 # -*- encoding : utf-8 -*-
+require 'set'
+require 'cgi'
 require 'pragmatic_tokenizer/languages'
 require 'pragmatic_tokenizer/pre_processor'
 require 'pragmatic_tokenizer/post_processor'
