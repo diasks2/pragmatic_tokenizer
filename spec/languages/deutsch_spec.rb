@@ -175,7 +175,7 @@ describe PragmaticTokenizer do
           remove_stop_words: true,
           language:          'de'
       )
-      expect(pt.tokenize(text)).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "english", "."])
+      expect(pt.tokenize(text)).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
     end
 
     it 'removes English and German stopwords' do

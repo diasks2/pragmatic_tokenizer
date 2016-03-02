@@ -485,6 +485,38 @@ describe PragmaticTokenizer do
       end
 
       context 'option (long_word_split)' do
+        it 'should not split twitter handles' do
+          text = "@john_doe"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 5
+          )
+          expect(pt.tokenize(text)).to eq(["@john_doe"])
+        end
+
+        it 'should not split emails' do
+          text = "john_doe@something.com"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 5
+          )
+          expect(pt.tokenize(text)).to eq(["john_doe@something.com"])
+        end
+
+        it 'should not split emails 2' do
+          text = "john_doe＠something.com"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 5
+          )
+          expect(pt.tokenize(text)).to eq(["john_doe＠something.com"])
+        end
+
+        it 'should not split urls' do
+          text = "http://test.com/some_path"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 5
+          )
+          expect(pt.tokenize(text)).to eq(["http://test.com/some_path"])
+        end
+
         it 'tokenizes a string #001' do
           text = "Some main-categories of the mathematics-test have sub-examples that most 14-year olds can't answer, therefor the implementation-instruction made in the 1990-years needs to be revised."
           pt = PragmaticTokenizer::Tokenizer.new(
@@ -1034,6 +1066,15 @@ describe PragmaticTokenizer do
       context 'option (remove_stop_words)' do
         it 'removes stop words' do
           text = 'This is a short sentence with explanations and stop words.'
+          pt = PragmaticTokenizer::Tokenizer.new(
+              language:          'en',
+              remove_stop_words: true
+          )
+          expect(pt.tokenize(text)).to eq(["short", "sentence", "explanations", "."])
+        end
+
+        it 'removes stop words 2' do
+          text = 'This is a short sentence with explanations and stop words i.e. is a stop word as so is e.g. I think.'
           pt = PragmaticTokenizer::Tokenizer.new(
               language:          'en',
               remove_stop_words: true

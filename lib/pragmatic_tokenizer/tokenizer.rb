@@ -20,7 +20,8 @@ module PragmaticTokenizer
     REGEX_DOMAIN              = /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix
     REGEX_URL                 = /(http|https)(\.|:)/
     REGEX_HYPHEN              = /\-/
-    REGEX_UNDERSCORE          = /\_/
+    REGEX_LONG_WORD           = /\-|\_/
+    REGEXP_SPLIT_CHECK        = /＠|@|(http)/
     REGEX_CONTRACTIONS        = /[‘’‚‛‹›＇´`]/
     REGEX_APOSTROPHE_S        = /['’`́]s$/
     REGEX_EMAIL               = /\S+(＠|@)\S+\.\S+/
@@ -126,7 +127,7 @@ module PragmaticTokenizer
       # TODO: why do we treat stop words differently than abbreviations and contractions? (we don't use @language_module::STOP_WORDS when passing @filter_languages)
       @contractions.merge!(@language_module::CONTRACTIONS) if @contractions.empty?
       @abbreviations       += @language_module::ABBREVIATIONS if @abbreviations.empty?
-      @stop_words          += @language_module::STOP_WORDS if @stop_words.empty? && @filter_languages.empty?
+      @stop_words          += @language_module::STOP_WORDS if @stop_words.empty?
 
       @filter_languages.each do |lang|
         language = Languages.get_language_by_code(lang)
@@ -286,8 +287,7 @@ module PragmaticTokenizer
 
       def split_long_words!
         @tokens = @tokens
-                      .flat_map { |t| t.length > @long_word_split ? t.split(REGEX_HYPHEN) : t }
-                      .flat_map { |t| t.length > @long_word_split ? t.split(REGEX_UNDERSCORE) : t }
+                      .flat_map { |t| (t.length > @long_word_split && t !~ REGEXP_SPLIT_CHECK ) ? t.split(REGEX_LONG_WORD) : t }
       end
 
       def chosen_case(token)

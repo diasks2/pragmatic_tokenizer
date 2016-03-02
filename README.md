@@ -103,7 +103,7 @@ options = {
 
 ##### `filter_languages`
   **default** = `nil`
-- You can pass an array of languages of which you would like to process abbreviations, stop words and contractions. This language can be indepedent of the language of the string you are tokenizing (for example your tex might be German but contain so English stop words that you want to remove). If you supply your own abbreviations, stop words or contractions they will be merged with the abbreviations, stop words and contractions of any languages you add in this option. You can pass an array of symbols or strings (i.e. `[:en, :de]` or `['en', 'de']`)
+- You can pass an array of languages of which you would like to process abbreviations, stop words and contractions. This language can be indepedent of the language of the string you are tokenizing (for example your text might be German but contain some English stop words that you want to remove). If you supply your own abbreviations, stop words or contractions they will be merged with the abbreviations, stop words and contractions of any languages you add in this option. You can pass an array of symbols or strings (i.e. `[:en, :de]` or `['en', 'de']`)
 
 <hr>
 
