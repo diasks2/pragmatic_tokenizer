@@ -290,8 +290,8 @@ module PragmaticTokenizer
                       .flat_map { |t| (t.length > @long_word_split && t !~ REGEXP_SPLIT_CHECK ) ? t.split(REGEX_LONG_WORD) : t }
       end
 
-      def chosen_case(token)
-        @downcase ? Unicode.downcase(token) : token
+      def chosen_case(txt)
+        @downcase ? Unicode.downcase(txt) : txt
       end
 
       def inverse_case(token)

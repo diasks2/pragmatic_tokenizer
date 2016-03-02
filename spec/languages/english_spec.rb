@@ -443,6 +443,17 @@ describe PragmaticTokenizer do
         end
       end
 
+      context 'option (downcase)' do
+        it 'does not downcase URLs' do
+          skip "NOT IMPLEMENTED"
+          text = "Here are some domains and urls GOOGLE.com http://test.com/UPPERCASE."
+          pt = PragmaticTokenizer::Tokenizer.new(
+              downcase: :true
+          )
+          expect(pt.tokenize(text)).to eq(["here", "are", "some", "domains", "and", "urls", "GOOGLE.com", "http://test.com/UPPERCASE", "."])
+        end
+      end
+
       context 'option (domains)' do
         it 'tokenizes a string #001' do
           text = "Here are some domains and urls google.com https://www.google.com www.google.com."
