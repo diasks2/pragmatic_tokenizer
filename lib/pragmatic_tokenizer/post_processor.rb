@@ -31,12 +31,12 @@ module PragmaticTokenizer
     end
 
     def post_process
-      separate_ending_punctuation(method_name3)
+      separate_ending_punctuation(post_process_punctuation)
     end
 
     private
 
-      def method_name3
+      def post_process_punctuation
         separated = separate_ending_punctuation(full_stop_separated_tokens)
         procs     = [unified1, split_unknown_period1, split_unknown_period2, split_emoji]
         procs.reduce(separated) { |a, e| a.flat_map(&e) }
