@@ -139,8 +139,11 @@ module PragmaticTokenizer
       raise "Punctuation argument can be only be nil, :all, :semi, :none, or :only" unless PUNCTIATION_OPTIONS.include?(@punctuation)
       raise "Numbers argument can be only be nil, :all, :semi, :none, or :only" unless NUMBERS_OPTIONS.include?(@numbers)
       raise "Mentions argument can be only be nil, :keep_original, :keep_and_clean, or :remove" unless MENTIONS_OPTIONS.include?(@mentions)
-      raise "In Pragmatic Tokenizer minimum_length must be an Integer" unless @minimum_length.class == Fixnum || @minimum_length.nil?
-      raise "In Pragmatic Tokenizer long_word_split must be an Integer" unless @long_word_split.class == Fixnum || @long_word_split.nil?
+
+      integer_class = Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0') ? Fixnum : Integer
+
+      raise "In Pragmatic Tokenizer minimum_length must be an Integer" unless @minimum_length.class == integer_class || @minimum_length.nil?
+      raise "In Pragmatic Tokenizer long_word_split must be an Integer" unless @long_word_split.class == integer_class || @long_word_split.nil?
     end
 
     # @param [String] text to be tokenized
