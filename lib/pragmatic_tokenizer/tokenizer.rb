@@ -150,7 +150,7 @@ module PragmaticTokenizer
 
     def tokenize(text)
       return [] unless text
-      raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
+      raise "In PragmaticTokenizer text must be a String or subclass of String" unless text.class <= String
       CGI.unescapeHTML(text)
           .scan(REGEXP_CHUNK_STRING)
           .flat_map { |segment| post_process(pre_process(segment)) }
