@@ -64,7 +64,7 @@ module PragmaticTokenizer
     REGEXP_NO_NUMBERS          = /\A\D+\z/
     REGEXP_NUMBER              = /\D*\d+\d*/
     REGEXP_CONSECUTIVE_DOTS    = /\A\.{2,}\z/
-    REGEXP_CHUNK_STRING        = /.{,10000}(?=\s|\z)/m
+    REGEXP_CHUNK_STRING        = /\S.{1,10000}(?!\S)/m
 
     # @param [Hash] opts optional arguments
 
@@ -150,7 +150,7 @@ module PragmaticTokenizer
 
     def tokenize(text)
       return [] unless text
-      raise "In Pragmatic Tokenizer text must be a String" unless text.class == String
+      raise "In PragmaticTokenizer text must be a String or subclass of String" unless text.class <= String
       CGI.unescapeHTML(text)
           .scan(REGEXP_CHUNK_STRING)
           .flat_map { |segment| post_process(pre_process(segment)) }

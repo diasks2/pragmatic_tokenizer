@@ -17,7 +17,7 @@ module PragmaticTokenizer
     end
 
     def separate
-      create_cleaned_tokens
+      @cleaned_tokens = create_cleaned_tokens
       replace_last_token unless @cleaned_tokens.empty?
       @cleaned_tokens
     end
@@ -25,21 +25,15 @@ module PragmaticTokenizer
     private
 
       def create_cleaned_tokens
-        @cleaned_tokens = []
-        @tokens.each_with_index do |token, position|
-          if @tokens[position + 1] && token =~ REGEXP_ENDS_WITH_DOT
-            match = Regexp.last_match(1)
-            if abbreviation?(match)
-              @cleaned_tokens += [match, DOT]
-              next
-            end
-          end
-          @cleaned_tokens << token
-        end
+        @tokens[0..-2]
+            .flat_map { |token| abbreviation?(token) ? [token[0..-2], DOT] : token }
+            .push(@tokens.last)
       end
 
       def abbreviation?(token)
-        !defined_abbreviation?(token) && token !~ REGEXP_ONLY_LETTERS && token !~ REGEXP_ABBREVIATION
+        return false unless token.end_with?(DOT) && token.length > 1
+        shortened = token.chomp(DOT)
+        !defined_abbreviation?(shortened) && shortened !~ REGEXP_ONLY_LETTERS && shortened !~ REGEXP_ABBREVIATION
       end
 
       def defined_abbreviation?(token)
@@ -52,7 +46,9 @@ module PragmaticTokenizer
 
       def replace_last_token
         last_token = @cleaned_tokens[-1]
-        return if defined_abbreviation?(last_token.chomp(DOT)) || last_token !~ REGEXP_ENDS_WITH_DOT
+        return unless last_token.end_with?(DOT) && last_token.length > 1
+        shortened = last_token.chomp(DOT)
+        return if defined_abbreviation?(shortened) || last_token !~ REGEXP_ENDS_WITH_DOT
         @cleaned_tokens[-1] = Regexp.last_match(1)
         @cleaned_tokens << DOT
       end
