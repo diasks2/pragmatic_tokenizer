@@ -1,120 +1,68 @@
 module PragmaticTokenizer
   class PostProcessor
 
-    DOT                       = '.'.freeze
-    RANGE_DINGBATS            = '[\u2701-\u27BE]'.freeze # e.g. ✁✎✳❄➾
-    RANGE_VARIATION_SELECTORS = '[\uFE00-\uFE0F]'.freeze # alter the previous character
-    RANGE_FULLWIDTH           = '[\uFF01-\ufF1F]'.freeze # e.g. ！＂＃＇？
-
-    REGEXP_COMMAS        = /^([,‚])+/
-    REGEXP_SINGLE_QUOTES = /(.+)([’'‘`])$/
-    REGEXP_SLASH         = /^(?!(https?:|www\.))(.*)\//
-    REGEXP_QUESTION_MARK = /^(?!(https?:|www\.))(.*)(\?)/
-    REGEXP_PLUS_SIGN     = /(.+)\+(.+)/
-    REGEXP_COLON         = /^(:)(\S{2,})/
-    REGEXP_DINGBATS      = /(#{RANGE_DINGBATS}#{RANGE_VARIATION_SELECTORS}*)/
-    REGEXP_ENDING_PUNCT  = /(?<=\S)([#{RANGE_FULLWIDTH}!?]+)$/
-    REGEXP_DOMAIN        = /^((https?:\/\/|)?[a-z0-9]+([\-\.][a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?)$/ix
-    REGEXP_EMAIL         = /\S+[＠@]\S+/
-    REGEXP_DOMAIN_START  = /^(https?:|www\.|[[:alpha:]]\.)/
-    REGEXP_DOMAIN_END    = /\.(com|net|org|edu|gov|mil|int|[[:alpha:]]{2})$/
-    REGEXP_DIGIT         = /[[:digit:]]+/
-    REGEXP_PERIOD1       = /(.*\.)/
-    REGEXP_PERIOD2       = /(\.)/
-
-    REGEX_UNIFIED1       = Regexp.union(REGEXP_SLASH,
-                                        REGEXP_QUESTION_MARK,
-                                        REGEXP_PLUS_SIGN,
-                                        REGEXP_COLON,
-                                        REGEXP_DINGBATS,
-                                        PragmaticTokenizer::Languages::Common::PREFIX_EMOJI_REGEX,
-                                        PragmaticTokenizer::Languages::Common::POSTFIX_EMOJI_REGEX)
-
-    REGEX_UNIFIED2       = Regexp.union(REGEXP_SINGLE_QUOTES,
-                                        REGEXP_COMMAS)
-
-    REGEX_DOMAIN_EMAIL   = Regexp.union(REGEXP_DOMAIN,
-                                        REGEXP_EMAIL)
-
-    REGEX_DOMAIN         = Regexp.union(REGEXP_DOMAIN_START,
-                                        REGEXP_DOMAIN_END)
+    DOT = '.'.freeze
 
     attr_reader :text, :abbreviations, :downcase
 
     def initialize(text:, abbreviations:, downcase:)
-      @text          = text
-      @abbreviations = abbreviations
-      @downcase      = downcase
+      @text            = text
+      @abbreviations   = abbreviations
+      @downcase        = downcase
     end
 
-    def post_process
-      procs.reduce(full_stop_separated_tokens) { |a, e| a.flat_map(&e) }
+    # Every #flat_map will increase memory usage, we should try to merge whatever can be merged
+    # We need to run #split(Regex::ENDS_WITH_PUNCTUATION2) before AND after #split(Regex::VARIOUS), can this be fixed?
+    def call
+      text
+          .split
+          .map      { |token| convert_sym_to_punct(token) }
+          .flat_map { |token| token.split(Regex::COMMAS_OR_PUNCTUATION) }
+          .flat_map { |token| token.split(Regex::VARIOUS) }
+          .flat_map { |token| token.split(Regex::ENDS_WITH_PUNCTUATION2) }
+          .flat_map { |token| split_dotted_email_or_digit(token) }
+          .flat_map { |token| split_abbreviations(token) }
+          .flat_map { |token| split_period_after_last_word(token) }
     end
 
     private
-
-      # note: we need to run #separate_ending_punctuation twice. maybe there's a better solution?
-      def procs
-        [
-            separate_ending_punctuation,
-            unified1,
-            split_unknown_period1,
-            split_unknown_period2,
-            separate_ending_punctuation
-        ]
-      end
-
-      def separate_ending_punctuation
-        proc { |token| token.split(REGEXP_ENDING_PUNCT) }
-      end
-
-      def unified1
-        proc { |token| token.split(REGEX_UNIFIED1) }
-      end
-
-      def full_stop_separated_tokens
-        FullStopSeparator.new(tokens: split_convert_commas_quotes, abbreviations: abbreviations, downcase: downcase).separate
-      end
-
-      def split_convert_commas_quotes
-        text
-            .split
-            .flat_map { |token| token.split(REGEX_UNIFIED2) }
-            .flat_map { |token| convert_sym_to_punct(token) }
-      end
-
-      def split_unknown_period1
-        proc { |token| unknown_period1?(token) ? token.split(REGEXP_PERIOD1) : token }
-      end
-
-      def split_unknown_period2
-        proc { |token| unknown_period2?(token) ? token.split(REGEXP_PERIOD2) : token }
-      end
-
-      def unknown_period1?(token)
-        token.include?(DOT) &&
-            token.length > 1 &&
-            token !~ REGEX_DOMAIN_EMAIL &&
-            abbreviations.include?(extract_abbreviation(token))
-      end
-
-      def unknown_period2?(token)
-        token.include?(DOT) &&
-            token !~ REGEX_DOMAIN &&
-            token !~ REGEXP_DIGIT &&
-            token.count(DOT) == 1 &&
-            !abbreviations.include?(extract_abbreviation(token))
-      end
-
-      def extract_abbreviation(token)
-        before_first_dot = token[0, token.index(DOT)]
-        downcase ? before_first_dot : Unicode.downcase(before_first_dot)
-      end
 
       def convert_sym_to_punct(token)
         PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP
             .each { |pattern, replacement| break if token.sub!(replacement, pattern) }
         token
+      end
+
+      # Per specs, "16.1. day one,17.2. day two" will result in ["16.1", ".",…]. Do we really want that?
+      def split_dotted_email_or_digit(token)
+        return token unless token.end_with?(DOT) && token.length > 1
+        shortened = token.chomp(DOT)
+        return [shortened, DOT] if shortened =~ Regex::DOMAIN_OR_EMAIL
+        return [shortened, DOT] if shortened =~ Regex::ENDS_WITH_DIGIT
+        token
+      end
+
+      def split_abbreviations(token)
+        return token unless token.include?(DOT) && token.length > 1
+        return token if token =~ Regex::DOMAIN_OR_EMAIL
+        abbreviation = extract_abbreviation(token)
+        return token.split(Regex::PERIOD_AND_PRIOR) if abbreviations.include?(abbreviation)
+        token
+      end
+
+      def split_period_after_last_word(token)
+        return token unless token.include?(DOT) && token.length > 1
+        return token if token.count(DOT) > 1
+        return token if token =~ Regex::ONLY_DOMAIN3
+        return token if token =~ Regex::DIGIT
+        abbreviation = extract_abbreviation(token)
+        return token.split(Regex::PERIOD_ONLY) unless abbreviations.include?(abbreviation)
+        token
+      end
+
+      def extract_abbreviation(token)
+        before_first_dot = token[0, token.index(DOT)]
+        downcase ? before_first_dot : Unicode.downcase(before_first_dot)
       end
 
   end

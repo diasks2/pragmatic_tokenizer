@@ -1,69 +1,22 @@
 require 'set'
 require 'cgi'
+require 'pragmatic_tokenizer/regex'
 require 'pragmatic_tokenizer/languages'
 require 'pragmatic_tokenizer/pre_processor'
 require 'pragmatic_tokenizer/post_processor'
-require 'pragmatic_tokenizer/full_stop_separator'
 require 'unicode'
 
 module PragmaticTokenizer
   class Tokenizer
 
-    PUNCTIATION_OPTIONS       = Set.new([:all, :semi, :none, :only]).freeze
-    NUMBERS_OPTIONS           = Set.new([:all, :semi, :none, :only]).freeze
-    MENTIONS_OPTIONS          = Set.new([:keep_original, :keep_and_clean, :remove]).freeze
+    PUNCTUATION_OPTIONS       = Set.new(%i[all semi none only]).freeze
+    NUMBERS_OPTIONS           = Set.new(%i[all semi none only]).freeze
+    MENTIONS_OPTIONS          = Set.new(%i[keep_original keep_and_clean remove]).freeze
     MAX_TOKEN_LENGTH          = 50
-    EMPTY_STRING              = ''.freeze
-    DOT_STRING                = '.'.freeze
-    SPACE_STRING              = ' '.freeze
-    REGEX_DOMAIN              = /(\s+|\A)[a-z0-9]{2,}([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,6}(:[0-9]{1,5})?(\/.*)?/ix
-    REGEX_URL                 = /(http|https)(\.|:)/
-    REGEX_HYPHEN              = /\-/
-    REGEX_LONG_WORD           = /\-|\_/
-    REGEXP_SPLIT_CHECK        = /＠|@|(http)/
-    REGEX_CONTRACTIONS        = /[‘’‚‛‹›＇´`]/
-    REGEX_APOSTROPHE_S        = /['’`́]s$/
-    REGEX_EMAIL               = /\S+(＠|@)\S+\.\S+/
-    REGEX_HASHTAG_OR_MENTION  = /[＠@#|＃]/
-    REGEX_UNDERSCORE_AT_START = /(?<=\A)\_+/
-    REGEX_UNDERSCORE_AT_END   = /\_+(?=\z)/
-    REGEX_ASTERISK            = /\*+/
-    REGEX_UNIFIED1            = Regexp.union(REGEX_UNDERSCORE_AT_START,
-                                             REGEX_UNDERSCORE_AT_END,
-                                             REGEX_ASTERISK)
-    # https://en.wikipedia.org/wiki/Control_character
-    # matches any character with hexadecimal value 00 through 1F or 7F.
-    # Rubular: http://rubular.com/r/E83fpBoDjI
-    REGEXP_CONTROL                  = /[[:cntrl:]]/
-    REGEXP_ENDING_COLON             = /\:(?=\z)/
-    REGEXP_EXCLAMATION_AT_START     = /(?<=\A)!+(?=.+)/
-    REGEXP_EXCLAMATION_AT_END       = /!+(1*!*)*(?=\z)/
-    REGEXP_HYPHEN_AT_START          = /\A(-|–|\u{00AD})/
-    REGEXP_SPECIAL_SYMBOL           = /[®©]/
-    REGEXP_PERCENT_AT_START         = /\A\%/
-    # https://codepoints.net/enclosed_alphanumeric_supplement
-    REGEXP_ALPHANUMERIC_SUPPLEMENT  = /[\u{1F100}-\u{1F1FF}]/
-    REGEX_UNIFIED2                  = Regexp.union(REGEXP_CONTROL,
-                                                   REGEXP_ENDING_COLON,
-                                                   REGEXP_EXCLAMATION_AT_START,
-                                                   REGEXP_EXCLAMATION_AT_END,
-                                                   REGEXP_HYPHEN_AT_START,
-                                                   REGEXP_SPECIAL_SYMBOL,
-                                                   REGEXP_PERCENT_AT_START,
-                                                   REGEXP_ALPHANUMERIC_SUPPLEMENT)
-    REGEXP_ONE_AS_EXCLAMATION  = /(?<=\D)1+(?=\z)/
-    REGEXP_HASHTAG_AT_START    = /(?<=\A)(#|＃)/
-    REGEXP_AT_SIGN_AT_START    = /(?<=\A)(@|＠)/
-    REGEXP_HYPHEN_HASTAG       = /\A(#|＃)\S+-/
-    REGEXP_EMOJI_SNOWFLAKE     = /\u{2744}[\u{FE0F}|\u{FE0E}]?/
-    REGEX_EMOJI_UNIFIED        = Regexp.union(REGEXP_EMOJI_SNOWFLAKE,
-                                            PragmaticTokenizer::Languages::Common::EMOJI_REGEX)
-    REGEXP_PUNCTUATION_ONLY    = /\A[[:punct:]]+\z/
-    REGEXP_NUMBER_ONLY         = /\A\d+\z/
-    REGEXP_NO_NUMBERS          = /\A\D+\z/
-    REGEXP_NUMBER              = /\D*\d+\d*/
-    REGEXP_CONSECUTIVE_DOTS    = /\A\.{2,}\z/
-    REGEXP_CHUNK_STRING        = /\S.{1,10000}(?!\S)/m
+    NOTHING                   = ''.freeze
+    DOT                       = '.'.freeze
+    SPACE                     = ' '.freeze
+    SINGLE_QUOTE              = "'".freeze
 
     # @param [Hash] opts optional arguments
 
@@ -123,7 +76,7 @@ module PragmaticTokenizer
       @abbreviations       = Set.new(opts[:abbreviations])
       @stop_words          = Set.new(opts[:stop_words])
 
-      # TODO: why do we treat stop words differently than abbreviations and contractions? (we don't use @language_module::STOP_WORDS when passing @filter_languages)
+      # Why do we treat stop words differently than abbreviations and contractions? (we don't use @language_module::STOP_WORDS when passing @filter_languages)
       @contractions.merge!(@language_module::CONTRACTIONS) if @contractions.empty?
       @abbreviations       += @language_module::ABBREVIATIONS if @abbreviations.empty?
       @stop_words          += @language_module::STOP_WORDS if @stop_words.empty?
@@ -135,13 +88,13 @@ module PragmaticTokenizer
         @stop_words    += language::STOP_WORDS
       end
 
-      raise "Punctuation argument can be only be nil, :all, :semi, :none, or :only" unless PUNCTIATION_OPTIONS.include?(@punctuation)
+      raise "Punctuation argument can be only be nil, :all, :semi, :none, or :only" unless PUNCTUATION_OPTIONS.include?(@punctuation)
       raise "Numbers argument can be only be nil, :all, :semi, :none, or :only" unless NUMBERS_OPTIONS.include?(@numbers)
       raise "Mentions argument can be only be nil, :keep_original, :keep_and_clean, or :remove" unless MENTIONS_OPTIONS.include?(@mentions)
 
       integer_class = Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4.0') ? Fixnum : Integer
 
-      raise "In Pragmatic Tokenizer minimum_length must be an Integer" unless @minimum_length.class == integer_class || @minimum_length.nil?
+      raise "In Pragmatic Tokenizer minimum_length must be an Integer"  unless @minimum_length.class  == integer_class || @minimum_length.nil?
       raise "In Pragmatic Tokenizer long_word_split must be an Integer" unless @long_word_split.class == integer_class || @long_word_split.nil?
     end
 
@@ -151,21 +104,27 @@ module PragmaticTokenizer
       return [] unless text
       raise "In PragmaticTokenizer text must be a String or subclass of String" unless text.class <= String
       CGI.unescapeHTML(text)
-          .scan(REGEXP_CHUNK_STRING)
-          .flat_map { |segment| post_process(pre_process(segment)) }
+          .scan(Regex::CHUNK_LONG_INPUT_TEXT)
+          .flat_map { |segment| process_segment(segment) }
     end
 
     private
 
-      def pre_process(text)
-        text
+      def process_segment(segment)
+        pre_processed = pre_process(segment)
+        cased_segment = chosen_case(pre_processed)
+        @tokens       = PostProcessor.new(text: cased_segment, abbreviations: @abbreviations, downcase: @downcase).call
+        post_process_tokens
+      end
+
+      def pre_process(segment)
+        segment
             .extend(PragmaticTokenizer::PreProcessor)
             .pre_process(language: @language_module)
       end
 
-      def post_process(text)
-        @tokens = run_post_processor(text)
-        remove_various!
+      def post_process_tokens
+        remove_by_options!
         process_numbers!
         process_punctuation!
         expand_contractions! if @expand_contractions
@@ -179,45 +138,45 @@ module PragmaticTokenizer
         @tokens.reject(&:empty?)
       end
 
-      def run_post_processor(text)
-        PostProcessor.new(
-            text:          chosen_case(text),
-            abbreviations: @abbreviations,
-            downcase:      @downcase
-        ).post_process
-      end
-
       def expand_contractions!
-        @tokens = @tokens.flat_map { |t| expand_token_contraction(t) }
+        @tokens = @tokens.flat_map { |token| expand_token_contraction(token) }
       end
 
       def expand_token_contraction(token)
-        normalized = inverse_case(token.gsub(REGEX_CONTRACTIONS, "'".freeze))
+        normalized = inverse_case(token.gsub(Regex::CONTRACTIONS, SINGLE_QUOTE))
         return token unless @contractions.key?(normalized)
-        result    = @contractions[normalized].split(SPACE_STRING)
+        result    = @contractions[normalized].split(SPACE)
         result[0] = Unicode.capitalize(result[0]) unless @downcase
         result
       end
 
       def clean!
         @tokens = @tokens
-            .flat_map { |t| t !~ REGEX_HASHTAG_OR_MENTION ? t.split(REGEX_UNIFIED1) : t }
-            .map! { |t| t !~ REGEX_HASHTAG_OR_MENTION ? t.gsub(REGEXP_ONE_AS_EXCLAMATION, EMPTY_STRING) : t }
-            .map! { |t| t.gsub(REGEX_UNIFIED2, EMPTY_STRING) }
-            .delete_if { |t| unclean_token?(t) }
+            .flat_map  { |token| split_underscores_asterisk(token) }
+            .map!      { |token| remove_irrelevant_characters(token) }
+            .delete_if { |token| many_dots?(token) }
       end
 
-      def unclean_token?(token)
-        return true if PragmaticTokenizer::Languages::Common::SPECIAL_CHARACTERS.include?(token)
-        return true if token.length > MAX_TOKEN_LENGTH
-        return true if token.include?('\\'.freeze)
-        token =~ REGEXP_CONSECUTIVE_DOTS
+      def split_underscores_asterisk(token)
+        return token if token =~ Regex::ONLY_HASHTAG_MENTION
+        token.split(Regex::UNDERSCORES_ASTERISK)
+      end
+
+      def remove_irrelevant_characters(token)
+        token.gsub!(Regex::IRRELEVANT_CHARACTERS, NOTHING)
+        return token if token =~ Regex::ONLY_HASHTAG_MENTION
+        token.gsub!(Regex::ENDS_WITH_EXCITED_ONE, NOTHING)
+        token
+      end
+
+      def many_dots?(token)
+        token =~ Regex::MANY_PERIODS
       end
 
       def classic_filter!
         @tokens.map! do |token|
-          token.delete!(DOT_STRING) if @abbreviations.include?(token.chomp(DOT_STRING))
-          token.sub!(REGEX_APOSTROPHE_S, EMPTY_STRING)
+          token.delete!(DOT) if @abbreviations.include?(token.chomp(DOT))
+          token.sub!(Regex::ENDS_WITH_APOSTROPHE_AND_S, NOTHING)
           token
         end
       end
@@ -225,26 +184,26 @@ module PragmaticTokenizer
       def process_numbers!
         case @numbers
         when :semi
-          @tokens.delete_if { |t| t =~ REGEXP_NUMBER_ONLY }
+          @tokens.delete_if { |token| token =~ Regex::ONLY_DECIMALS }
         when :none
-          @tokens.delete_if { |t| t =~ REGEXP_NUMBER || PragmaticTokenizer::Languages::Common::ROMAN_NUMERALS.include?(inverse_case(t)) }
+          @tokens.delete_if { |token| token =~ Regex::NO_DECIMALS_NO_NUMERALS }
         when :only
-          @tokens.delete_if { |t| t =~ REGEXP_NO_NUMBERS }
+          @tokens.delete_if { |token| token =~ Regex::NO_DECIMALS }
         end
       end
 
       def remove_short_tokens!
-        @tokens.delete_if { |t| t.length < @minimum_length }
+        @tokens.delete_if { |token| token.length < @minimum_length }
       end
 
       def process_punctuation!
         case @punctuation
         when :semi
-          @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::SEMI_PUNCTUATION.include?(t) }
+          @tokens.delete_if { |token| token =~ Regex::PUNCTUATION4 }
         when :none
-          @tokens.delete_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) || t =~ REGEXP_PUNCTUATION_ONLY }
+          @tokens.delete_if { |token| token =~ Regex::ONLY_PUNCTUATION }
         when :only
-          @tokens.keep_if { |t| PragmaticTokenizer::Languages::Common::PUNCTUATION.include?(t) }
+          @tokens.keep_if   { |token| token =~ Regex::ONLY_PUNCTUATION }
         end
       end
 
@@ -255,45 +214,50 @@ module PragmaticTokenizer
       def mentions!
         case @mentions
         when :remove
-          @tokens.delete_if { |t| t =~ REGEXP_AT_SIGN_AT_START }
+          @tokens.delete_if { |token| token =~ Regex::ONLY_MENTION }
         when :keep_and_clean
-          @tokens.map! { |t| t =~ REGEXP_AT_SIGN_AT_START ? t.gsub!(REGEXP_AT_SIGN_AT_START, EMPTY_STRING) : t }
+          @tokens.map!      { |token| token =~ Regex::ONLY_MENTION ? token[1..-1] : token }
         end
       end
 
       def hashtags!
         case @hashtags
         when :remove
-          @tokens.delete_if { |t| t =~ REGEXP_HASHTAG_AT_START }
+          @tokens.delete_if { |token| token =~ Regex::ONLY_HASHTAG }
         when :keep_and_clean
-          @tokens = @tokens
-                        .flat_map { |t| t =~ REGEXP_HYPHEN_HASTAG ? t.split(REGEX_HYPHEN) : t }
-                        .map { |t| t =~ REGEXP_HASHTAG_AT_START ? t.gsub!(REGEXP_HASHTAG_AT_START, EMPTY_STRING) : t }
+          @tokens.map!      { |token| token =~ Regex::ONLY_HASHTAG ? token[1..-1] : token }
         end
       end
 
-      def remove_various!
-        @tokens.delete_if { |t| t =~ regex_various }
+      def remove_by_options!
+        @tokens.delete_if { |token| token =~ regex_by_options }
       end
 
-      def regex_various
-        @regex_various ||= begin
+      def regex_by_options
+        @regex_by_options ||= begin
           regex_array = []
-          regex_array << REGEX_EMOJI_UNIFIED if @remove_emoji
-          regex_array << REGEX_EMAIL         if @remove_emails
-          regex_array << REGEX_URL           if @remove_urls
-          regex_array << REGEX_DOMAIN        if @remove_domains
+          regex_array << Regex::RANGE_UNUSUAL_AND_EMOJI if @remove_emoji
+          regex_array << Regex::ONLY_EMAIL              if @remove_emails
+          regex_array << Regex::STARTS_WITH_HTTP        if @remove_urls
+          regex_array << Regex::ONLY_DOMAIN2            if @remove_domains
           Regexp.union(regex_array)
         end
       end
 
       def split_long_words!
-        @tokens = @tokens
-                      .flat_map { |t| (t.length > @long_word_split && t !~ REGEXP_SPLIT_CHECK ) ? t.split(REGEX_LONG_WORD) : t }
+        @tokens = @tokens.flat_map { |token| split_long_word(token) }
       end
 
-      def chosen_case(txt)
-        @downcase ? Unicode.downcase(txt) : txt
+      def split_long_word(token)
+        return token unless @long_word_split
+        return token if token.length <= @long_word_split
+        return token if token =~ Regex::ONLY_HASHTAG_MENTION
+        return token if token =~ Regex::DOMAIN_OR_EMAIL
+        token.split(Regex::HYPHEN_OR_UNDERSCORE)
+      end
+
+      def chosen_case(text)
+        @downcase ? Unicode.downcase(text) : text
       end
 
       def inverse_case(token)

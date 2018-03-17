@@ -98,21 +98,18 @@ module PragmaticTokenizer
 
       class SingleQuotes
 
-        REGEXP_LEFT_QUOTES1      = /(\W|^)'(?=.*\w)(?!twas)(?!Twas)/o
-        REGEXP_LEFT_QUOTES2      = /(\W|^)‘(?=.*\w)(?!twas)(?!Twas)/o
-        REGEXP_LEFT_QUOTES3      = /(\W|^)'(?=.*\w)/o
-        REGEXP_RIGHT_SIDE_QUOTES = /(\w|\D)'(?!')(?=\W|$)/o
+        ALNUM_QUOTE     = /(\w|\D)'(?!')(?=\W|$)/
+        QUOTE_WORD      = /(\W|^)'(?=\w)/
+        QUOTE_NOT_TWAS1 = /(\W|^)'(?!twas)/i
+        QUOTE_NOT_TWAS2 = /(\W|^)‘(?!twas)/i
 
         def handle_single_quotes(text)
-          # Convert left quotes to special character except for 'Twas or 'twas
-          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze]
-          text.gsub!(REGEXP_LEFT_QUOTES1, "\\1 #{replacement} ")
-          text.gsub!(REGEXP_LEFT_QUOTES3, ' ' << replacement)
-          text.gsub!(REGEXP_RIGHT_SIDE_QUOTES, "\\1 #{replacement} ")
+          # special treatment for "'twas"
+          text.gsub!(QUOTE_NOT_TWAS1, '\1 ' << PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze] << ' ')
+          text.gsub!(QUOTE_NOT_TWAS2, '\1 ' << PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["‘".freeze] << ' ')
 
-          replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["‘".freeze]
-          text.gsub!(REGEXP_LEFT_QUOTES2, "\\1 #{replacement} ")
-
+          text.gsub!(QUOTE_WORD,      ' '   << PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze])
+          text.gsub!(ALNUM_QUOTE,     '\1 ' << PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze] << ' ')
           text
         end
 

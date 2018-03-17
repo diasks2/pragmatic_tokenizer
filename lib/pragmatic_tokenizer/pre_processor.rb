@@ -3,176 +3,67 @@ module PragmaticTokenizer
 
     def pre_process(language: Languages::Common)
       remove_non_breaking_space!
-      shift_comma!
-      shift_multiple_dash!
-      shift_inverted_question_mark!
-      shift_inverted_exclamation!
-      shift_exclamation!
-      shift_ellipse_three_dots!
-      shift_ellipse_two_dots!
-      shift_horizontal_ellipsis!
-      shift_no_space_mention!
-      shift_not_equals!
-      shift_special_quotes!
-      shift_colon!
-      shift_bracket!
-      shift_semicolon!
-      shift_percent!
-      shift_caret!
+      shift_various_characters!
+      replace_colon_in_url!
+      shift_remaining_colons!
       shift_hashtag!
-      shift_ampersand!
-      shift_vertical_bar!
-      convert_dbl_quotes!
-      convert_sgl_quotes!(language)
-      convert_apostrophe_s!
-      shift_beginning_hyphen!
-      shift_ending_hyphen!
+      convert_double_quotes!
+      convert_single_quotes!(language)
+      convert_acute_accent_s!
+      shift_hyphens!
       squeeze(' '.freeze)
     end
 
     private
 
       def remove_non_breaking_space!
-         gsub!(/\u{00A0}/, ''.freeze)
+        gsub!(Regex::NO_BREAK_SPACE, ''.freeze)
       end
 
-      # Shift commas off everything but numbers
-      def shift_comma!
-        gsub!(/,(?!\d)/o, ' , '.freeze)
-        gsub!(/(?<=\D),(?=\S+)/, ' , '.freeze)
+      def shift_various_characters!
+        gsub!(Regex::PRE_PROCESS, ' \1 \2 \3 \4 \5 \6 \7 \8 \9 ')
       end
 
-      def shift_multiple_dash!
-        gsub!(/--+/o, ' - '.freeze)
+      def replace_colon_in_url!
+        gsub!(Regex::COLON_IN_URL, replacement_for_key(':'.freeze))
       end
 
-      def shift_inverted_question_mark!
-        gsub!(/¿/, ' ¿ '.freeze)
-      end
-
-      def shift_inverted_exclamation!
-        gsub!(/¡/, ' ¡ '.freeze)
-      end
-
-      def shift_exclamation!
-        gsub!(/(?<=[a-zA-z])!(?=[a-zA-z])/, ' ! '.freeze)
-      end
-
-      def shift_horizontal_ellipsis!
-        gsub!(/(…+)/o, ' \1 ')
-      end
-
-      def shift_ellipse_two_dots!
-        gsub!(/(\.\.+)/o, ' \1 ')
-      end
-
-      def shift_ellipse_three_dots!
-        gsub!(/(\.\.\.+)/o, ' \1 ')
-      end
-
-      def shift_no_space_mention!
-        gsub!(/\.(?=(@|＠)[^\.]+(\s|\z))/, '. '.freeze)
-      end
-
-      def shift_not_equals!
-        gsub!(/≠/, ' ≠ '.freeze)
-      end
-
-      def shift_special_quotes!
-        gsub!(/([«»„“])/, ' \1 ')
-      end
-
-      def shift_colon!
-        return unless may_shift_colon?
-        # Ignore web addresses
-        replacement = replacement_for_key(':'.freeze)
-        gsub!(%r{(?<=[(https?|ftp)]):(?=//)}, replacement)
-        gsub!(/:/o, ' :'.freeze)
-        gsub!(/(?<=\s):(?=\#)/, ': '.freeze)
-      end
-
-      def may_shift_colon?
-        return false unless include?(':'.freeze)
-        partitions = partition(':'.freeze)
-        partitions.last[0] !~ /\A\d+/ || partitions.first[-1] !~ /\A\d+/
-      end
-
-      def shift_bracket!
-        gsub!(/([\(\[\{\}\]\)])/o, ' \1 ')
-      end
-
-      def shift_semicolon!
-        gsub!(/([;])/o, ' \1 ')
-      end
-
-      def shift_percent!
-        gsub!(/(?<=\D)%(?=\d+)/, ' %'.freeze)
-      end
-
-      def shift_caret!
-        gsub!(/\^/, ' ^ '.freeze)
+      def shift_remaining_colons!
+        gsub!(':'.freeze, ' :'.freeze) if self !~ Regex::TIME_WITH_COLON
       end
 
       def shift_hashtag!
-        gsub!(/(?<=\S)(#|＃)(?=\S)/, ' \1\2')
+        gsub!('#'.freeze, ' #'.freeze)
       end
 
-      def shift_ampersand!
-        gsub!(/\&/, ' & '.freeze)
+      def convert_double_quotes!
+        gsub!(Regex::QUOTE, replacements_for_quotes)
       end
 
-      def shift_vertical_bar!
-        gsub!(/\|/, ' | '.freeze)
+      def replacements_for_quotes
+        @replacements_for_quotes ||= {
+            "''" => ' ' << replacement_for_key('"'.freeze) << ' ',
+            '"'  => ' ' << replacement_for_key('"'.freeze) << ' ',
+            '“'  => ' ' << replacement_for_key('“'.freeze) << ' '
+        }.freeze
       end
 
-      def convert_dbl_quotes!
-        replace_left_double_quotes!
-        replace_remaining_double_quotes!
+      def convert_single_quotes!(language)
+        replace(class_for_single_quotes(language).new.handle_single_quotes(self))
       end
 
-      def replace_left_double_quotes!
-        replace_left_quotes!("''", '"'.freeze)
-        replace_left_quotes!('"', '"'.freeze)
-        replace_left_quotes!('“', '“'.freeze)
+      def class_for_single_quotes(language)
+        defined?(language::SingleQuotes) ? language::SingleQuotes : PragmaticTokenizer::Languages::Common::SingleQuotes
       end
 
-      def replace_left_quotes!(style, replacement_key)
-        replacement = replacement_for_key(replacement_key)
-        gsub!(/#{style}(?=.*\w)/o, ' ' << replacement << ' ')
+      def convert_acute_accent_s!
+        gsub!(Regex::ACUTE_ACCENT_S, replacement_for_key('`'.freeze))
       end
 
-      def replace_remaining_double_quotes!
-        replace_remaining_quotes!('"', '"'.freeze)
-        replace_remaining_quotes!("''", '"'.freeze)
-        replace_remaining_quotes!('”', '”'.freeze)
-      end
-
-      def replace_remaining_quotes!(style, replacement_key)
-        replacement = replacement_for_key(replacement_key)
-        gsub!(/#{style}/, ' ' << replacement << ' ')
-      end
-
-      def convert_sgl_quotes!(language)
-        replace(if defined?(language::SingleQuotes)
-                  language::SingleQuotes.new
-                      .handle_single_quotes(self)
-                else
-                  PragmaticTokenizer::Languages::Common::SingleQuotes.new
-                      .handle_single_quotes(self)
-                end)
-      end
-
-      def convert_apostrophe_s!
-        replacement = replacement_for_key('`'.freeze)
-        gsub!(/\s\u{0301}(?=s(\s|\z))/, replacement)
-      end
-
-      def shift_beginning_hyphen!
-        gsub!(/\s+-/, ' - '.freeze)
-      end
-
-      def shift_ending_hyphen!
-        gsub!(/-\s+/, ' - '.freeze)
+      # can these two regular expressions be merged somehow?
+      def shift_hyphens!
+        gsub!(Regex::HYPHEN_AFTER_NON_WORD,  ' - '.freeze)
+        gsub!(Regex::HYPHEN_BEFORE_NON_WORD, ' - '.freeze)
       end
 
       def replacement_for_key(replacement_key)
