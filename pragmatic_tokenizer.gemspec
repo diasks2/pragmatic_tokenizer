@@ -1,5 +1,4 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'pragmatic_tokenizer/version'
 
@@ -9,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Kevin S. Dias"]
   spec.email         = ["diasks2@gmail.com"]
 
-  spec.summary       = %q{A multilingual tokenizer}
-  spec.description   = %q{A multilingual tokenizer to split a string into tokens.}
-  spec.homepage      = "https://github.com/diasks2/pragmatic_tokenizer"
+  spec.summary       = 'A multilingual tokenizer'
+  spec.description   = 'A multilingual tokenizer to split a string into tokens.'
+  spec.homepage      = 'https://github.com/diasks2/pragmatic_tokenizer'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
