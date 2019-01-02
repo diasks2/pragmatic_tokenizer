@@ -543,6 +543,13 @@ describe PragmaticTokenizer do
           )
           expect(pt.tokenize(text)).to eq(["some", "main", "categories", "of", "the", "mathematics", "test", "have", "sub", "examples", "that", "most", "14", "year", "olds", "can't", "answer", ",", "therefor", "the", "implementation", "instruction", "made", "in", "the", "1990", "years", "needs", "to", "be", "revised", "."])
         end
+        it 'tokenizes something with a slash' do
+          text = "EO/AA/M/F/Veterans/Disability/Sexual Orientation/Gender Identity"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 1
+          )
+          expect(pt.tokenize(text)).to eq(["eo", "aa", "m", "f", "veterans", "disability", "sexual", "orientation", "gender", "identity"])
+        end
       end
 
       context 'option (clean)' do

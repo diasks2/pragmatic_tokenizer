@@ -253,7 +253,7 @@ module PragmaticTokenizer
         return token if token.length <= @long_word_split
         return token if token =~ Regex::ONLY_HASHTAG_MENTION
         return token if token =~ Regex::DOMAIN_OR_EMAIL
-        token.split(Regex::HYPHEN_OR_UNDERSCORE)
+        token.split(Regex::LONG_WORD_SPLIT)
       end
 
       def chosen_case(text)
