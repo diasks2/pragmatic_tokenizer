@@ -88,6 +88,12 @@ describe PragmaticTokenizer do
           expect(pt.tokenize(text)).to eq(["#ab-cd"])
         end
 
+        it 'tokenizes a string #015' do
+          text = "In 2004, he co-founded Palantir Technologies, which offers platforms for finance companies and intelligence, defense, and law enforcement communities to integrate, visualize, and analyze the world's information."
+          pt = PragmaticTokenizer::Tokenizer.new
+          expect(pt.tokenize(text)).to eq(["in", "2004", ",", "he", "co-founded", "palantir", "technologies", ",", "which", "offers", "platforms", "for", "finance", "companies", "and", "intelligence", ",", "defense", ",", "and", "law", "enforcement", "communities", "to", "integrate", ",", "visualize", ",", "and", "analyze", "the", "world's", "information", "."])
+        end
+
         it 'handles numbers with symbols 2' do
           text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
           pt = PragmaticTokenizer::Tokenizer.new
