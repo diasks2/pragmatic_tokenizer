@@ -1,3 +1,3 @@
 module PragmaticTokenizer
-  VERSION = "3.0.7".freeze
+  VERSION = "3.1.0".freeze
 end
