@@ -11,11 +11,37 @@ module PragmaticTokenizer
         # why can't we directly reference constants from Languages::Common?
         ALNUM_QUOTE  = PragmaticTokenizer::Languages::Common::SingleQuotes::ALNUM_QUOTE
         QUOTE_WORD   = PragmaticTokenizer::Languages::Common::SingleQuotes::QUOTE_WORD
+        C_APOSTROPHE = /c'/i
+        J_APOSTROPHE = /j'/i
         L_APOSTROPHE = /l'/i
+        D_APOSTROPHE = /d'/i
+        QU_APOSTROPHE = /qu'/i
+        N_APOSTROPHE = /n'/i
+        T_APOSTROPHE = /t'/i
+        M_APOSTROPHE = /m'/i
+        S_APOSTROPHE = /s'/i
+        QUELQU_APOSTROPHE = /quelqu'/i
+        JUSQU_APOSTROPHE = /jusqu'/i
+        LORSQU_APOSTROPHE = /lorsqu'/i
+        PUISQU_APOSTROPHE = /puisqu'/i
+        QUOIQU_APOSTROPHE = /quoiqu'/i
 
         def handle_single_quotes(text)
           replacement = PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP["'".freeze]
+          text.gsub!(C_APOSTROPHE, '\1 c' << replacement << ' ')
+          text.gsub!(J_APOSTROPHE, '\1 j' << replacement << ' ')
           text.gsub!(L_APOSTROPHE, '\1 l' << replacement << ' ')
+          text.gsub!(D_APOSTROPHE, '\1 d' << replacement << ' ')
+          text.gsub!(QU_APOSTROPHE, '\1 qu' << replacement << ' ')
+          text.gsub!(N_APOSTROPHE, '\1 n' << replacement << ' ')
+          text.gsub!(T_APOSTROPHE, '\1 t' << replacement << ' ')
+          text.gsub!(M_APOSTROPHE, '\1 m' << replacement << ' ')
+          text.gsub!(S_APOSTROPHE, '\1 s' << replacement << ' ')
+          text.gsub!(QUELQU_APOSTROPHE, '\1 quelqu' << replacement << ' ')
+          text.gsub!(JUSQU_APOSTROPHE, '\1 jusqu' << replacement << ' ')
+          text.gsub!(LORSQU_APOSTROPHE, '\1 lorsqu' << replacement << ' ')
+          text.gsub!(PUISQU_APOSTROPHE, '\1 puisqu' << replacement << ' ')
+          text.gsub!(QUOIQU_APOSTROPHE, '\1 quoiqu' << replacement << ' ')
           text.gsub!(ALNUM_QUOTE,  '\1 '  << replacement << ' ')
           text.gsub!(QUOTE_WORD,   ' '    << replacement)
           text
