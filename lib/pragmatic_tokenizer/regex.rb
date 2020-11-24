@@ -61,7 +61,7 @@ module PragmaticTokenizer
     QUESTION_MARK_NOT_URL         = /#{NOT_URL.source}(\?)/
     # Should we change specs and also capture "/", just like we capture ":" and "?"
     SLASH_NOT_URL                 = /#{NOT_URL.source}\//
-    SHIFT_BOUNDARY_CHARACTERS     = /([;^&|…«»„“¿¡≠]+)/
+    SHIFT_BOUNDARY_CHARACTERS     = /([;^|…«»„“¿¡≠]+)/
     MULTIPLE_DOTS                 = /(\.{2,})/ # we keep all dashes
     MULTIPLE_DASHES               = /(-){2,}/ # we only keep first dash
     BRACKET                       = /([{}()\[\]])/
