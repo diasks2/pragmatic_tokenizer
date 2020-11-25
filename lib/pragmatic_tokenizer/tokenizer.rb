@@ -112,9 +112,8 @@ module PragmaticTokenizer
 
       def process_segment(segment)
         pre_processed = pre_process(segment)
-        cased_segment = chosen_case(pre_processed)
-        @tokens       = PostProcessor.new(text: cased_segment, abbreviations: @abbreviations, downcase: @downcase).call
-        post_process_tokens
+        @tokens       = PostProcessor.new(text: pre_processed, abbreviations: @abbreviations, downcase: @downcase).call
+        post_process_tokens.map { |token| token.include?("://") ? token : chosen_case(token) }
       end
 
       def pre_process(segment)
