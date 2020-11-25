@@ -111,10 +111,12 @@ module PragmaticTokenizer
     private
 
       def process_segment(segment)
-        pre_processed = pre_process(segment)
-        @tokens       = PostProcessor.new(text: pre_processed, abbreviations: @abbreviations, downcase: @downcase).call
-        post_process_tokens.map { |token| token.include?("://") ? token : chosen_case(token) }
-      end
+        pre_processed = pre_process(segment)        
+        @tokens       = PostProcessor.new(text: pre_processed, abbreviations: @abbreviations, downcase: @downcase).call	        
+        post_process_tokens
+     end
+
+
 
       def pre_process(segment)
         segment
@@ -253,10 +255,6 @@ module PragmaticTokenizer
         return token if token =~ Regex::ONLY_HASHTAG_MENTION
         return token if token =~ Regex::DOMAIN_OR_EMAIL
         token.split(Regex::HYPHEN_OR_UNDERSCORE)
-      end
-
-      def chosen_case(text)
-        @downcase ? Unicode.downcase(text) : text
       end
 
       def inverse_case(token)

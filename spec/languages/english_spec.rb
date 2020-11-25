@@ -679,7 +679,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               clean: true
           )
-          expect(pt.tokenize(text)).to eq(["you", "&", "me"])
+          expect(pt.tokenize(text)).to eq(["you&me"])
         end
       end
 
@@ -1354,7 +1354,7 @@ describe PragmaticTokenizer do
               clean:       true,
               punctuation: :none
           )
-          expect(pt.tokenize(text)).to eq(%w(you me))
+          expect(pt.tokenize(text)).to eq(%w(you&me))
         end
 
         it 'cleans percent signs not related to numbers' do

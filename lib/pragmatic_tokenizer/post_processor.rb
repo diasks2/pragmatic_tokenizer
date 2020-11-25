@@ -17,6 +17,7 @@ module PragmaticTokenizer
       text
           .split
           .map      { |token| convert_sym_to_punct(token) }
+          .flat_map { |token| !token.include?("://") && @downcase ? Unicode.downcase(token) : token }
           .flat_map { |token| token.split(Regex::COMMAS_OR_PUNCTUATION) }
           .flat_map { |token| token.split(Regex::VARIOUS) }
           .flat_map { |token| token.split(Regex::ENDS_WITH_PUNCTUATION2) }
