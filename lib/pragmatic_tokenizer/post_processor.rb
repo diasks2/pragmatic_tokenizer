@@ -2,7 +2,7 @@ module PragmaticTokenizer
   class PostProcessor
 
     DOT = '.'.freeze
-
+    
     attr_reader :text, :abbreviations, :downcase
 
     def initialize(text:, abbreviations:, downcase:)
@@ -17,16 +17,29 @@ module PragmaticTokenizer
       text
           .split
           .map      { |token| convert_sym_to_punct(token) }
-          .flat_map { |token| !token.include?("://") && @downcase ? Unicode.downcase(token) : token }
+          .flat_map { |token| t = should_downcase(token); remove_symbols(t) }
           .flat_map { |token| token.split(Regex::COMMAS_OR_PUNCTUATION) }
           .flat_map { |token| token.split(Regex::VARIOUS) }
           .flat_map { |token| token.split(Regex::ENDS_WITH_PUNCTUATION2) }
           .flat_map { |token| split_dotted_email_or_digit(token) }
           .flat_map { |token| split_abbreviations(token) }
-          .flat_map { |token| split_period_after_last_word(token) }
+          .flat_map { |token| split_period_after_last_word(token) }          
     end
 
     private
+      def should_downcase(token)
+        !token.include?("://") && 
+        !token.start_with?("#") && 
+        !token.start_with?("@") && @downcase ? Unicode.downcase(token) : token
+      end
+
+      def remove_symbols(token)
+        chrs = token.chars
+        is_string = chrs[1..-2].join('') =~ /[[:alpha:]]/
+        token.gsub!(/^[&`]|[&`]$/, '')
+        token.gsub!(/[<>%=’]/, ' ') if is_string
+        token.strip
+      end
 
       def convert_sym_to_punct(token)
         PragmaticTokenizer::Languages::Common::PUNCTUATION_MAP

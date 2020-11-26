@@ -43,7 +43,7 @@ describe PragmaticTokenizer do
         it 'tokenizes a string #007' do
           text = 'One of the lawyers from ‚Making a Murderer’ admitted a mistake'
           pt = PragmaticTokenizer::Tokenizer.new
-          expect(pt.tokenize(text)).to eq(["one", "of", "the", "lawyers", "from", "‚", "making", "a", "murderer", "’", "admitted", "a", "mistake"])
+          expect(pt.tokenize(text)).to eq(["one", "of", "the", "lawyers", "from", "‚", "making", "a", "murderer", "admitted", "a", "mistake"])
         end
 
         it 'tokenizes a string #008' do
@@ -631,7 +631,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               clean: true
           )
-          expect(pt.tokenize(text)).to eq(["#le1101", "#artistq21", "@someone12", "@someoneelse1", "and", "@somebody1980"])
+          expect(pt.tokenize(text)).to eq(["#le1101", "#artistQ21", "@someone12", "@someoneelse1", "and", "@somebody1980"])
         end
 
         it 'cleans a prefixed weird hyphen' do
@@ -948,7 +948,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               punctuation: 'none'
           )
-          expect(pt.tokenize(text)).to eq(["data", "visualization", "how", "to", "tell", "stories", "with", "data", "jeff", "korhan", "by", "@ainewsletter"])
+          expect(pt.tokenize(text)).to eq(["data", "visualization", "how", "to", "tell", "stories", "with", "data", "jeff", "korhan", "by", "@AINewsletter"])
         end
 
         it 'handles mentions' do
@@ -1070,7 +1070,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               punctuation: :none
           )
-          expect(pt.tokenize(text)).to eq(["some", "sentence", "#rt", "i", "like", "u2", "#bono"])
+          expect(pt.tokenize(text)).to eq(["some", "sentence", "#RT", "i", "like", "u2", "#bono"])
         end
       end
 

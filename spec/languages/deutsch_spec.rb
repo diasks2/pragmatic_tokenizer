@@ -129,7 +129,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(["was", "wir", "tun", "wird", "in", "diesem", "land", "leben", "retten", "#obama"])
+      expect(pt.tokenize(text)).to eq(["was", "wir", "tun", "wird", "in", "diesem", "land", "leben", "retten", "#Obama"])
     end
 
     it 'handles numbers and words' do

@@ -237,7 +237,7 @@ module PragmaticTokenizer
       def regex_by_options
         @regex_by_options ||= begin
           regex_array = []
-          regex_array << Regex::RANGE_UNUSUAL_AND_EMOJI if @remove_emoji
+          regex_array << Regex::EMOJII                  if @remove_emoji
           regex_array << Regex::ONLY_EMAIL              if @remove_emails
           regex_array << Regex::STARTS_WITH_HTTP        if @remove_urls
           regex_array << Regex::ONLY_DOMAIN2            if @remove_domains
