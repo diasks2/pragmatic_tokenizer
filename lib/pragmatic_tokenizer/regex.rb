@@ -37,7 +37,7 @@ module PragmaticTokenizer
     PUNCTUATION2                  = /(?:(?<=\S)([!?#{RANGE_FULLWIDTH.source}]+))/
     PUNCTUATION3                  = /(?:[!%\-–\u00AD<>=+]+)/
     PUNCTUATION4                  = /(?:[.．。]+)/
-    EMOJI                         = Regexp.new("(#{Unicode::Emoji::REGEX_WELL_FORMED_INCLUDE_TEXT.to_s})")
+    EMOJI                         = /(?:(#{Unicode::Emoji::REGEX_WELL_FORMED_INCLUDE_TEXT.source}))/
     NO_BREAK_SPACE                = /(?:\u00A0+)/
     HTTP                          = /(?:https?:\/\/)/
     TIME_WITH_COLON               = /(?:\d:\d)/

@@ -65,12 +65,13 @@ describe PragmaticTokenizer do
   #     expect(tokenized).to eq(check)
   #   end
   # end
-  
-  it 'tokenizes emoji' do
-    emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
-    tokenized = TOKENIZER.tokenize(emoji.join(' '))
-    puts (emoji - tokenized).inspect
-    expect(tokenized).to eq(emoji)
+
+  emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
+  emoji.each do |e|
+    it "tokenizes emoji #{e}" do
+      tokenized = TOKENIZER.tokenize(e)
+      expect(tokenized).to eq([e])
+    end
   end
 
   it 'Testing currency after no space' do
@@ -100,15 +101,12 @@ describe PragmaticTokenizer do
   it 'Testing words with special text and numbers' do
     text  = "123_test VPL-FHZ58 VPL-FHZ58 one-two asd-123 poi_poi_123_sdfg 'asd'123 _asd&123"
     check = "123_test vpl-fhz58 vpl-fhz58 one-two asd-123 poi_poi_123_sdfg asd'123 asd&123"
-    puts text
-    puts check
-    puts TOKENIZER.tokenize(text.dup).inspect
     expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq(check)
   end
 
   it "Testing for malformed indexing \uFFFE⁣⁣" do
     text = "#ABLVDevents⁣⁣\n“Teeth Health & Beauty”⁣⁣\nJoin us tomorrow for GCC Oral Health Week Event under the supervision of Ministry of Health ⁣⁣\nand under the patronage of Dr. Fatma Mohammed Al Ajmi ⁣\n⁣⁣\nThursday 28 March 2019 from 4-8 pm at #AlAraimiBoulevard⁣⁣\n*Free Dental Examination⁣⁣\n*Awareness Programs⁣⁣\n*Kids Corner⁣⁣\n*Gifts and Other Surprises⁣⁣\n⁣.\n\"الأسنان صحة وجمال\"⁣⁣\nشاركوا معنا في فعالیة الأسبوع الخلیجي الموحد لتعزیز صحة الفم والأسنان تحت إشراف \uFFFE#وزارة_الصحة وتحت رعایة الدكتورة ⁣⁣\nفاطمة بنت محمد العجمیة⁣\n⁣⁣\nالخمیس ٢٨ مارس ٢٠١٩ من ٤-٨ مساءاً في #العریمي_بولیفارد ⁣⁣\n*فحص مجاني للأسنان⁣⁣\n*أركان توعیة⁣⁣\n*ركن للاطفال⁣⁣\n*ھدایا ومفاجآت أخرى "
-    check = '#ABLVDevents⁣⁣ teeth health beauty ⁣⁣ join us tomorrow for gcc oral health week event under the supervision of ministry of health ⁣⁣ and under the patronage of dr. fatma mohammed al ajmi ⁣ ⁣⁣ thursday 28 march 2019 from 4-8 pm at #AlAraimiBoulevard⁣⁣ free dental examination⁣⁣ awareness programs⁣⁣ kids corner⁣⁣ gifts and other surprises⁣⁣ ⁣ الأسنان صحة وجمال ⁣⁣ شاركوا معنا في فعالیة الأسبوع الخلیجي الموحد لتعزیز صحة الفم والأسنان تحت إشراف ￾ #وزارة_الصحة وتحت رعایة الدكتورة ⁣⁣ فاطمة بنت محمد العجمیة⁣ ⁣⁣ الخمیس ٢٨ مارس ٢٠١٩ من ٤ ٨ مساءاً في #العریمي_بولیفارد ⁣⁣ فحص مجاني للأسنان⁣⁣ أركان توعیة⁣⁣ ركن للاطفال⁣⁣ ھدایا ومفاجآت أخرى'
+    check = '#ABLVDevents⁣⁣ teeth health beauty ⁣⁣ join us tomorrow for gcc oral health week event under the supervision of ministry of health ⁣⁣ and under the patronage of dr. fatma mohammed al ajmi ⁣ ⁣⁣ thursday 28 march 2019 from 4-8 pm at #AlAraimiBoulevard⁣⁣ free dental examination⁣⁣ awareness programs⁣⁣ kids corner⁣⁣ gifts and other surprises⁣⁣ ⁣ الأسنان صحة وجمال ⁣⁣ شاركوا معنا في فعالیة الأسبوع الخلیجي الموحد لتعزیز صحة الفم والأسنان تحت إشراف #وزارة_الصحة وتحت رعایة الدكتورة ⁣⁣ فاطمة بنت محمد العجمیة⁣ ⁣⁣ الخمیس ٢٨ مارس ٢٠١٩ من ٤ ٨ مساءاً في #العریمي_بولیفارد ⁣⁣ فحص مجاني للأسنان⁣⁣ أركان توعیة⁣⁣ ركن للاطفال⁣⁣ ھدایا ومفاجآت أخرى'
     expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq(check)
   end
 

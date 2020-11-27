@@ -103,7 +103,7 @@ module PragmaticTokenizer
     def tokenize(text)
       return [] unless text
       raise "In PragmaticTokenizer text must be a String or subclass of String" unless text.class <= String
-      CGI.unescapeHTML(text)
+      CGI.unescapeHTML(" #{text} ")
           .scan(Regex::CHUNK_LONG_INPUT_TEXT)
           .flat_map { |segment| process_segment(segment) }
     end
@@ -117,10 +117,11 @@ module PragmaticTokenizer
      end
 
       def pre_process(segment)
-        segment = CGI.unescapeHTML(Loofah.fragment(segment).scrub!(:prune).text)
-        segment
-            .extend(PragmaticTokenizer::PreProcessor)
-            .pre_process(language: @language_module)
+        shift_segment = " #{segment}"
+        prune =  CGI.unescapeHTML(Loofah.fragment(shift_segment).scrub!(:prune).text)
+        prune
+          .extend(PragmaticTokenizer::PreProcessor)
+          .pre_process(language: @language_module)
       end
 
       def post_process_tokens
