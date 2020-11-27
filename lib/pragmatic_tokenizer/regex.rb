@@ -1,3 +1,5 @@
+require "unicode/emoji"
+
 module PragmaticTokenizer
   class Regex
 
@@ -32,7 +34,7 @@ module PragmaticTokenizer
     PUNCTUATION2                  = /(?:(?<=\S)([!?#{RANGE_FULLWIDTH.source}]+))/
     PUNCTUATION3                  = /(?:[!%\-–\u00AD<>=+]+)/
     PUNCTUATION4                  = /(?:[.．。]+)/
-    EMOJI                         = /(?:(#{RANGE_EMOJI.source}))/
+    EMOJI                         = Unicode::Emoji::REGEX_WELL_FORMED_INCLUDE_TEXT
     NO_BREAK_SPACE                = /(?:\u00A0+)/
     HTTP                          = /(?:https?:\/\/)/
     TIME_WITH_COLON               = /(?:\d:\d)/
