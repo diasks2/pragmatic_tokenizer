@@ -1049,7 +1049,7 @@ describe PragmaticTokenizer do
         end
 
         it 'handles emoji 2' do
-          text = "😝How bad!"
+          text = "😝😝How bad!"
           pt = PragmaticTokenizer::Tokenizer.new(
               punctuation: 'none'
           )
