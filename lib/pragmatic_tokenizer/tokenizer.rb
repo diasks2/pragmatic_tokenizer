@@ -116,9 +116,8 @@ module PragmaticTokenizer
         post_process_tokens
      end
 
-
-
       def pre_process(segment)
+        segment = CGI.unescapeHTML(Loofah.fragment(segment).scrub!(:prune).text)
         segment
             .extend(PragmaticTokenizer::PreProcessor)
             .pre_process(language: @language_module)
