@@ -15,7 +15,7 @@ describe PragmaticTokenizer do
   BAHT_SIGN   = [0x0e3f].map{ |u| u.chr(Encoding::UTF_8) }
   CURRENCY_SYMBOLS = DOLLAR_SIGN + EURO_SIGN + POUND_SIGN + LARI_SYMBOL + CEDI_SIGN + YEN_SIGN + RIAL_SIGN + BAHT_SIGN
 
-  max = 10
+  max = 1000
   # skipping currency symbols and symbols not allowed in the middle of a word
   in_symbols  = TEXT_SYMBOLS - CURRENCY_SYMBOLS - ['#', '@']
   in_words    = in_symbols.map { |s| "test#{s}word" } + in_symbols.map { |s| "testword#{s}" } + in_symbols.map { |s| "#{s}testword" } + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com'] + in_symbols
@@ -65,7 +65,6 @@ describe PragmaticTokenizer do
   #     expect(tokenized).to eq(check)
   #   end
   # end
-
   
   it "tokenizes emoji" do
     emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
