@@ -92,7 +92,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(["@rainersteinke", "@_sternchen_2015", "1:0", "für", "dich"])
+      expect(pt.tokenize(text)).to eq(["@RainerSteinke", "@_Sternchen_2015", "1:0", "für", "dich"])
     end
 
     it 'handles mentions 2' do
@@ -101,7 +101,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(["@landaudaniel", "@anthzeto", "@julianfranz", "@s_beck19", "yep"])
+      expect(pt.tokenize(text)).to eq(["@LandauDaniel", "@AnthZeto", "@julianfranz", "@S_Beck19", "yep"])
     end
 
     it 'handles old school emoticons 1' do
