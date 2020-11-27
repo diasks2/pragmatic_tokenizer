@@ -131,8 +131,8 @@ describe PragmaticTokenizer do
         end
 
         it 'handles snowflakes 1' do
-          text = "❄️❄️❄️"
-          pt = PragmaticTokenizer::Tokenizer.new
+          text = "❄️❄️❄️" # "\uFEFF\u2744\uFE0F\u2744\uFE0F\u2744\uFE0F"
+          # text = "❄❄❄" # "\uFEFF\u2744\u2744\u2744"
           expect(pt.tokenize(text)).to eq(["❄️", "❄️", "❄️"])
         end
 
