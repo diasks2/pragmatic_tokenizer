@@ -19,13 +19,8 @@ module PragmaticTokenizer
           .map      { |token| convert_sym_to_punct(token) }
           .flat_map { |token| 
             token = should_downcase(token)
-            emoji = token.scan(Regex::EMOJI)
-            puts token.inspect
-            puts emoji.inspect
-            emoji.size > 0 ? emoji.join(' ') : token
             remove_symbols(token)
           }
-          .flat_map { |token| token.split(Regex::COMMAS_OR_PUNCTUATION) }
           .flat_map { |token| token.split(Regex::COMMAS_OR_PUNCTUATION) }
           .flat_map { |token| token.split(Regex::VARIOUS) }
           .flat_map { |token| token.split(Regex::ENDS_WITH_PUNCTUATION2) }
