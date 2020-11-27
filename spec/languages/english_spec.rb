@@ -1053,7 +1053,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               punctuation: 'none'
           )
-          expect(pt.tokenize(text)).to eq(["😝", "how", "bad"])
+          expect(pt.tokenize(text)).to eq(["😝", "😝", "how", "bad"])
         end
 
         it 'identifies old school emoticons' do
