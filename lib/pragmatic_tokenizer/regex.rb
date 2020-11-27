@@ -12,12 +12,10 @@ module PragmaticTokenizer
     # Text that needs to be tokenized is initially split into chunks of this length:
     CHUNK_LONG_INPUT_TEXT         = /\S.{1,10000}(?!\S)/m
     RANGE_FULLWIDTH               = /[\uFF01-\ufF1F]/ # e.g. ！＂＃＇？
-    # RANGE_ALPHANUMERIC_SUPPLEMENT = /[\u{1F100}-\u{1F1FF}]/
-    # Regular expressions which do not need to capture anything are enclosed in /(?: … )/ to enhance performance
-    
+
+    # Regular expressions which do not need to capture anything are enclosed in /(?: … )/ to enhance performance 
     # Matches "data:" followed by an optional mime type, followed by an optional charset, followed by ";base64,", then any number of alphanumeric and +/, until up to two =. See https://regexr.com/52127
     BASE64_REGEXP                 = /(?:(data:(?:[a-z]+\/[a-z]+)?(?:;charset=utf-8)?;base64,(?:[A-Za-z0-9]|[+\/])+={0,2}))/
-
     # Matches forums BBcode tags (ignore case) - http://www.bbcode.org/reference.php
     BBCODE_REGEXP                 = /\[\/?(?:b|u|i|s|size|font|color|center|quote|url|img|ul|ol|list|li|\*|code|table|tr|th|td|youtube|gvideo)(?:=[^\]]+)?\]/i
 
@@ -131,9 +129,8 @@ module PragmaticTokenizer
         ENDS_WITH_COLON2,
         ENDS_WITH_ONES_EXCLAMATIONS,
         CONTROL_CHARACTER,
-        COPYRIGHT_TRADEMARK,
-        #RANGE_ALPHANUMERIC_SUPPLEMENT
-    )
+        COPYRIGHT_TRADEMARK
+      )
 
     PRE_PROCESS = Regexp.union(
         BBCODE_REGEXP,
