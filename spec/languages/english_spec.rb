@@ -148,6 +148,12 @@ describe PragmaticTokenizer do
           expect(pt.tokenize(text)).to eq(["\u2744", "\u2744", "\u2744"])
         end
 
+        it 'handles snowflakes 4' do
+          pt = PragmaticTokenizer::Tokenizer.new
+          text = "❄❄❄" # "\uFEFF\u2744\u2744\u2744"
+          expect(pt.tokenize(text)).to eq(["❄", "❄", "❄"])
+        end
+
         it 'separates tokens' do
           text = "football≠soccer"
           pt = PragmaticTokenizer::Tokenizer.new
