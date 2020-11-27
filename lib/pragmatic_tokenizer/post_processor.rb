@@ -23,7 +23,7 @@ module PragmaticTokenizer
           .flat_map { |token| token.split(Regex::ENDS_WITH_PUNCTUATION2) }
           .flat_map { |token| split_dotted_email_or_digit(token) }
           .flat_map { |token| split_abbreviations(token) }
-          .flat_map { |token| split_period_after_last_word(token) }          
+          .flat_map { |token| split_period_after_last_word(token) }   
     end
 
     private
@@ -37,7 +37,7 @@ module PragmaticTokenizer
         chrs = token.chars
         is_string = chrs[1..-2].join('') =~ /[[:alpha:]]/
         token.gsub!(/^[&`]|[&`]$/, '')
-        token.gsub!(/[<>%=’]/, ' ') if is_string
+        token.gsub!(/[<>%=]/, ' ') if is_string
         token.strip
       end
 
