@@ -12,7 +12,7 @@ module PragmaticTokenizer
     # Text that needs to be tokenized is initially split into chunks of this length:
     CHUNK_LONG_INPUT_TEXT         = /\S.{1,10000}(?!\S)/m
     RANGE_FULLWIDTH               = /[\uFF01-\ufF1F]/ # e.g. ！＂＃＇？
-    RANGE_ALPHANUMERIC_SUPPLEMENT = /[\u{1F100}-\u{1F1FF}]/
+    # RANGE_ALPHANUMERIC_SUPPLEMENT = /[\u{1F100}-\u{1F1FF}]/
     # Regular expressions which do not need to capture anything are enclosed in /(?: … )/ to enhance performance
     
     # Matches "data:" followed by an optional mime type, followed by an optional charset, followed by ";base64,", then any number of alphanumeric and +/, until up to two =. See https://regexr.com/52127
@@ -132,7 +132,7 @@ module PragmaticTokenizer
         ENDS_WITH_ONES_EXCLAMATIONS,
         CONTROL_CHARACTER,
         COPYRIGHT_TRADEMARK,
-        RANGE_ALPHANUMERIC_SUPPLEMENT
+        #RANGE_ALPHANUMERIC_SUPPLEMENT
     )
 
     PRE_PROCESS = Regexp.union(

@@ -111,7 +111,7 @@ module PragmaticTokenizer
     private
 
       def process_segment(segment)
-        pre_processed = pre_process(segment)        
+        pre_processed = pre_process(segment)
         @tokens       = PostProcessor.new(text: pre_processed, abbreviations: @abbreviations, downcase: @downcase).call	        
         post_process_tokens
      end

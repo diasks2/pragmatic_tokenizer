@@ -661,7 +661,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               clean: true
           )
-          expect(pt.tokenize(text)).to eq(%w(making postcards))
+          expect(pt.tokenize(text)).to eq(%w(making 🇦🇹 postcards))
         end
 
         it 'removes colons' do
