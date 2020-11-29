@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+def admitted?(input)
+  input.scan(Regexp.new("[#{ADMITTED_SYMBOLS_IN_A_WORD.map { |w| Regexp.escape(w) }.join("")}]", "i")).size > 0
+end
+
 describe PragmaticTokenizer do
   ADMITTED_SYMBOLS_IN_A_WORD = ["&","+","-","_","'"]
   TEXT_SYMBOLS = ["!",'"',"#","$","%","&","'","(",")","*","+",",","-",".","/",":",";","<","=",">","?","@","[","\\", "]","\^","_","{","|","}","\~","€","£","ლ","₵","¥","$","﷼","฿","…","’","“","”","‵‵", "〝", "″","〞","〟", "〃", "「", "⌈", "」", "⌋","『", "』"," "]
