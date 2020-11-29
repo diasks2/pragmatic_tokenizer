@@ -41,7 +41,7 @@ describe PragmaticTokenizer do
     in_words_shuffle_string = in_words_shuffle.join(' ')
     out_words_shuffle = in_words_shuffle.map { |item| lut[item] }.flatten.compact
     out_words_shuffle_string = out_words_shuffle.join(' ')
-    out_words_links_keywords_string = out_words_shuffle.map { |element| 'lorem' if element =~ /^http:\/\/www.lorem.com$|^http:\/\/lorem.com$/ }.compact.join(' ').to_s
+    out_words_links_keywords_string = '' #out_words_shuffle.map { |element| 'lorem' if element =~ /^http:\/\/www.lorem.com$|^http:\/\/lorem.com$/ }.compact.join(' ').to_s
     tests << [in_words_shuffle_string, "#{out_words_shuffle_string}#{" #{out_words_links_keywords_string}" if out_words_links_keywords_string.size > 0}"]
   end
 
