@@ -53,22 +53,6 @@ describe PragmaticTokenizer do
     downcase: true,
     clean: true)
 
-  # tests.uniq.each_with_index do |test, i|
-  #   it "Testing no currency case #{i}: #{test[0]}" do
-  #     check = test[1]
-  #     tokenized = TOKENIZER.tokenize(test[0]).join(' ')
-  #     puts "ORIGINAL"
-  #     puts test[0]
-      
-  #     puts "TOKENIZED"
-  #     puts tokenized
-  #     puts "\n"
-  #     puts "CHECK"
-  #     puts check
-  #     puts "\n\n"
-  #     expect(tokenized).to eq(check)
-  #   end
-  # end
   lut.map do |test, check|
     it "Testing no currency case: #{test}" do
       tokenized = TOKENIZER.tokenize(test).join(' ')
@@ -76,6 +60,24 @@ describe PragmaticTokenizer do
     end
   end
 
+  tests.uniq.each_with_index do |test, i|
+    it "Testing no currency case #{i}: #{test[0][0..9]}..." do
+      check = test[1]
+      tokenized = TOKENIZER.tokenize(test[0]).join(' ')
+      # puts "ORIGINAL"
+      # puts test[0]
+      # puts "TOKENIZED"
+      # puts tokenized
+      # puts "\n"
+      # puts "CHECK"
+      # puts check
+      # puts "DIFF"
+      # puts (tokenized.split.reject(&:empty?) - check.split.reject(&:empty?)).inspect if tokenized.split.reject(&:empty?) != check.split.reject(&:empty?)
+      # puts "\n\n"
+      # byebug unless (tokenized.split.reject(&:empty?)).eql?(check.split.reject(&:empty?))
+      expect(tokenized.split.reject(&:empty?)).to eq(check.split.reject(&:empty?))
+    end
+  end
   
   it "tokenizes emoji" do
     emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
