@@ -27,6 +27,7 @@ module PragmaticTokenizer
     ASTERISK                      = /(?:\*+)/
     UNDERSCORE                    = /(?:_+)/
     HYPHEN_OR_UNDERSCORE          = /(?:[-_])/
+    LONG_WORD_SPLIT               = /(?:[-_\/—–])/
     PERIOD_AND_PRIOR              = /(?:(.+\.))/
     PERIOD_ONLY                   = /(?:(\.))/
     CONTRACTIONS                  = /(?:[‘’‚‛‹›＇´`])/

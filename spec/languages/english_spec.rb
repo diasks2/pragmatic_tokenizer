@@ -88,6 +88,12 @@ describe PragmaticTokenizer do
           expect(pt.tokenize(text)).to eq(["#ab-cd"])
         end
 
+        it 'tokenizes a string #015' do
+          text = "In 2004, he co-founded Palantir Technologies, which offers platforms for finance companies and intelligence, defense, and law enforcement communities to integrate, visualize, and analyze the world's information."
+          pt = PragmaticTokenizer::Tokenizer.new
+          expect(pt.tokenize(text)).to eq(["in", "2004", ",", "he", "co-founded", "palantir", "technologies", ",", "which", "offers", "platforms", "for", "finance", "companies", "and", "intelligence", ",", "defense", ",", "and", "law", "enforcement", "communities", "to", "integrate", ",", "visualize", ",", "and", "analyze", "the", "world's", "information", "."])
+        end
+
         it 'handles numbers with symbols 2' do
           text = "Pittsburgh Steelers won 18:16 against Cincinnati Bengals!"
           pt = PragmaticTokenizer::Tokenizer.new
@@ -542,6 +548,13 @@ describe PragmaticTokenizer do
               long_word_split: 4
           )
           expect(pt.tokenize(text)).to eq(["some", "main", "categories", "of", "the", "mathematics", "test", "have", "sub", "examples", "that", "most", "14", "year", "olds", "can't", "answer", ",", "therefor", "the", "implementation", "instruction", "made", "in", "the", "1990", "years", "needs", "to", "be", "revised", "."])
+        end
+        it 'tokenizes something with a slash' do
+          text = "EO/AA/M/F/Veterans/Disability/Sexual Orientation/Gender Identity"
+          pt = PragmaticTokenizer::Tokenizer.new(
+              long_word_split: 1
+          )
+          expect(pt.tokenize(text)).to eq(["eo", "aa", "m", "f", "veterans", "disability", "sexual", "orientation", "gender", "identity"])
         end
       end
 

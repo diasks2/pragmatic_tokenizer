@@ -17,7 +17,7 @@ module PragmaticTokenizer
     private
 
       def remove_non_breaking_space!
-        gsub!(Regex::NO_BREAK_SPACE, ''.freeze)
+        gsub!(Regex::NO_BREAK_SPACE, ' '.freeze)
       end
 
       def shift_various_characters!
