@@ -29,7 +29,7 @@ describe PragmaticTokenizer do
 
   lut = {}
   in_words.each_with_index do |item, k|
-    lut[item] = out_words[k]
+    lut[item] = out_words[k] || ''
   end
 
   temp_in_words = []
