@@ -21,9 +21,9 @@ describe PragmaticTokenizer do
 
   max = 1000
   # skipping currency symbols and symbols not allowed in the middle of a word
-  in_symbols  = TEXT_SYMBOLS - CURRENCY_SYMBOLS - ['#', '@']
-  in_words    = in_symbols.map { |s| "test#{s}word" } + in_symbols.map { |s| "testword#{s}" } + in_symbols.map { |s| "#{s}testword" } + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com'] + in_symbols
-  out_words   = in_symbols.map { |s| "test#{s.scan(Regexp.new("[#{ADMITTED_SYMBOLS_IN_A_WORD.map { |w| Regexp.escape(w) }.join("")}]", "i")).size > 0 ? s : " "}word" } + in_symbols.map { |s| 'testword' } + in_symbols.map { |s| 'testword' } + ['lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com']
+  in_symbols  = TEXT_SYMBOLS - CURRENCY_SYMBOLS - ['#', '@'] - ['+', '’', '<', ' '] #"\uFEFF\u00A0" 
+  in_words    = in_symbols.map { |s| "test#{s}word" }      + in_symbols.map { |s| "testword#{s}" } + in_symbols.map { |s| "#{s}testword" } + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com'] + in_symbols
+  out_words   = in_symbols.map { |s| "test#{admitted?(s) ? s : ' '}word" } + in_symbols.map { |s| 'testword'     } + in_symbols.map { |s| 'testword' }     + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com']
 
   tests = []
 
