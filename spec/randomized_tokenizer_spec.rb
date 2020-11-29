@@ -69,6 +69,13 @@ describe PragmaticTokenizer do
   #     expect(tokenized).to eq(check)
   #   end
   # end
+  lut.map do |test, check|
+    it "Testing no currency case: #{test}" do
+      tokenized = TOKENIZER.tokenize(test).join(' ')
+      expect(tokenized).to eq(check)
+    end
+  end
+
   
   it "tokenizes emoji" do
     emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
