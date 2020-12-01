@@ -4,6 +4,20 @@ describe PragmaticTokenizer do
   context 'Language: English (en)' do
     context '#tokenize (example strings)' do
       context 'no options selected' do
+        
+        it "do" do
+          stop_words_file_name = "ro_stopwords.txt"
+          classe = "Romanian"
+          old = File.open("lib/pragmatic_tokenizer/stopwords/#{stop_words_file_name}").read.split("\n") rescue []
+          newer = eval("PragmaticTokenizer::Languages::#{classe}::STOP_WORDS").to_a
+          
+          File.open("lib/pragmatic_tokenizer/stopwords/#{classe.downcase}.txt", "w:UTF-8") do |f|
+            (old + newer).uniq.sort.each do |token|
+              f.puts(token)
+            end
+          end
+        end
+
         it 'tokenizes a string #001' do
           text = "Hello world."
           pt = PragmaticTokenizer::Tokenizer.new
