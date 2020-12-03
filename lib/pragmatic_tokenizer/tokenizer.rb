@@ -61,7 +61,7 @@ module PragmaticTokenizer
       @remove_stop_words   = opts[:remove_stop_words]
       @punctuation         = opts[:punctuation] ? opts[:punctuation].to_sym : :all
       @numbers             = opts[:numbers] ? opts[:numbers].to_sym : :all
-      @minimum_length      = opts[:minimum_length] || 0
+      @minimum_length      = opts[:minimum_length] || 1
       @long_word_split     = opts[:long_word_split]
       @mentions            = opts[:mentions] ? opts[:mentions].to_sym : :keep_original
       @hashtags            = opts[:hashtags] ? opts[:hashtags].to_sym : :keep_original
@@ -194,7 +194,7 @@ module PragmaticTokenizer
       end
 
       def remove_short_tokens!
-        @tokens.delete_if { |token| token.length < @minimum_length }
+        @tokens.delete_if { |token| token.length < @minimum_length && !token.match(Regex::EMOJI)   }
       end
 
       def process_punctuation!

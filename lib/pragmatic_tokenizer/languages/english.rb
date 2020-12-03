@@ -3,7 +3,7 @@ module PragmaticTokenizer
     module English
       include Languages::Common
       ABBREVIATIONS = Set.new(%w[adj adm adv al ala alta apr arc ariz ark art assn asst attys aug ave bart bld bldg blvd brig bros btw cal calif capt cl cmdr co col colo comdr con conn corp cpl cres ct d.phil dak dec del dept det dist dr dr.phil dr.philos drs e.g ens esp esq etc exp expy ext feb fed fla ft fwy fy ga gen gov hon hosp hr hway hwy i.e i.b.m ia id ida ill inc ind ing insp jan jr jul jun kan kans ken ky la lt ltd maj man mar mass may md me med messrs mex mfg mich min minn miss mlle mm mme mo mont mr mrs ms msgr mssrs mt mtn neb nebr nev no nos nov nr oct ok okla ont op ord ore p pa pd pde penn penna pfc ph ph.d pl plz pp prof pvt que rd ref rep reps res rev rt sask sec sen sens sep sept sfc sgt sr st supt surg tce tenn tex u.s u.s.a univ usafa ut v va ver vs vt wash wis wisc wy wyo yuk]).freeze
-      STOP_WORDS = File.open("lib/pragmatic_tokenizer/stopwords/#{name.to_s.split('::').last.downcase}.txt").read.split("\n").freeze
+      STOP_WORDS = File.open(File.expand_path("../../stopwords/#{name.to_s.split('::').last.downcase}.txt", __FILE__)).read.split("\n").freeze
       # N.B. Some English contractions are ambigous (i.e. "she's" can mean "she has" or "she is").
       # Pragmatic Tokenizer will return the most frequently appearing expanded contraction. Regardless, this should
       # be rather insignificant as in most cases one is probably removing stop words.
