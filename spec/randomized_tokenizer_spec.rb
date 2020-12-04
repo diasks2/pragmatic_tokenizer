@@ -21,28 +21,75 @@ describe PragmaticTokenizer do
 
   max = 1000
   # skipping currency symbols and symbols not allowed in the middle of a word
-  in_symbols  = TEXT_SYMBOLS - CURRENCY_SYMBOLS - ['#', '@'] - ['+', '’', '<', ' '] #"\uFEFF\u00A0" 
-  in_words    = in_symbols.map { |s| "test#{s}word" }      + in_symbols.map { |s| "testword#{s}" } + in_symbols.map { |s| "#{s}testword" } + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com'] + in_symbols
-  out_words   = in_symbols.map { |s| "test#{admitted?(s) ? s : ' '}word" } + in_symbols.map { |s| 'testword'     } + in_symbols.map { |s| 'testword' }     + ['@@lorem', 'lorem', '@lorem', '#lorem', 'lorem@lorem.com', 'lorem.ipsum@lorem.com', '666', '666.666', '666.666,666', '666,666.666', 'http://www.lorem.com', 'http://lorem.com', 'lorem.com']
-
-  tests = []
+  in_symbols  = TEXT_SYMBOLS - CURRENCY_SYMBOLS - ['#', '@']
 
   lut = {}
-  in_words.each_with_index do |item, k|
-    lut[item] = out_words[k] || ''
+  in_symbols.each do |s|
+    next if s == '+' #TO BE FIXED
+    next if s == '’' #TO BE FIXED
+    next if s == '<' #TO BE FIXED
+    next if s == ' ' #TO BE FIXED "\uFEFF\u00A0"
+
+    lut["test#{s}word"] = "test#{admitted?(s) ? s : ' '}word"
+    lut["testword#{s}"] = 'testword'
+    lut["#{s}testword"] = 'testword'
+  end
+
+  # words
+  lut.merge!({'lorem' => 'lorem'})
+
+  # mentions
+  lut.merge!({
+    '@@lorem' => '@@lorem', # TO BE FIXED, should be @lorem
+    '@lorem' => '@lorem',
+  })
+
+  # hashtags
+  lut.merge!({
+    '#lorem' => '#lorem',
+    '##lorem' => '#lorem',
+  })
+
+  # emails
+  lut.merge!({
+    'lorem@lorem.com' => 'lorem@lorem.com',
+    'lorem.ipsum@lorem.com' => 'lorem.ipsum@lorem.com',
+  })
+
+  # figures
+  lut.merge!({
+    '666' => '666',
+    '666.666' => '666.666',
+    '666,666' => '666,666',
+    '666.666,666' => '666.666,666',
+    '666.666.666,666' => '666.666.666,666',
+    '666,666.666' => '666,666.666',
+    '666,666,666.666' => '666,666,666.666',
+  })
+
+  # urls
+  lut.merge!({
+    'http://www.lorem.com' => 'http://www.lorem.com',
+    'http://lorem.com' => 'http://lorem.com',
+    'lorem.com' => 'lorem.com',
+    'http://www.lorem.com/ipsum' => 'http://www.lorem.com/ipsum',
+  })
+
+  # symbols
+  in_symbols.each do |s|
+    lut[s] = ''
   end
 
   temp_in_words = []
-
+  tests = []
   (0..max).collect do |i|
-    temp_in_words = in_words if temp_in_words.empty?
+    temp_in_words = lut.keys if temp_in_words.empty?
     in_words_shuffle = temp_in_words.sort_by { rand }[0..rand(temp_in_words.size)].compact
     temp_in_words = temp_in_words - in_words_shuffle
     in_words_shuffle_string = in_words_shuffle.join(' ')
     out_words_shuffle = in_words_shuffle.map { |item| lut[item] }.flatten.compact
     out_words_shuffle_string = out_words_shuffle.join(' ')
-    out_words_links_keywords_string = '' #out_words_shuffle.map { |element| 'lorem' if element =~ /^http:\/\/www.lorem.com$|^http:\/\/lorem.com$/ }.compact.join(' ').to_s
-    tests << [in_words_shuffle_string, "#{out_words_shuffle_string}#{" #{out_words_links_keywords_string}" if out_words_links_keywords_string.size > 0}"]
+    tests << [in_words_shuffle_string, out_words_shuffle_string]
   end
 
   TOKENIZER = PragmaticTokenizer::Tokenizer.new(
