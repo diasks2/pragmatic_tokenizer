@@ -31,9 +31,10 @@ module PragmaticTokenizer
 
     private
       def should_downcase(token)
+        @downcase &&
         !token.include?("://") && 
         !token.start_with?("#") && 
-        !token.start_with?("@") && @downcase ? Unicode.downcase(token) : token
+        !token.start_with?("@") ? Unicode.downcase(token) : token
       end
 
       def remove_symbols(token)
