@@ -128,9 +128,12 @@ describe PragmaticTokenizer do
   
   it "tokenizes emoji" do
     emoji = Unicode::Emoji.list.keys.map{ |cat| Unicode::Emoji.list(cat).keys.map{|sub| Unicode::Emoji.list(cat, sub)}}.flatten
-    tokenized = TOKENIZER.tokenize(emoji.join(' '))
-    not_supported = ["☠️", "☀️", "☁️", "☂️", "☃️", "☄️", "☢️", "☣️", "☦️", "☮️", "©️", "®️", "™️", "*️⃣", "Ⓜ️", "🏴‍☠️"]
-    expect(tokenized).to eq(emoji - not_supported)
+    # ["☠️", "☀️", "☁️", "☂️", "☃️", "☄️", "☢️", "☣️", "☦️", "☮️", "©️", "®️", "™️", "*️⃣", "Ⓜ️", "🏴‍☠️"]
+    not_supported = [[9760, 65039], [9728, 65039], [9729, 65039], [9730, 65039], [9731, 65039], [9732, 65039], [9762, 65039], [9763, 65039], [9766, 65039], [9774, 65039], [169, 65039], [174, 65039], [8482, 65039], [42, 65039, 8419], [9410, 65039], [127988, 8205, 9760, 65039]]
+    supported_unpacked = emoji.map{|e| e.unpack("U*")} - not_supported
+    supported_packed = supported_unpacked.map{|e| e.pack("U*")}
+    tokenized = TOKENIZER.tokenize(supported_packed.join(' '))
+    expect(tokenized).to eq(supported_packed)
   end
 
   it 'Testing currency after no space' do
