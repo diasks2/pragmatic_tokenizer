@@ -166,7 +166,7 @@ module PragmaticTokenizer
       def remove_irrelevant_characters(token)
         token.gsub!(Regex::IRRELEVANT_CHARACTERS, NOTHING)
         return token if token =~ Regex::ONLY_HASHTAG_MENTION
-        token.gsub!(Regex::ENDS_WITH_EXCITED_ONE, NOTHING)
+        # token.gsub!(Regex::ENDS_WITH_EXCITED_ONE, NOTHING)
         token
       end
 
