@@ -186,4 +186,10 @@ describe PragmaticTokenizer do
     check = "guggenheim's select 2019 #biotech catalysts jun 19 fyi and dd twitter https://twitter.com/syinvesting/status/1140944747768324096 paragraph1 paragraph2 paragraph3"
     expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq(check)
   end
+
+  it 'Testing word ending with a 1' do
+    text = 'testword testword1 testword2'
+    check = ['testword', 'testword1', 'testword2']
+    expect(TOKENIZER.tokenize(text.dup)).to eq(check)
+  end
 end
