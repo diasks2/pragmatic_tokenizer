@@ -27,6 +27,7 @@ module PragmaticTokenizer
           .flat_map { |token| split_dotted_email_or_digit(token) }
           .flat_map { |token| split_abbreviations(token) }
           .flat_map { |token| split_period_after_last_word(token) }
+          .flat_map { |token| remove_slash_start_and_end(token) }
     end
 
     private
@@ -83,5 +84,10 @@ module PragmaticTokenizer
         downcase ? before_first_dot : Unicode.downcase(before_first_dot)
       end
 
+      def remove_slash_start_and_end(token)
+        token.gsub!('/'.freeze, '') if token[0] == '/'
+        token.gsub!('/'.freeze, '') if token[-1] == '/'
+        token
+      end
   end
 end

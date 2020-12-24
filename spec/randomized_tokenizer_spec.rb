@@ -5,7 +5,7 @@ def admitted?(input)
 end
 
 describe PragmaticTokenizer do
-  ADMITTED_SYMBOLS_IN_A_WORD = ["&","-","_","'","’"]
+  ADMITTED_SYMBOLS_IN_A_WORD = ["&","-","_","'","’","/"]
   TEXT_SYMBOLS = ["!",'"',"#","$","%","&","'","(",")","*","+",",","-",".","/",":",";","<","=",">","?","@","[","\\", "]","\^","_","{","|","}","\~","€","£","ლ","₵","¥","$","﷼","฿","…","’","“","”","‵‵", "〝", "″","〞","〟", "〃", "「", "⌈", "」", "⌋","『", "』"," "]
   # @see https://en.wikipedia.org/wiki/Currency_symbol
   # @see http://graphemica.com/
