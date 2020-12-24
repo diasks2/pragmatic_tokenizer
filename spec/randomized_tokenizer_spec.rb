@@ -183,7 +183,7 @@ describe PragmaticTokenizer do
 
   it 'Testing base64 images' do
     text = '<h1 class="fs14 pB10">Guggenheim\'s select 2019 #biotech catalysts (Jun \'19)</h1><div id="divMessageText" class="fs12 ceFontFix"><span style="font-size: 12pt;"><br /><div>&nbsp; fyi and dd </div><div>(Twitter; <a target="_blank" href="https://twitter.com/syinvesting/status/1140944747768324096">https://twitter.com/syinvesting/status/1140944747768324096 )</a></div><div>&nbsp;</div><div><img src="data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAlMAAAQFCAYAAACV="> <p>paragraph1</p> <img src="data:image/gif;charset=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAlMAAAQFCAYAAACV="> <p>paragraph2</p> <img src="data:;base64,iVBORw0KGgoAAAANSUhEUgAAAlMAAAQFCAYAAACV="> <p>paragraph3</p> </div> </div>'
-    check = "guggenheim's select 2019 #biotech catalysts jun 19 fyi and dd twitter https://twitter.com/syinvesting/status/1140944747768324096 paragrap paragraph2 paragraph3"
+    check = "guggenheim's select 2019 #biotech catalysts jun 19 fyi and dd twitter https://twitter.com/syinvesting/status/1140944747768324096 paragraph1 paragraph2 paragraph3"
     expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq(check)
   end
 end
