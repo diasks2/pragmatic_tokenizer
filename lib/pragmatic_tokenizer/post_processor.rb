@@ -74,6 +74,7 @@ module PragmaticTokenizer
         return token if token.count(DOT) > 1
         return token if token =~ Regex::ONLY_DOMAIN3
         return token if token =~ Regex::DIGIT
+        return token if ((token.index('.') || 0) < (token.index('/') || 0)) && token =~ Regex::SLASH_NOT_URL && ("www." + token) =~ Regex::ONLY_DOMAIN3 # handle (see:) EDGE_CASE_7
         abbreviation = extract_abbreviation(token)
         return token.split(Regex::PERIOD_ONLY) unless abbreviations.include?(abbreviation)
         token

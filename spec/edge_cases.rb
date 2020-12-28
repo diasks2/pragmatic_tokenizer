@@ -15,6 +15,7 @@ TOKENIZER = PragmaticTokenizer::Tokenizer.new(
     ['/testword', ['testword']],
     ['testword/', ['testword']],
     ['test/word', ['test/word']],
+    ['cnn.com/europe', ['cnn.com/europe']] #EDGE_CASE_7
   ].freeze
 
 describe PragmaticTokenizer do
