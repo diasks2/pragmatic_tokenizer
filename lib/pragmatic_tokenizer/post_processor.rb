@@ -27,6 +27,7 @@ module PragmaticTokenizer
           .flat_map { |token| split_dotted_email_or_digit(token) }
           .flat_map { |token| split_abbreviations(token) }
           .flat_map { |token| split_period_after_last_word(token) }
+          .flat_map { |token| remove_slash_start_and_end(token) }
     end
 
     private
@@ -73,6 +74,7 @@ module PragmaticTokenizer
         return token if token.count(DOT) > 1
         return token if token =~ Regex::ONLY_DOMAIN3
         return token if token =~ Regex::DIGIT
+        return token if ((token.index('.') || 0) < (token.index('/') || 0)) && token =~ Regex::SLASH_NOT_URL && ("www." + token) =~ Regex::ONLY_DOMAIN3 # handle (see:) EDGE_CASE_7
         abbreviation = extract_abbreviation(token)
         return token.split(Regex::PERIOD_ONLY) unless abbreviations.include?(abbreviation)
         token
@@ -83,5 +85,10 @@ module PragmaticTokenizer
         downcase ? before_first_dot : Unicode.downcase(before_first_dot)
       end
 
+      def remove_slash_start_and_end(token)
+        token.gsub!('/'.freeze, '') if token[0] == '/'
+        token.gsub!('/'.freeze, '') if token[-1] == '/'
+        token
+      end
   end
 end

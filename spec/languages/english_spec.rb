@@ -319,7 +319,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               expand_contractions: true
           )
-          expect(pt.tokenize(text)).to eq(["look", "for", "his", "her", "account", "."])
+          expect(pt.tokenize(text)).to eq(["look", "for", "his/her", "account", "."])
         end
 
         it 'tokenizes a string #004' do
@@ -327,7 +327,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               expand_contractions: true
           )
-          expect(pt.tokenize(text)).to eq(["i", "like", "apples", "and", "or", "oranges", "."])
+          expect(pt.tokenize(text)).to eq(["i", "like", "apples", "and/or", "oranges", "."])
         end
       end
 
@@ -944,7 +944,7 @@ describe PragmaticTokenizer do
           pt = PragmaticTokenizer::Tokenizer.new(
               punctuation: 'none'
           )
-          expect(pt.tokenize(text)).to eq(["they", "were", "being", "helped", "this", "is", "solidarity", "see", "the", "breaking", "news", "stories", "about", "x", "on", "cnn.com", "europe", "and", "english.alarabiya.net", "here’s", "a", "screenshot", "https://t.co/s83k28f29d31s83"])
+          expect(pt.tokenize(text)).to eq(["they", "were", "being", "helped", "this", "is", "solidarity", "see", "the", "breaking", "news", "stories", "about", "x", "on", "cnn.com/europe", "and", "english.alarabiya.net", "here’s", "a", "screenshot", "https://t.co/s83k28f29d31s83"])
         end
 
         it 'handles numbers with symbols 1' do

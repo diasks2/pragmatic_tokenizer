@@ -117,7 +117,7 @@ module PragmaticTokenizer
     # Can this constant name be clarified?
     VARIOUS = Regexp.union(
         EMOJI,
-        SLASH_NOT_URL,
+        # SLASH_NOT_URL,
         QUESTION_MARK_NOT_URL,
         ENCLOSED_PLUS,
         STARTS_WITH_COLON1,
