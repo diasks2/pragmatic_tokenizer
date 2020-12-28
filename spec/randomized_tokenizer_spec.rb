@@ -123,7 +123,8 @@ describe PragmaticTokenizer do
       # byebug unless (tokenized.split.reject(&:empty?)).eql?(check.split.reject(&:empty?))
       t1 = tokenized.split.reject(&:empty?)
       t2 = check.split.reject(&:empty?)
-      # byebug unless t1 == t2
+    
+      #byebug unless t1 == t2
       expect(t1).to eq(t2)
     end
   end
@@ -182,7 +183,7 @@ describe PragmaticTokenizer do
 
   it "Testing malformed html" do
     text = 'foo bar <foo bar'
-    expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq("foo bar")
+    expect(TOKENIZER.tokenize(text.dup).join(' ')).to eq("foo bar foo bar")
   end
 
   it 'Testing BBcode' do

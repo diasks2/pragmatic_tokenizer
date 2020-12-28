@@ -117,8 +117,11 @@ module PragmaticTokenizer
      end
 
       def pre_process(segment)
-        shift_segment = " #{segment}"
-        prune =  CGI.unescapeHTML(Loofah.fragment(shift_segment).scrub!(:prune).text)
+        suffix = " < "
+        shift_segment = " #{segment}#{suffix}"
+        shift_segment.gsub!(/<[^<>]*(?=<)/) { |m|  CGI.escapeHTML(m) }
+        shift_segment.delete_suffix!(suffix)
+        prune = CGI.unescapeHTML(Loofah.fragment(shift_segment).scrub!(:prune).text)
         prune
           .extend(PragmaticTokenizer::PreProcessor)
           .pre_process(language: @language_module)
