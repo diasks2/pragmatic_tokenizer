@@ -47,7 +47,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(["we", "pay", "3000", "€", "month"])
+      expect(pt.tokenize(text)).to eq(["we", "pay", "3000", "€/month"])
     end
 
     it 'handles words with a slash 2' do
@@ -56,7 +56,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(%w(ich frage mich wieso er nicht herr der lage war ist))
+      expect(pt.tokenize(text)).to eq(%w(ich frage mich wieso er nicht herr der lage war/ist))
     end
 
     it 'handles words with a slash 3' do
@@ -65,7 +65,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(%w(poison gas attack in ghuta syria))
+      expect(pt.tokenize(text)).to eq(%w(poison gas attack in ghuta/syria))
     end
 
     it 'handles words with a question mark' do
@@ -147,7 +147,7 @@ describe PragmaticTokenizer do
           punctuation: 'none',
           language:    'de'
       )
-      expect(pt.tokenize(text)).to eq(%w(der die lehrer_in und seine ihre schüler_innen))
+      expect(pt.tokenize(text)).to eq(%w(der/die lehrer_in und seine/ihre schüler_innen))
     end
 
     it 'handles contractions 1' do
@@ -175,7 +175,7 @@ describe PragmaticTokenizer do
           remove_stop_words: true,
           language:          'de'
       )
-      expect(pt.tokenize(text)).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
+      expect(pt.tokenize(text)).to eq(["der/die", "lehrer_in", "seine/ihre", "schüler_innen", ".", "english", "."])
     end
 
     it 'removes English and German stopwords' do
@@ -185,7 +185,7 @@ describe PragmaticTokenizer do
           remove_stop_words: true,
           language:          'de'
       )
-      expect(pt.tokenize(text)).to eq(["lehrer_in", "schüler_innen", ".", "english", "."])
+      expect(pt.tokenize(text)).to eq(["der/die","lehrer_in", "seine/ihre", "schüler_innen", ".", "english", "."])
     end
 
     it 'does not remove English stopwords' do
@@ -193,7 +193,7 @@ describe PragmaticTokenizer do
       pt = PragmaticTokenizer::Tokenizer.new(
           language: 'de'
       )
-      expect(pt.tokenize(text)).to eq(["der", "die", "lehrer_in", "und", "seine", "ihre", "schüler_innen", ".", "this", "has", "some", "english", "."])
+      expect(pt.tokenize(text)).to eq(["der/die", "lehrer_in", "und", "seine/ihre", "schüler_innen", ".", "this", "has", "some", "english", "."])
     end
 
     # I don't know how to easily treat these forms, especially the most frequent form
