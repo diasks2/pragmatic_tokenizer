@@ -15,7 +15,16 @@ TOKENIZER = PragmaticTokenizer::Tokenizer.new(
     ['/testword', ['testword']],
     ['testword/', ['testword']],
     ['test/word', ['test/word']],
-    ['cnn.com/europe', ['cnn.com/europe']] #EDGE_CASE_7
+    ['cnn.com/europe', ['cnn.com/europe']], #EDGE_CASE_7
+    ['Video: If you\'re in Tier 2 this is the rule about mixing outdoors https://t.co/GZqNwEJifu', ["Video", "If", "you're", "in", "Tier", "2", "this", "is", "the", "rule", "about", "mixing", "outdoors", "https://t.co/GZqNwEJifu"]],
+    ['(Lost Media Iceberg, credit: /u/lostmediamike) https://t.co/twNhpiCIQs', ["Lost", "Media", "Iceberg", "credit", "ulostmediamike", "https://t.co/twNhpiCIQs"]],
+    ['https://t.co/sBxuC8iS34', ['https://t.co/sBxuC8iS34']],
+    ['62.The position', ['62', 'position']],
+    ['62.3', ['62.3']],
+    ['pippo.pluto', ['pippo', 'pluto']],
+    ['his Tier-1 resource competes for capital right away', ["his", "Tier-1", "resource", "competes", "for", "capital", "right", "away"]],
+    ['https://t.co/LGOG7oqvu1', ['https://t.co/LGOG7oqvu1']],
+    ['The seven-day rolling rate per 100,000 population is 266.1 –   46.3 per 100,000 population a week ago.', ["The", "seven-day", "rolling", "rate", "per", "100,000", "population", "is", "266.1", "46.3", "per", "100,000", "population", "a", "week", "ago"]]
   ].freeze
 
 describe PragmaticTokenizer do
